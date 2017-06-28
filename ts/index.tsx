@@ -5,6 +5,7 @@ import {createStore, Store as ReduxStore} from 'redux';
 import * as BigNumber from 'bignumber.js';
 import {configs} from 'ts/utils/configs';
 import {Home} from 'ts/pages/home/home';
+import {RegistrationFlow} from 'ts/pages/token_distribution/registration_flow';
 import {FAQ} from 'ts/pages/faq';
 import {NotFound} from 'ts/pages/not_found';
 import {LazyComponent, createLazyComponent} from 'ts/lazy_component';
@@ -85,6 +86,7 @@ render(
                             <Route exact={true} path="/" component={Home as any} />
                             <Route path="/otc" component={LazyOTC} />
                             <Route path="/faq" component={FAQ as any} />
+                            <Route path="/registration" component={RegistrationFlow as any} />
                             <Route path="/docs/0xjs/:version?" component={LazyZeroExJSDocumentation} />
                             <Route component={NotFound as any} />
                         </Switch>

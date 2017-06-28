@@ -341,3 +341,13 @@ export const DocSections = strEnum([
   'types',
 ]);
 export type DocSections = keyof typeof DocSections;
+
+interface CivicSignupOpts {
+    style: string;
+    scopeRequest: string;
+}
+export interface CivicSip {
+    ScopeRequests: any;
+    signup: (opts: CivicSignupOpts) => void;
+    on: (eventName: string, callback: (event: any) => void) => void;
+}

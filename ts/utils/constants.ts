@@ -2,12 +2,13 @@ import {ExchangeContractErrs} from 'ts/types';
 import * as BigNumber from 'bignumber.js';
 
 export const constants = {
-    BACKEND_BASE_URL: 'https://api.0xproject.com',
+    BACKEND_BASE_URL: 'http://localhost:3000', //'https://api.0xproject.com',
     STAGING_DOMAIN: 'staging-0xproject.s3-website-us-east-1.amazonaws.com',
     PRODUCTION_DOMAIN: '0xproject.com',
     BIGNUMBERJS_GITHUB_URL: 'http://mikemcl.github.io/bignumber.js',
     BITLY_ACCESS_TOKEN: 'ffc4c1a31e5143848fb7c523b39f91b9b213d208',
     BITLY_ENDPOINT: 'https://api-ssl.bitly.com',
+    CIVIC_APP_ID: 'H1dfQuJEb',
     DEFAULT_TOKEN_ICON_URL: '/images/token_icons/default.png',
     ETHER_SCAN_ENDPOINT: 'https://kovan.etherscan.io',
     ETHER_FAUCET_ENDPOINT: 'https://faucet.0xproject.com/rain',
