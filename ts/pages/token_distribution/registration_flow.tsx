@@ -38,10 +38,8 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             this.sendAuthCodeAsync(jwtToken);
         });
 
-        // TODO: Handle errors!
         this.civicSip.on('civic-sip-error', (error: any) => {
-            console.log('   Error type = ' + error.type);
-            console.log('   Error message = ' + error.message);
+            this.props.dispatcher.showFlashMessage(error.message);
         });
     }
     public render() {
@@ -69,7 +67,8 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                         /> :
                         <AddressForm
                             civicUserId={this.state.civicUserId}
-                            dispatcher={this.props.dispatcher}/>
+                            dispatcher={this.props.dispatcher}
+                        />
                     }
                 </div>
                 <FlashMessage
@@ -98,12 +97,12 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             body,
         });
         if (response.status !== 200) {
-            // TODO: Show the user an error message
-            throw new Error('UNABLE_TO_VERIFY_JWT_TOKEN');
+            this.props.dispatcher.showFlashMessage('Civic authorization failed');
+        } else {
+            const responseJSON = await response.json();
+            this.setState({
+                civicUserId: responseJSON.civicUserId,
+            });
         }
-        const responseJSON = await response.json();
-        this.setState({
-            civicUserId: responseJSON.civicUserId,
-        });
     }
 }
