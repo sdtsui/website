@@ -46,8 +46,14 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         });
     }
     public render() {
+        const registrationStyle: React.CSSProperties = {
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+        };
         return (
-            <div id="tokenDistribution">
+            <div id="tokenDistribution" style={registrationStyle}>
                 <TopBar
                     blockchainIsLoaded={false}
                     location={this.props.location}
