@@ -1,5 +1,7 @@
+import * as _ from 'lodash';
 import * as React from 'react';
 import {isAddress} from 'ethereum-address';
+import * as Recaptcha from 'react-recaptcha';
 import {constants} from 'ts/utils/constants';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
@@ -14,6 +16,7 @@ interface AddressFormState {
     addressInputErrMsg: string;
     contributionAddress: string;
     didRegistrationSucceed: boolean;
+    recaptchaToken?: string;
 }
 
 export class AddressForm extends React.Component<AddressFormProps, AddressFormState> {
@@ -23,6 +26,7 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
             addressInputErrMsg: '',
             contributionAddress: '',
             didRegistrationSucceed: false,
+            recaptchaToken: undefined,
         };
     }
     public render() {
@@ -45,14 +49,20 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
                             value={this.state.contributionAddress}
                             onChange={this.onContributionAddressChanged.bind(this)}
                         />
-                        <div
-                            className="g-recaptcha pt3"
-                            data-sitekey="6LcXHicUAAAAAOmRl4ZpDf2MxLEiHolYp1vpdOII"
+                        <Recaptcha
+                            sitekey="6LcXHicUAAAAAOmRl4ZpDf2MxLEiHolYp1vpdOII"
+                            render="explicit"
+                            onloadCallback={_.noop}
+                            verifyCallback={this.verifyCaptchaCallback.bind(this)}
                         />
                         <div className="pt3">
                             <RaisedButton
                                 label="Submit"
                                 primary={true}
+                                disabled={
+                                    _.isUndefined(this.state.recaptchaToken) ||
+                                    !_.isEmpty(this.state.addressInputErrMsg)
+                                }
                                 onClick={this.onContributionAddressSubmitClickAsync.bind(this)}
                             />
                         </div>
@@ -61,10 +71,16 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
             </div>
         );
     }
+    private verifyCaptchaCallback(recaptchaToken: string) {
+        this.setState({
+            recaptchaToken,
+        });
+    }
     private async onContributionAddressSubmitClickAsync() {
         const body = JSON.stringify({
             contributionAddress: this.state.contributionAddress,
             civicUserId: this.props.civicUserId,
+            recaptchaToken: this.state.recaptchaToken,
         });
         const response = await fetch(`${constants.BACKEND_BASE_URL}/register_address`, {
             method: 'POST',

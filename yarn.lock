@@ -4070,6 +4070,10 @@ react-markdown@^2.5.0:
     in-publish "^2.0.0"
     prop-types "^15.5.1"
 
+react-recaptcha@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/react-recaptcha/-/react-recaptcha-2.3.2.tgz#d69683d5b91c04f122011d8d15262dc84e66aae7"
+
 react-redux@^5.0.3:
   version "5.0.5"
   resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-5.0.5.tgz#f8e8c7b239422576e52d6b7db06439469be9846a"
