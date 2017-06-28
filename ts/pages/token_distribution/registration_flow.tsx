@@ -8,9 +8,13 @@ import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
 import {AddressForm} from 'ts/pages/token_distribution/address_form';
 import {CivicSip} from 'ts/types';
+import {Dispatcher} from 'ts/redux/dispatcher';
+import {FlashMessage} from 'ts/components/ui/flash_message';
 
 export interface RegistrationFlowProps {
     location: Location;
+    dispatcher: Dispatcher;
+    flashMessage?: string;
 }
 
 interface RegistrationFlowState {
@@ -63,9 +67,15 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                             primary={true}
                             onClick={this.onRegisterClick.bind(this)}
                         /> :
-                        <AddressForm civicUserId={this.state.civicUserId}/>
+                        <AddressForm
+                            civicUserId={this.state.civicUserId}
+                            dispatcher={this.props.dispatcher}/>
                     }
                 </div>
+                <FlashMessage
+                    dispatcher={this.props.dispatcher}
+                    flashMessage={this.props.flashMessage}
+                />
                 <Footer />
             </div>
         );

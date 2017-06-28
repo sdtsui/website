@@ -1,10 +1,13 @@
 import * as React from 'react';
+import {isAddress} from 'ethereum-address';
 import {constants} from 'ts/utils/constants';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
+import {Dispatcher} from 'ts/redux/dispatcher';
 
 export interface AddressFormProps {
     civicUserId: string;
+    dispatcher: Dispatcher;
 }
 
 interface AddressFormState {
@@ -24,11 +27,18 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
     }
     public render() {
         return (
-            <div className="mx-auto" style={{width: 300}}>
+            <div className="mx-auto" style={{width: 400}}>
                 {this.state.didRegistrationSucceed ?
                     'Thank you for registering!' :
-                    <div>
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                        }}
+                    >
                         <TextField
+                            style={{width: 400}}
                             floatingLabelFixed={true}
                             floatingLabelText="Contribution Ethereum address"
                             errorText={this.state.addressInputErrMsg}
@@ -64,18 +74,18 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
             body,
         });
         if (response.status !== 200) {
-            // TODO: Show the user an error message
-            throw new Error('UNABLE_TO_REGISTER_ETHEREUM_ADDRESS');
+            this.props.dispatcher.showFlashMessage('Address registration failed');
+        } else {
+            this.setState({
+                didRegistrationSucceed: true,
+            });
         }
-        this.setState({
-            didRegistrationSucceed: true,
-        });
     }
     private onContributionAddressChanged(e: any) {
         const address = e.target.value.toLowerCase();
-        // TODO: Validate Ethereum address!!!
         this.setState({
             contributionAddress: address,
+            addressInputErrMsg: isAddress(address) ? '' : 'Invalid address',
         });
     }
 }
