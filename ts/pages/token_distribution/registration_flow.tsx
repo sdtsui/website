@@ -39,7 +39,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         });
 
         this.civicSip.on('civic-sip-error', (error: any) => {
-            this.props.dispatcher.showFlashMessage(error.message);
+            this.props.dispatcher.showFlashMessage('Civic SIP error');
         });
     }
     public render() {
