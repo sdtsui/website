@@ -341,3 +341,12 @@ export const DocSections = strEnum([
   'types',
 ]);
 export type DocSections = keyof typeof DocSections;
+
+export interface FAQQuestion {
+    prompt: string;
+    answer: React.ReactNode;
+}
+export interface FAQSection {
+    name: string;
+    questions: FAQQuestion[];
+}

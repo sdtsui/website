@@ -5,7 +5,7 @@ import {createStore, Store as ReduxStore} from 'redux';
 import * as BigNumber from 'bignumber.js';
 import {configs} from 'ts/utils/configs';
 import {Home} from 'ts/pages/home/home';
-import {FAQ} from 'ts/pages/faq';
+import {FAQ} from 'ts/pages/faq/faq';
 import {NotFound} from 'ts/pages/not_found';
 import {LazyComponent, createLazyComponent} from 'ts/lazy_component';
 import {State, reducer} from 'ts/redux/reducer';
