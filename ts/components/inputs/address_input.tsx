@@ -14,7 +14,7 @@ interface AddressInputProps {
     shouldHideLabel?: boolean;
     label?: string;
     shouldShowIncompleteErrs?: boolean;
-    updateAddress: (address: string) => void;
+    updateAddress: (address?: string) => void;
 }
 
 interface AddressInputState {
@@ -68,8 +68,6 @@ export class AddressInput extends React.Component<AddressInputProps, AddressInpu
             address,
             errMsg,
         });
-        if (isValidAddress) {
-            this.props.updateAddress(address);
-        }
+        this.props.updateAddress(isValidAddress ? address : undefined);
     }
 }

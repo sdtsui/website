@@ -220,10 +220,12 @@ export class NewTokenDialog extends React.Component<NewTokenDialogProps, NewToke
             decimalsErrText,
         });
     }
-    private onTokenAddressChanged(address: string) {
-        this.setState({
-            address,
-        });
+    private onTokenAddressChanged(address?: string) {
+        if (!_.isUndefined(address)) {
+            this.setState({
+                address,
+            });
+        }
     }
     private isValidName(input: string) {
         return /^[a-z0-9 ]+$/i.test(input);

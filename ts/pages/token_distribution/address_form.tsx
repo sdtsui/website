@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
 import * as React from 'react';
-import {isAddress} from 'ethereum-address';
 import * as Recaptcha from 'react-recaptcha';
 import {constants} from 'ts/utils/constants';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import {Dispatcher} from 'ts/redux/dispatcher';
+import {IdenticonAddressInput} from 'ts/components/inputs/identicon_address_input';
 
 export interface AddressFormProps {
     civicUserId: string;
@@ -13,8 +13,7 @@ export interface AddressFormProps {
 }
 
 interface AddressFormState {
-    addressInputErrMsg: string;
-    contributionAddress: string;
+    contributionAddress?: string;
     didRegistrationSucceed: boolean;
     recaptchaToken?: string;
 }
@@ -23,8 +22,7 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
     constructor(props: AddressFormProps) {
         super(props);
         this.state = {
-            addressInputErrMsg: '',
-            contributionAddress: '',
+            contributionAddress: undefined,
             didRegistrationSucceed: false,
             recaptchaToken: undefined,
         };
@@ -41,13 +39,11 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
                             alignItems: 'center',
                         }}
                     >
-                        <TextField
-                            style={{width: 400}}
-                            floatingLabelFixed={true}
-                            floatingLabelText="Contribution Ethereum address"
-                            errorText={this.state.addressInputErrMsg}
-                            value={this.state.contributionAddress}
-                            onChange={this.onContributionAddressChanged.bind(this)}
+                        <IdenticonAddressInput
+                            initialAddress={''}
+                            isRequired={true}
+                            label={'Contribution Ethereum address'}
+                            updateOrderAddress={this.onContributionAddressChanged.bind(this)}
                         />
                         <Recaptcha
                             sitekey="6LcXHicUAAAAAOmRl4ZpDf2MxLEiHolYp1vpdOII"
@@ -61,7 +57,7 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
                                 primary={true}
                                 disabled={
                                     _.isUndefined(this.state.recaptchaToken) ||
-                                    !_.isEmpty(this.state.addressInputErrMsg)
+                                    _.isUndefined(this.state.contributionAddress)
                                 }
                                 onClick={this.onContributionAddressSubmitClickAsync.bind(this)}
                             />
@@ -102,11 +98,9 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
             });
         }
     }
-    private onContributionAddressChanged(e: any) {
-        const address = e.target.value.toLowerCase();
+    private onContributionAddressChanged(contributionAddress?: string) {
         this.setState({
-            contributionAddress: address,
-            addressInputErrMsg: isAddress(address) ? '' : 'Invalid address',
+            contributionAddress,
         });
     }
 }

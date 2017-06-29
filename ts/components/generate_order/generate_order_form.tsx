@@ -164,8 +164,8 @@ export class GenerateOrderForm extends React.Component<GenerateOrderFormProps, a
                     <div className="pt1 flex mx-auto">
                         <IdenticonAddressInput
                             label="Taker"
-                            address={this.props.orderTakerAddress}
-                            updateOrderAddress={dispatcher.updateOrderTakerAddress.bind(dispatcher)}
+                            initialAddress={this.props.orderTakerAddress}
+                            updateOrderAddress={this.updateOrderAddress.bind(this)}
                         />
                         <div className="pt3">
                             <div className="pl1">
@@ -319,5 +319,10 @@ export class GenerateOrderForm extends React.Component<GenerateOrderFormProps, a
             globalErrMsg,
         });
         return globalErrMsg === '';
+    }
+    private updateOrderAddress(address?: string): void {
+        if (!_.isUndefined(address)) {
+            this.props.dispatcher.updateOrderTakerAddress(address);
+        }
     }
 }
