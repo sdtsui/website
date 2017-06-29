@@ -6,6 +6,7 @@ import * as BigNumber from 'bignumber.js';
 import {configs} from 'ts/utils/configs';
 import {Home} from 'ts/pages/home/home';
 import {FAQ} from 'ts/pages/faq/faq';
+import {TokenDistribution} from 'ts/pages/token_distribution/token_distribution';
 import {NotFound} from 'ts/pages/not_found';
 import {LazyComponent, createLazyComponent} from 'ts/lazy_component';
 import {State, reducer} from 'ts/redux/reducer';
@@ -84,6 +85,7 @@ render(
                         <Switch>
                             <Route exact={true} path="/" component={Home as any} />
                             <Route path="/otc" component={LazyOTC} />
+                            <Route path="/token_sale" component={TokenDistribution as any} />
                             <Route path="/faq" component={FAQ as any} />
                             <Route path="/docs/0xjs/:version?" component={LazyZeroExJSDocumentation} />
                             <Route component={NotFound as any} />
