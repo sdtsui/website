@@ -22,7 +22,6 @@ export class Question extends React.Component<QuestionProps, QuestionState> {
     public render() {
         return (
             <div
-                key={this.props.prompt}
                 className="py1"
             >
                 <Card

@@ -422,6 +422,7 @@ export class FAQ extends React.Component<FAQProps, FAQState> {
             const isFirstQuestion = i === 0;
             return (
                 <Question
+                    key={question.prompt}
                     prompt={question.prompt}
                     answer={question.answer}
                     shouldDisplayExpanded={isFirstSection && isFirstQuestion}
