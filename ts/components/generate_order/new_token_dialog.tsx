@@ -81,7 +81,7 @@ export class NewTokenDialog extends React.Component<NewTokenDialogProps, NewToke
                         <AddressInput
                             isRequired={true}
                             label="Contract address"
-                            initialOrderAddress=""
+                            initialAddress=""
                             shouldShowIncompleteErrs={this.state.shouldShowAddressIncompleteErr}
                             updateOrderAddress={this.onTokenAddressChanged.bind(this)}
                         />

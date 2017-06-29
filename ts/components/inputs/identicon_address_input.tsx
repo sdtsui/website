@@ -31,7 +31,7 @@ export class IdenticonAddressInput extends React.Component<IdenticonAddressInput
                         <AddressInput
                             hintText="0x75bE4F78AA3699B3A348c84bDB2a96c3Dbb5E2EF"
                             shouldHideLabel={true}
-                            initialOrderAddress={this.props.address}
+                            initialAddress={this.props.address}
                             updateOrderAddress={this.props.updateOrderAddress}
                         />
                     </div>

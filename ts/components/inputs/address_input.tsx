@@ -8,7 +8,7 @@ import {RequiredLabel} from 'ts/components/ui/required_label';
 
 interface AddressInputProps {
     disabled?: boolean;
-    initialOrderAddress: string;
+    initialAddress: string;
     isRequired?: boolean;
     hintText?: string;
     shouldHideLabel?: boolean;
@@ -26,7 +26,7 @@ export class AddressInput extends React.Component<AddressInputProps, AddressInpu
     constructor(props: AddressInputProps) {
         super(props);
         this.state = {
-            address: this.props.initialOrderAddress,
+            address: this.props.initialAddress,
             errMsg: '',
         };
     }
