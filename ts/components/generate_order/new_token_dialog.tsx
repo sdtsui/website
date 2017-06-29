@@ -6,7 +6,7 @@ import Dialog from 'material-ui/Dialog';
 import {constants} from 'ts/utils/constants';
 import {Blockchain} from 'ts/blockchain';
 import {Token, TokenByAddress, AlertTypes} from 'ts/types';
-import {OrderAddressInput} from 'ts/components/inputs/order_address_input';
+import {AddressInput} from 'ts/components/inputs/address_input';
 import {Alert} from 'ts/components/ui/alert';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 import {RequiredLabel} from 'ts/components/ui/required_label';
@@ -78,7 +78,7 @@ export class NewTokenDialog extends React.Component<NewTokenDialogProps, NewToke
                         />
                     </div>
                     <div>
-                        <OrderAddressInput
+                        <AddressInput
                             isRequired={true}
                             label="Contract address"
                             initialOrderAddress=""

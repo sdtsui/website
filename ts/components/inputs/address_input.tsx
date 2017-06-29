@@ -6,7 +6,7 @@ import {colors} from 'material-ui/styles';
 import {Blockchain} from 'ts/blockchain';
 import {RequiredLabel} from 'ts/components/ui/required_label';
 
-interface OrderAddressInputProps {
+interface AddressInputProps {
     disabled?: boolean;
     initialOrderAddress: string;
     isRequired?: boolean;
@@ -17,20 +17,20 @@ interface OrderAddressInputProps {
     updateOrderAddress: (address: string) => void;
 }
 
-interface OrderAddressInputState {
+interface AddressInputState {
     address: string;
     errMsg: string;
 }
 
-export class OrderAddressInput extends React.Component<OrderAddressInputProps, OrderAddressInputState> {
-    constructor(props: OrderAddressInputProps) {
+export class AddressInput extends React.Component<AddressInputProps, AddressInputState> {
+    constructor(props: AddressInputProps) {
         super(props);
         this.state = {
             address: this.props.initialOrderAddress,
             errMsg: '',
         };
     }
-    public componentWillReceiveProps(nextProps: OrderAddressInputProps) {
+    public componentWillReceiveProps(nextProps: AddressInputProps) {
         if (nextProps.shouldShowIncompleteErrs && this.props.isRequired &&
             this.state.address === '') {
                 this.setState({
