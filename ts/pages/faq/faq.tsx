@@ -264,11 +264,69 @@ const sections: FAQSection[] = [
             {
                 prompt: 'What will be the initial distribution of ZRX tokens?',
                 answer: (
-                    <div className="center">
-                        <img
-                            style={{width: 350}}
-                            src="/images/zrx_pie_chart.png"
-                        />
+                    <div>
+                        <div className="center" style={{width: '100%'}}>
+                            <img
+                                style={{width: 350}}
+                                src="/images/zrx_pie_chart.png"
+                            />
+                        </div>
+                        <div className="py1">
+                            <div className="bold pb1">
+                                Token Launch (50%)
+                            </div>
+                            <div>
+                                ZRX is inherently a governance token that plays a critical role in the
+                                process of upgrading 0x protocol. We are fully committed to formulating
+                                a functional and theoretically sound governance model and we plan to dedicate
+                                significant resources to R&D.
+                            </div>
+                        </div>
+                        <div className="py1">
+                            <div className="bold pb1">
+                                Retained by 0x (15%)
+                            </div>
+                            <div>
+                                The 0x core development team will be able to sustain itself for approximately
+                                five years using funds raised through the token launch. If 0x protocol
+                                proves to be as foundational a technology as we believe it to be, the
+                                retained ZRX tokens will allow the 0x core development team to sustain
+                                operations beyond the first 5 years.
+                            </div>
+                        </div>
+                        <div className="py1">
+                            <div className="bold pb1">
+                                Developer Fund (15%)
+                            </div>
+                            <div>
+                                The Developer Fund will be used to make targeted capital injections
+                                into high potential projects and teams that are attempting to grow
+                                the 0x ecosystem, strategic partnerships, hackathon prizes and community
+                                development activities.
+                            </div>
+                        </div>
+                        <div className="py1">
+                            <div className="bold pb1">
+                                Founding Team (10%)
+                            </div>
+                            <div>
+                                The founding team’s allocation of ZRX will vest over a traditional 4
+                                year vesting schedule with a one year cliff. We believe this should
+                                be standard practice for any team that is committed to making their
+                                project a long term success.
+                            </div>
+                        </div>
+                        <div className="py1">
+                            <div className="bold pb1">
+                                Early Investors & Advisors (10%)
+                            </div>
+                            <div>
+                                Our investors and advisors have provided capital, resources and guidance
+                                that have allowed us to fill out our team, setup a robust legal entity
+                                and build a fully functional product before launching a token. As a result,
+                                we have a proven track record and can offer a token that holds genuine utility.
+                            </div>
+                        </div>
                     </div>
                 ),
             },
