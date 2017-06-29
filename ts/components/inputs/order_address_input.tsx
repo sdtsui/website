@@ -1,12 +1,12 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import {isAddress} from 'ethereum-address';
 import TextField from 'material-ui/TextField';
 import {colors} from 'material-ui/styles';
 import {Blockchain} from 'ts/blockchain';
 import {RequiredLabel} from 'ts/components/ui/required_label';
 
 interface OrderAddressInputProps {
-    blockchain: Blockchain;
     disabled?: boolean;
     initialOrderAddress: string;
     isRequired?: boolean;
@@ -62,8 +62,7 @@ export class OrderAddressInput extends React.Component<OrderAddressInputProps, O
     }
     private onOrderTakerAddressUpdated(e: any) {
         const address = e.target.value.toLowerCase();
-        const isValidAddress = this.props.blockchain.isValidAddress(address) ||
-            address === '';
+        const isValidAddress = isAddress(address) || address === '';
         const errMsg = isValidAddress ? '' : 'Invalid ethereum address';
         this.setState({
             address,

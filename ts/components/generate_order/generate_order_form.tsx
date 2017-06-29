@@ -164,7 +164,6 @@ export class GenerateOrderForm extends React.Component<GenerateOrderFormProps, a
                     <div className="pt1 flex mx-auto">
                         <IdenticonAddressInput
                             label="Taker"
-                            blockchain={this.props.blockchain}
                             address={this.props.orderTakerAddress}
                             updateOrderAddress={dispatcher.updateOrderTakerAddress.bind(dispatcher)}
                         />

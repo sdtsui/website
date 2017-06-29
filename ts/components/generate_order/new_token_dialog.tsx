@@ -81,7 +81,6 @@ export class NewTokenDialog extends React.Component<NewTokenDialogProps, NewToke
                         <OrderAddressInput
                             isRequired={true}
                             label="Contract address"
-                            blockchain={this.props.blockchain}
                             initialOrderAddress=""
                             shouldShowIncompleteErrs={this.state.shouldShowAddressIncompleteErr}
                             updateOrderAddress={this.onTokenAddressChanged.bind(this)}

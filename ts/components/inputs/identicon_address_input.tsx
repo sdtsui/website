@@ -8,7 +8,6 @@ import {OrderAddressInput} from 'ts/components/inputs/order_address_input';
 import {InputLabel} from 'ts/components/ui/input_label';
 
 interface IdenticonAddressInputProps {
-    blockchain: Blockchain;
     address: string;
     isRequired?: boolean;
     label: string;
@@ -30,7 +29,6 @@ export class IdenticonAddressInput extends React.Component<IdenticonAddressInput
                     </div>
                     <div className="col col-11 pb1 pl1" style={{height: 65}}>
                         <OrderAddressInput
-                            blockchain={this.props.blockchain}
                             hintText="0x75bE4F78AA3699B3A348c84bDB2a96c3Dbb5E2EF"
                             shouldHideLabel={true}
                             initialOrderAddress={this.props.address}
