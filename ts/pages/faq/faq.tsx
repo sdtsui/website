@@ -82,30 +82,6 @@ const sections: FAQSection[] = [
                 ),
             },
             {
-                prompt: 'How is 0x different from other decentralized exchange projects?',
-                answer: (
-                    <div>
-                        <ul>
-                            <li>
-                                Bancor (from their FAQ: “0x is a next-generation decentralized exchange that aims
-                                to solve some of the scalability and cost challenges of current decentralized exchange
-                                solutions. Unlike Bancor, 0x uses the classic exchange model of matching bid and ask
-                                orders to facilitate transactions between two parties. The Bancor protocol works
-                                differently than the existing exchange model since it does not require matching two
-                                parties in order to facilitate an asset conversion transaction, thus enabling continuous
-                                liquidity for assets at any time and scale.”)
-                            </li>
-                            <li>
-                                TODO: OasisDex, EtherDelta
-                            </li>
-                            <li>
-                                TODO: Swap
-                            </li>
-                        </ul>
-                    </div>
-                ),
-            },
-            {
                 prompt: 'If 0x protocol is free to use, where do transaction fees come in?',
                 answer: (
                     <div>
@@ -275,7 +251,7 @@ const sections: FAQSection[] = [
                     <div>
                         100% of the proceeds raised in the token launch will be used to fund the development
                         of free and open source software, tools and infrastructure that support the protocol
-                        and surrounding ecosystem. Check out our
+                        and surrounding ecosystem. Check out our{' '}
                         <a
                             href="https://docs.google.com/document/d/1_RVa-_bkU92fWRsC8eNy4vYjcTt-WC8GtqyyjbTd-oY"
                             target="_blank"
@@ -290,7 +266,7 @@ const sections: FAQSection[] = [
                 answer: (
                     <div className="center">
                         <img
-                            style={{width: 700}}
+                            style={{width: 350}}
                             src="/images/zrx_pie_chart.png"
                         />
                     </div>
