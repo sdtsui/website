@@ -101,6 +101,7 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
     private async onContributionAddressSubmitClickAsync() {
         const body = JSON.stringify({
             contributionAddress: this.state.contributionAddress,
+            contributionAmountInBaseUnits: this.state.contributionAmountInBaseUnits,
             civicUserId: this.props.civicUserId,
             recaptchaToken: this.state.recaptchaToken,
         });
@@ -116,6 +117,8 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
             const errorMsg = await response.text();
             if (errorMsg === 'ADDRESS_ALREADY_REGISTERED') {
                 this.props.dispatcher.showFlashMessage('You cannot update your contribution address.');
+            } else if (errorMsg === 'NOT_ENOUGH_BALANCE') {
+                this.props.dispatcher.showFlashMessage('You don\'t have enough balance');
             } else {
                 this.props.dispatcher.showFlashMessage('Address registration failed');
             }
