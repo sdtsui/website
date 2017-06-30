@@ -97,7 +97,14 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             body,
         });
         if (response.status !== 200) {
-            this.props.dispatcher.showFlashMessage('Civic authorization failed');
+            const errMsg = await response.text();
+            if (_.includes(errMsg, 'CIVIC_EMAIL_NOT_VERIFIED')) {
+                this.props.dispatcher.showFlashMessage('Civic email authorization failed');
+            } else if (_.includes(errMsg, 'CIVIC_PHONE_NOT_VERIFIED')) {
+                this.props.dispatcher.showFlashMessage('Civic phone authorization failed');
+            } else {
+                this.props.dispatcher.showFlashMessage('Civic authorization failed');
+            }
         } else {
             const responseJSON = await response.json();
             this.setState({
