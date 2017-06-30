@@ -62,6 +62,7 @@ export class ContributionForm extends React.Component<ContributionFormProps, Con
                 <Recaptcha
                     sitekey={constants.RECAPTCHA_SITE_KEY}
                     render="explicit"
+                    ref={this.setRecaptchaInstance.bind(this)}
                     onloadCallback={_.noop}
                     verifyCallback={this.verifyCaptchaCallback.bind(this)}
                 />
@@ -88,6 +89,7 @@ export class ContributionForm extends React.Component<ContributionFormProps, Con
     private async onContributionAddressSubmitClickAsync() {
         const body = JSON.stringify({
             contributionAddress: this.state.contributionAddress,
+            contributionAmountInBaseUnits: this.state.contributionAmountInBaseUnits,
             civicUserId: this.props.civicUserId,
             recaptchaToken: this.state.recaptchaToken,
         });
@@ -98,10 +100,15 @@ export class ContributionForm extends React.Component<ContributionFormProps, Con
             },
             body,
         });
+        this.resetRecaptcha();
         if (response.status !== 200) {
             const errorMsg = await response.text();
             if (errorMsg === 'ADDRESS_ALREADY_REGISTERED') {
                 this.props.dispatcher.showFlashMessage('You cannot update your contribution address.');
+            } else if (errorMsg === 'NOT_ENOUGH_BALANCE') {
+                this.props.dispatcher.showFlashMessage(
+                    'You must have a sufficient balance in the contribution address.',
+                );
             } else {
                 this.props.dispatcher.showFlashMessage('Address registration failed');
             }
@@ -118,5 +125,11 @@ export class ContributionForm extends React.Component<ContributionFormProps, Con
         this.setState({
             contributionAddress,
         });
+    }
+    private setRecaptchaInstance(recaptchaInstance: any) {
+        this.recaptchaInstance = recaptchaInstance;
+    }
+    private resetRecaptcha() {
+        this.recaptchaInstance.reset();
     }
 }
