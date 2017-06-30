@@ -1,11 +1,15 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import * as BigNumber from 'bignumber.js';
 import * as Recaptcha from 'react-recaptcha';
 import {constants} from 'ts/utils/constants';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {IdenticonAddressInput} from 'ts/components/inputs/identicon_address_input';
+import {EthAmountInput} from 'ts/components/inputs/eth_amount_input';
+import {InputLabel} from 'ts/components/ui/input_label';
+import {RequiredLabel} from 'ts/components/ui/required_label';
 
 export interface AddressFormProps {
     civicUserId: string;
@@ -16,6 +20,7 @@ interface AddressFormState {
     contributionAddress?: string;
     didRegistrationSucceed: boolean;
     recaptchaToken?: string;
+    contributionAmountInBaseUnits?: BigNumber.BigNumber;
 }
 
 export class AddressForm extends React.Component<AddressFormProps, AddressFormState> {
@@ -25,9 +30,11 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
             contributionAddress: undefined,
             didRegistrationSucceed: false,
             recaptchaToken: undefined,
+            contributionAmountInBaseUnits: undefined,
         };
     }
     public render() {
+        const contributionAmountLabel = <RequiredLabel label="How much do you want to contribute"/>;
         return (
             <div className="mx-auto" style={{width: 400}}>
                 {this.state.didRegistrationSucceed ?
@@ -45,6 +52,16 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
                             label={'Contribution Ethereum address'}
                             updateOrderAddress={this.onContributionAddressChanged.bind(this)}
                         />
+                        <div style={{width: 400}}>
+                            <InputLabel text={contributionAmountLabel}/>
+                            <EthAmountInput
+                                amount={this.state.contributionAmountInBaseUnits}
+                                balance={new BigNumber(Infinity)}
+                                shouldCheckBalance={false}
+                                shouldShowIncompleteErrs={false}
+                                onChange={this.onContributionAmountChanged.bind(this)}
+                            />
+                        </div>
                         <Recaptcha
                             sitekey="6LcXHicUAAAAAOmRl4ZpDf2MxLEiHolYp1vpdOII"
                             render="explicit"
@@ -57,7 +74,8 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
                                 primary={true}
                                 disabled={
                                     _.isUndefined(this.state.recaptchaToken) ||
-                                    _.isUndefined(this.state.contributionAddress)
+                                    _.isUndefined(this.state.contributionAddress) ||
+                                    _.isUndefined(this.state.contributionAmountInBaseUnits)
                                 }
                                 onClick={this.onContributionAddressSubmitClickAsync.bind(this)}
                             />
@@ -97,6 +115,11 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
                 didRegistrationSucceed: true,
             });
         }
+    }
+    private onContributionAmountChanged(isValid: boolean, contributionAmountInBaseUnits?: BigNumber.BigNumber) {
+        this.setState({
+            contributionAmountInBaseUnits,
+        });
     }
     private onContributionAddressChanged(contributionAddress?: string) {
         this.setState({

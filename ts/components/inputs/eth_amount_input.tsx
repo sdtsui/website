@@ -7,12 +7,13 @@ import {BalanceBoundedInput} from 'ts/components/inputs/balance_bounded_input';
 import {constants} from 'ts/utils/constants';
 
 interface EthAmountInputProps {
-    label: string;
+    label?: string;
     balance: BigNumber.BigNumber;
     amount?: BigNumber.BigNumber;
     onChange: ValidatedBigNumberCallback;
     shouldShowIncompleteErrs: boolean;
     onVisitBalancesPageClick?: () => void;
+    shouldCheckBalance: boolean;
 }
 
 interface EthAmountInputState {}
@@ -29,11 +30,11 @@ export class EthAmountInput extends React.Component<EthAmountInputProps, EthAmou
                     balance={this.props.balance}
                     amount={amount}
                     onChange={this.onChange.bind(this)}
-                    shouldCheckBalance={true}
+                    shouldCheckBalance={this.props.shouldCheckBalance}
                     shouldShowIncompleteErrs={this.props.shouldShowIncompleteErrs}
                     onVisitBalancesPageClick={this.props.onVisitBalancesPageClick}
                 />
-                <div style={{paddingTop: 44}}>
+                <div style={{paddingTop: _.isUndefined(this.props.label) ? 15 : 40}}>
                     ETH
                 </div>
             </div>

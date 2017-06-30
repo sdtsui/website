@@ -50,7 +50,8 @@ export class EthWethConversionDialog extends
                 title="I want to convert"
                 titleStyle={{fontWeight: 100}}
                 actions={convertDialogActions}
-                open={this.props.isOpen}>
+                open={this.props.isOpen}
+            >
                 {this.renderConversionDialogBody()}
             </Dialog>
         );
@@ -90,6 +91,7 @@ export class EthWethConversionDialog extends
                         balance={this.props.etherBalance}
                         amount={this.state.value}
                         onChange={this.onValueChange.bind(this)}
+                        shouldCheckBalance={true}
                         shouldShowIncompleteErrs={this.state.shouldShowIncompleteErrs}
                         onVisitBalancesPageClick={this.props.onCancelled}
                     />
