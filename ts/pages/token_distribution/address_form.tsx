@@ -88,7 +88,7 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
         if (response.status !== 200) {
             const errorMsg = await response.text();
             if (errorMsg === 'ADDRESS_ALREADY_REGISTERED') {
-                this.props.dispatcher.showFlashMessage('You can\'t change an address');
+                this.props.dispatcher.showFlashMessage('You cannot update your contribution address.');
             } else {
                 this.props.dispatcher.showFlashMessage('Address registration failed');
             }
