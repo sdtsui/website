@@ -2,7 +2,7 @@ import {ExchangeContractErrs} from 'ts/types';
 import * as BigNumber from 'bignumber.js';
 
 export const constants = {
-    BACKEND_BASE_URL: 'http://localhost:3000', //'https://api.0xproject.com',
+    BACKEND_BASE_URL: 'http://localhost:3000', // 'https://api.0xproject.com',
     STAGING_DOMAIN: 'staging-0xproject.s3-website-us-east-1.amazonaws.com',
     PRODUCTION_DOMAIN: '0xproject.com',
     BIGNUMBERJS_GITHUB_URL: 'http://mikemcl.github.io/bignumber.js',
