@@ -24,6 +24,7 @@ interface AddressFormState {
 }
 
 export class AddressForm extends React.Component<AddressFormProps, AddressFormState> {
+    private recaptchaInstance: any;
     constructor(props: AddressFormProps) {
         super(props);
         this.state = {
@@ -65,6 +66,7 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
                         <Recaptcha
                             sitekey="6LcXHicUAAAAAOmRl4ZpDf2MxLEiHolYp1vpdOII"
                             render="explicit"
+                            ref={this.setRecaptchaInstance.bind(this)}
                             onloadCallback={_.noop}
                             verifyCallback={this.verifyCaptchaCallback.bind(this)}
                         />
@@ -90,6 +92,12 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
             recaptchaToken,
         });
     }
+    private setRecaptchaInstance(recaptchaInstance: any) {
+        this.recaptchaInstance = recaptchaInstance;
+    }
+    private resetRecaptcha() {
+        this.recaptchaInstance.reset();
+    }
     private async onContributionAddressSubmitClickAsync() {
         const body = JSON.stringify({
             contributionAddress: this.state.contributionAddress,
@@ -103,6 +111,7 @@ export class AddressForm extends React.Component<AddressFormProps, AddressFormSt
             },
             body,
         });
+        this.resetRecaptcha();
         if (response.status !== 200) {
             const errorMsg = await response.text();
             if (errorMsg === 'ADDRESS_ALREADY_REGISTERED') {
