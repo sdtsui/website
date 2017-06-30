@@ -35,8 +35,8 @@ export class TokenDistribution extends React.Component<TokenDistributionProps, T
                                 disabled={true}
                             />
                             <div
-                                className="pt4 mx-auto"
-                                style={{width: 400}}
+                                className="pt4 mx-auto sm-px3"
+                                style={{maxWidth: 400}}
                             >
                                 <div style={{textAlign: 'left'}}>
                                     Get notified when the registration starts

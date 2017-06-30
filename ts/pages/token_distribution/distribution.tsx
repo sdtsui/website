@@ -33,8 +33,8 @@ export function Distribution(props: DistributionProps) {
         <div className="pb4">
             <div className="mx-auto max-width-4 center pt2">
                 <h1 className="thin">TOKEN SALE TERMS</h1>
-                <div className="flex pt2">
-                    <div className="col col-6">
+                <div className="clearfix pt2">
+                    <div className="col lg-col-6 md-col-6 sm-col-12 col-12">
                         <div
                             className="pb2 thin"
                             style={{textAlign: 'center', fontSize: 24, color: CUSTOM_GRAY}}
@@ -48,7 +48,10 @@ export function Distribution(props: DistributionProps) {
                             />
                         </div>
                     </div>
-                    <div className="col col-6" style={{textAlign: 'left', fontSize: 20}}>
+                    <div
+                        className="col lg-col-6 md-col-6 sm-col-12 col-12 sm-px3 sm-pt3 lg-h3 md-h3 sm-h4"
+                        style={{textAlign: 'left'}}
+                    >
                         <div className="pb2 thin">
                             <span style={{color: CUSTOM_GRAY}}>
                                 Maximum cap on token sale:{' '}
@@ -83,7 +86,7 @@ export function Distribution(props: DistributionProps) {
 function renderBreakdownList() {
     const listItems = _.map(distributionEntities, distributionEntity => {
         return (
-            <li>
+            <li key={distributionEntity.recipient}>
                 <span className="bold">{distributionEntity.percentage}</span>{' '}
                 <span className="pl1" style={{color: CUSTOM_GRAY}}>
                     {distributionEntity.recipient}
