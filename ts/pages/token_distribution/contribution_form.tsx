@@ -25,6 +25,7 @@ interface ContributionFormState {
 }
 
 export class ContributionForm extends React.Component<ContributionFormProps, ContributionFormState> {
+    private recaptchaInstance: any;
     constructor(props: ContributionFormProps) {
         super(props);
         this.state = {
