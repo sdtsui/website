@@ -104,6 +104,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                 <FlashMessage
                     dispatcher={this.props.dispatcher}
                     flashMessage={this.props.flashMessage}
+                    showDurationMs={10000}
                 />
                 <Footer />
             </div>
