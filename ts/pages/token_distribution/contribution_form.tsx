@@ -107,7 +107,7 @@ export class ContributionForm extends React.Component<ContributionFormProps, Con
                 this.props.dispatcher.showFlashMessage('You cannot update your contribution address.');
             } else if (errorMsg === 'NOT_ENOUGH_BALANCE') {
                 this.props.dispatcher.showFlashMessage(
-                    'You must have a sufficient balance in the contribution address.',
+                    'You must have a sufficient balance in your account to contribute your desired amount.',
                 );
             } else {
                 this.props.dispatcher.showFlashMessage('Address registration failed');
