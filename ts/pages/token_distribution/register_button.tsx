@@ -21,11 +21,11 @@ export class RegisterButton extends React.Component<RegisterButtonProps, Registe
             <div
                 className="mx-auto"
                 onClick={this.props.onClick}
-                style={{width: 230, cursor: 'pointer', opacity: this.state.isHovering ? 0.8 : 1}}
+                style={{width: 210, cursor: 'pointer', opacity: this.state.isHovering ? 0.8 : 1}}
                 onMouseOver={this.setHoverState.bind(this, true)}
                 onMouseOut={this.setHoverState.bind(this, false)}
             >
-                <img style={{width: 230}} src="/images/register_with_civic.png" />
+                <img style={{width: 210}} src="/images/register_with_civic.png" />
             </div>
         );
     }
