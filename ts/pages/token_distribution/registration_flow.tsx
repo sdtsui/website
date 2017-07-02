@@ -14,6 +14,7 @@ import {RegisterButton} from 'ts/pages/token_distribution/register_button';
 import {CivicSip} from 'ts/types';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {FlashMessage} from 'ts/components/ui/flash_message';
+import {NewsletterInput} from 'ts/pages/home/newsletter_input';
 
 const CUSTOM_GRAY = 'rgb(74, 74, 74)';
 
@@ -116,10 +117,17 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                 <div className="h2 my2">
                     Registration successful!
                 </div>
-                <div className="pt2">
-                    Thank you for taking the time to register for the 0x token sale. The contribution
-                    period will begin on the <span className="bold">15th of August</span>, be sure to
-                    set yourself a reminder.
+                <div style={{color: CUSTOM_GRAY}}>
+                    <div className="pt2">
+                        Thank you for taking the time to register for the 0x token sale. The contribution
+                        period will begin on the <span className="bold">15th of August</span>.
+                    </div>
+                    <div className="pt4 mx-auto" style={{width: 440}}>
+                        <div className="left-align pb2">
+                            Get a reminder email when the contribution period opens
+                        </div>
+                        <NewsletterInput />
+                    </div>
                 </div>
             </div>
         );
