@@ -248,6 +248,10 @@ export class Blockchain {
     }
     public async getTokenBalanceAndAllowanceAsync(ownerAddress: string, tokenAddress: string):
                     Promise<BigNumber.BigNumber[]> {
+        if (_.isEmpty(ownerAddress)) {
+            const zero = new BigNumber(0);
+            return [zero, zero];
+        }
         const tokenContract = await this.instantiateContractIfExistsAsync(TokenArtifacts, tokenAddress);
         let balance;
         let allowance;
