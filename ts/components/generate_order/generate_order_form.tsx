@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
-import {ZeroEx} from '@0xproject/0x.js';
+import {ZeroEx} from '0x.js';
 import * as BigNumber from 'bignumber.js';
 import {Blockchain} from 'ts/blockchain';
 import Divider from 'material-ui/Divider';

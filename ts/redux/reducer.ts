@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import {ZeroEx} from '@0xproject/0x.js';
+import {ZeroEx} from '0x.js';
 import * as BigNumber from 'bignumber.js';
 import {utils} from 'ts/utils/utils';
 import {

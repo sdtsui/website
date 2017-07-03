@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import {Link} from 'react-router-dom';
-import {ZeroEx} from '@0xproject/0x.js';
+import {ZeroEx} from '0x.js';
 import * as moment from 'moment';
 import * as BigNumber from 'bignumber.js';
 import Paper from 'material-ui/Paper';
