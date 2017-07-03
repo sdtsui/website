@@ -26,22 +26,24 @@ Add the following to your `/etc/hosts` file:
 
 Clone the [0x contracts repo](https://github.com/0xProject/contracts) into the same parent directory as this project.
 
+Install [yarn](https://yarnpkg.com/lang/en/docs/install/) in order to install the project dependencies more deterministically.
+
 Install dependencies:
 
 ```
-npm install
+yarn
 ```
 
 Import smart contract artifacts from `contracts` repo:
 
 ```
-npm run update_contracts
+yarn run update_contracts
 ```
 
 Start dev server:
 
 ```
-npm run dev
+yarn run dev
 ```
 
 Visit [0xproject.dev:3572](http://0xproject.dev:3572) in your browser.

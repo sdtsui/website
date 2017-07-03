@@ -351,3 +351,12 @@ export interface CivicSip {
     signup: (opts: CivicSignupOpts) => void;
     on: (eventName: string, callback: (event: any) => void) => void;
 }
+
+export interface FAQQuestion {
+    prompt: string;
+    answer: React.ReactNode;
+}
+export interface FAQSection {
+    name: string;
+    questions: FAQQuestion[];
+}

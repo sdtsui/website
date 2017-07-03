@@ -149,17 +149,25 @@ const partnershipsRow1: Partner[] = [
 
 const partnershipsRow2: Partner[] = [
     {
+        name: 'Melonport',
+        logo: '/images/logos/melonport.png',
+        url: 'https://melonport.com/',
+    },
+    {
+        name: 'District0x',
+        logo: '/images/logos/district0x.png',
+        url: 'https://district0x.io/',
+    },
+    {
+        name: 'Dharma',
+        logo: '/images/logos/dharma.png',
+        url: 'https://dharma.io/',
+    },
+    {
         name: 'OpenANX',
         logo: '/images/logos/openANX.png',
         url: 'https://anxintl.com/',
     },
-    {
-        name: 'Melonport',
-        logo: '/images/logos/melonport.jpg',
-        url: 'https://melonport.com/',
-    },
-    undefined,
-    undefined,
 ];
 
 const investorsRow1: Partner[] = [

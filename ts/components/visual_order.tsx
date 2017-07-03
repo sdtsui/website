@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {ZeroEx} from '@0xproject/0x.js';
+import {ZeroEx} from '0x.js';
 import {AssetToken, Token} from 'ts/types';
 import {Party} from 'ts/components/ui/party';
 
