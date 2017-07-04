@@ -76,7 +76,7 @@ export class ContributionForm extends React.Component<ContributionFormProps, Con
                             _.isUndefined(this.state.contributionAddress) ||
                             _.isUndefined(this.state.contributionAmountInBaseUnits)
                         }
-                        onClick={this.onContributionAddressSubmitClickAsync.bind(this)}
+                        onClick={this.onContributionSubmitClickAsync.bind(this)}
                     />
                 </div>
             </div>
@@ -87,7 +87,7 @@ export class ContributionForm extends React.Component<ContributionFormProps, Con
             recaptchaToken,
         });
     }
-    private async onContributionAddressSubmitClickAsync() {
+    private async onContributionSubmitClickAsync() {
         const body = JSON.stringify({
             contributionAddress: this.state.contributionAddress,
             contributionAmountInBaseUnits: this.state.contributionAmountInBaseUnits,
