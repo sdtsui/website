@@ -4,6 +4,7 @@ import MenuItem from 'material-ui/MenuItem';
 import {colors} from 'material-ui/styles';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
+import compareVersions = require('compare-versions');
 import {VersionDropDown} from 'ts/pages/documentation/version_drop_down';
 import {DocSections, Styles} from 'ts/types';
 import {Link as ScrollLink} from 'react-scroll';
@@ -28,6 +29,7 @@ export const menu = {
         DocSections.token,
         DocSections.tokenRegistry,
         DocSections.etherToken,
+        DocSections.proxy,
     ],
     types: [
         DocSections.types,
@@ -37,8 +39,8 @@ export const menu = {
 interface Docs0xjsMenuProps {
     shouldDisplaySectionHeaders?: boolean;
     onMenuItemClick?: () => void;
-    versions?: string[];
-    selectedVersion?: string;
+    selectedVersion: string;
+    versions: string[];
 }
 
 interface Docs0xjsMenuState {}
@@ -61,7 +63,23 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
         onMenuItemClick: _.noop,
     };
     public render() {
-        const navigation = _.map(menu, (menuItems: string[], sectionName: string) => {
+        const finalMenu = _.cloneDeep(menu);
+        const lastVersionWithoutEtherToken = '0.7.0';
+        const versionWithoutEtherToken = compareVersions(this.props.selectedVersion, lastVersionWithoutEtherToken) <= 0;
+        if (versionWithoutEtherToken) {
+            finalMenu.contracts = _.filter(finalMenu.contracts, contractName => {
+                return contractName !== DocSections.etherToken;
+            });
+        }
+        const lastVersionWithoutProxy = '0.7.1';
+        const versionWithoutProxy = compareVersions(this.props.selectedVersion, lastVersionWithoutProxy) <= 0;
+        if (versionWithoutProxy) {
+            finalMenu.contracts = _.filter(finalMenu.contracts, contractName => {
+                return contractName !== DocSections.proxy;
+            });
+        }
+
+        const navigation = _.map(finalMenu, (menuItems: string[], sectionName: string) => {
             if (this.props.shouldDisplaySectionHeaders) {
                 return (
                     <div

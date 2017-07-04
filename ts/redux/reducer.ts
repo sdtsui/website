@@ -17,6 +17,7 @@ import {
 } from 'ts/types';
 
 export interface State {
+    // OTC
     blockchainErr: BlockchainErrs;
     blockchainIsLoaded: boolean;
     generateOrderStep: GenerateOrderSteps;
@@ -35,10 +36,17 @@ export interface State {
     userEtherBalance: BigNumber.BigNumber;
     // Note: cache of supplied orderJSON in fill order step. Do not use for anything else.
     userSuppliedOrderCache: Order;
+
+    // Docs
+    zeroExJSversion: string;
+    availableZeroExJSVersions: string[];
+
+    // Shared
     flashMessage: string;
 };
 
 const INITIAL_STATE: State = {
+    // OTC
     blockchainErr: '',
     blockchainIsLoaded: false,
     generateOrderStep: GenerateOrderSteps.ChooseAssets,
@@ -64,11 +72,18 @@ const INITIAL_STATE: State = {
     userAddress: '',
     userEtherBalance: new BigNumber(0),
     userSuppliedOrderCache: undefined,
+
+    // Docs
+    zeroExJSversion: '0.7.1',
+    availableZeroExJSVersions: ['0.7.1'],
+
+    // Shared
     flashMessage: undefined,
 };
 
 export function reducer(state: State = INITIAL_STATE, action: Action) {
     switch (action.type) {
+        // OTC
         case ActionTypes.RESET_STATE:
             return INITIAL_STATE;
 
@@ -250,6 +265,19 @@ export function reducer(state: State = INITIAL_STATE, action: Action) {
             });
         }
 
+        // Docs
+        case ActionTypes.UPDATE_LIBRARY_VERSION: {
+            return _.assign({}, state, {
+                zeroExJSversion: action.data,
+            });
+        }
+        case ActionTypes.UPDATE_AVAILABLE_LIBRARY_VERSIONS: {
+            return _.assign({}, state, {
+                availableZeroExJSVersions: action.data,
+            });
+        }
+
+        // Shared
         case ActionTypes.SHOW_FLASH_MESSAGE: {
             return _.assign({}, state, {
                 flashMessage: action.data,
