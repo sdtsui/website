@@ -23,7 +23,7 @@ export class FlashMessage extends React.Component<FlashMessageProps, FlashMessag
                 <Snackbar
                     open={true}
                     message={this.props.flashMessage}
-                    autoHideDuration={SHOW_DURATION_MS}
+                    autoHideDuration={this.props.showDurationMs}
                     onRequestClose={this.onClose.bind(this)}
                 />
             );
