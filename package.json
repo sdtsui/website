@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "Website and 0x OTC dapp",
   "scripts": {
-    "build": "webpack && npm run minify",
+    "build": "NODE_ENV=production webpack && npm run minify",
     "minify": "for f in public/bundle*.js; do ./node_modules/uglify-es/bin/uglifyjs $f -o $f -m; done",
     "dev": "webpack-dev-server --content-base public",
     "update_contracts": "copyfiles -u 4 ./../contracts/build/contracts/*.json ./contracts;",
@@ -14,7 +14,7 @@
   "author": "Fabio Berger",
   "license": "Apache-2.0",
   "dependencies": {
-    "@0xproject/0x.js": "^0.2.2",
+    "0x.js": "0.6.1",
     "basscss": "^8.0.3",
     "bignumber.js": "^4.0.2",
     "bn.js": "^4.11.6",
@@ -77,6 +77,7 @@
     "copy-webpack-plugin": "^4.0.1",
     "copyfiles": "^1.2.0",
     "css-loader": "0.23.x",
+    "ethereumjs-testrpc": "^3.0.5",
     "exports-loader": "0.6.x",
     "imports-loader": "0.6.x",
     "json-loader": "^0.5.4",
@@ -88,9 +89,8 @@
     "tslint-react": "^2.5.0",
     "typescript": "^2.2.1",
     "web3-typescript-typings": "^0.0.8",
-    "webpack": "^2.2.1",
+    "webpack": "^2.6.1",
     "webpack-dev-middleware": "^1.10.0",
-    "webpack-dev-server": "^2.3.0",
-    "ethereumjs-testrpc": "^3.0.5"
+    "webpack-dev-server": "^2.5.0"
   }
 }

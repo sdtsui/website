@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import {ZeroEx} from '@0xproject/0x.js';
+import {ZeroEx} from '0x.js';
 import promisify = require('es6-promisify');
 import findVersions = require('find-versions');
 import compareVersions = require('compare-versions');
@@ -248,6 +248,10 @@ export class Blockchain {
     }
     public async getTokenBalanceAndAllowanceAsync(ownerAddress: string, tokenAddress: string):
                     Promise<BigNumber.BigNumber[]> {
+        if (_.isEmpty(ownerAddress)) {
+            const zero = new BigNumber(0);
+            return [zero, zero];
+        }
         const tokenContract = await this.instantiateContractIfExistsAsync(TokenArtifacts, tokenAddress);
         let balance;
         let allowance;

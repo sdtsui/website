@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import * as BigNumber from 'bignumber.js';
-import {ZeroEx} from '@0xproject/0x.js';
+import {ZeroEx} from '0x.js';
 import {Link} from 'react-router-dom';
 import {colors} from 'material-ui/styles';
 import {Token, InputErrMsg, ValidatedBigNumberCallback} from 'ts/types';
