@@ -173,7 +173,7 @@ export interface Styles {
     [name: string]: React.CSSProperties;
 }
 
-export interface Profile {
+export interface ProfileInfo {
     name: string;
     title: string;
     description: string;

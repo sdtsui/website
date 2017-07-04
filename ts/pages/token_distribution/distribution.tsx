@@ -30,9 +30,11 @@ const distributionEntities = [
 
 export function Distribution(props: DistributionProps) {
     return (
-        <div className="pb4">
+        <div className="pb4" style={{backgroundColor: '#eaeaea'}}>
             <div className="mx-auto max-width-4 center pt2">
-                <h1 className="thin">TOKEN SALE TERMS</h1>
+                <h1 className="thin pt2">
+                    TOKEN SALE TERMS
+                </h1>
                 <div className="clearfix pt2">
                     <div className="col lg-col-6 md-col-6 sm-col-12 col-12">
                         <div

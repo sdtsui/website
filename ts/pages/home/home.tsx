@@ -6,7 +6,7 @@ import FlatButton from 'material-ui/FlatButton';
 import {colors} from 'material-ui/styles';
 import {configs} from 'ts/utils/configs';
 import {constants} from 'ts/utils/constants';
-import {Styles, Profile, Partner} from 'ts/types';
+import {Styles, ProfileInfo, Partner} from 'ts/types';
 import {
     Link as ScrollLink,
     Element as ScrollElement,
@@ -17,53 +17,8 @@ import {TopBar} from 'ts/components/top_bar';
 import {NewsletterInput} from 'ts/pages/home/newsletter_input';
 import {Statistics} from 'ts/pages/home/statistics';
 import {TeamAndAdvisors} from 'ts/pages/home/team_and_advisors';
+import {Partnerships} from 'ts/pages/home/partnerships';
 import ReactTooltip = require('react-tooltip');
-
-const partnershipsRow1: Partner[] = [
-    {
-        name: 'Augur',
-        logo: '/images/logos/augur.png',
-        url: 'https://augur.net/',
-    },
-    {
-        name: 'Maker',
-        logo: '/images/logos/maker.png',
-        url: 'http://makerdao.com/',
-    },
-    {
-        name: 'Aragon',
-        logo: '/images/logos/aragon.png',
-        url: 'https://aragon.one/',
-    },
-    {
-        name: 'Chronobank.io',
-        logo: '/images/logos/chronobank.png',
-        url: 'https://chronobank.io/',
-    },
-];
-
-const partnershipsRow2: Partner[] = [
-    {
-        name: 'Melonport',
-        logo: '/images/logos/melonport.png',
-        url: 'https://melonport.com/',
-    },
-    {
-        name: 'District0x',
-        logo: '/images/logos/district0x.png',
-        url: 'https://district0x.io/',
-    },
-    {
-        name: 'Dharma',
-        logo: '/images/logos/dharma.png',
-        url: 'https://dharma.io/',
-    },
-    {
-        name: 'OpenANX',
-        logo: '/images/logos/openANX.png',
-        url: 'https://anxintl.com/',
-    },
-];
 
 const investorsRow1: Partner[] = [
     {
@@ -259,23 +214,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
                         style={{bottom: 0, right: 0, zIndex: 0, width: 550}}
                     />
                 </div>
-                <div style={{backgroundColor: 'white'}}>
-                    <div className="mx-auto max-width-4 pb4">
-                        <h1
-                            id="partners"
-                            className="pt4 sm-center md-pl3 lg-pl0 thin"
-                            style={{...styles.subheader}}
-                        >
-                            Projects Building on 0x
-                        </h1>
-                        <div className="clearfix pt3 mx-auto md-pl3 lg-pl0">
-                            {this.renderPartners(partnershipsRow1)}
-                        </div>
-                        <div className="clearfix lg-pt3 md-pt3 mx-auto md-pl3 lg-pl0">
-                            {this.renderPartners(partnershipsRow2)}
-                        </div>
-                    </div>
-                </div>
+                <Partnerships />
                 <TeamAndAdvisors />
                 <div style={{backgroundColor: 'white'}}>
                     <div className="mx-auto max-width-4 pb4">

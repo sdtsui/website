@@ -69,9 +69,9 @@ export class KeyDates extends React.Component<KeyDatesProps, KeyDatesState> {
         });
         const orientation: StepperOrientation = this.state.screenWidth === ScreenWidths.SM ? 'vertical' : 'horizontal';
         return (
-            <div className="pb4" style={{backgroundColor: 'rgb(234, 234, 234)'}}>
+            <div className="pb4" style={{backgroundColor: 'white'}}>
                 <div className="mx-auto max-width-4 center pt3">
-                    <h1 className="thin">KEY DATES</h1>
+                    <h1 className="thin pt1">KEY DATES</h1>
                     <div className="sm-px4 sm-mx2">
                         <Stepper
                             orientation={orientation}

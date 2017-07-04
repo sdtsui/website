@@ -3,9 +3,10 @@ import * as React from 'react';
 import {colors} from 'material-ui/styles';
 import {utils} from 'ts/utils/utils';
 import {Element as ScrollElement} from 'react-scroll';
-import {Styles, Profile} from 'ts/types';
+import {Styles, ProfileInfo} from 'ts/types';
+import {Profile} from 'ts/pages/home/profile';
 
-const teamRow1: Profile[] = [
+const teamRow1: ProfileInfo[] = [
     {
         name: 'Will Warren',
         title: 'Co-founder & CEO',
@@ -38,7 +39,7 @@ const teamRow1: Profile[] = [
     },
 ];
 
-const teamRow2: Profile[] = [
+const teamRow2: ProfileInfo[] = [
     {
         name: 'Leonid Logvinov',
         title: 'Engineer',
@@ -72,7 +73,7 @@ const teamRow2: Profile[] = [
     },
 ];
 
-const advisors: Profile[] = [
+const advisors: ProfileInfo[] = [
     {
         name: 'Fred Ehrsam',
         title: 'Advisor',
@@ -166,74 +167,19 @@ export function TeamAndAdvisors(props: TeamAndAdvisorsProps) {
     );
 }
 
-function renderProfiles(profiles: Profile[]) {
+function renderProfiles(profiles: ProfileInfo[]) {
     const numIndiv = profiles.length;
     const colSize = utils.getColSize(profiles.length);
     return _.map(profiles, profile => {
         return (
             <div
                 key={profile.name}
-                className={`sm-col sm-col-${colSize}`}
             >
-                <div className="mx-auto" style={{width: 200}}>
-                    <div>
-                        <img src={profile.image} />
-                    </div>
-                    <div
-                        className="pt1"
-                        style={{fontSize: 18, fontWeight: 'bold'}}
-                    >
-                        {profile.name}
-                    </div>
-                    <div
-                        className="pb2 pt1 thin"
-                        style={{fontSize: 16}}
-                    >
-                        {profile.title}
-                    </div>
-                    <div
-                        style={{fontSize: 13, minHeight: 60}}
-                        className="pb2 thin"
-                    >
-                        {profile.description}
-                    </div>
-                    <div className="flex pb3">
-                        {renderSocialMediaIcons(profile)}
-                    </div>
-                </div>
+                <Profile
+                    colSize={colSize}
+                    profileInfo={profile}
+                />
             </div>
         );
     });
-}
-
-function renderSocialMediaIcons(profile: Profile) {
-    const icons = [];
-    if (!_.isEmpty(profile.github)) {
-        const icon = renderSocialMediaIcon('zmdi-github-box', profile.github);
-        icons.push(icon);
-    }
-    if (!_.isEmpty(profile.linkedIn)) {
-        const icon = renderSocialMediaIcon('zmdi-linkedin-box', profile.linkedIn);
-        icons.push(icon);
-    }
-    if (!_.isEmpty(profile.twitter)) {
-        const icon = renderSocialMediaIcon('zmdi-twitter-box', profile.twitter);
-        icons.push(icon);
-    }
-    return icons;
-}
-
-function renderSocialMediaIcon(iconName: string, url: string) {
-    return (
-        <div key={url} className="pr2">
-            <a
-                href={url}
-                style={{color: 'inherit'}}
-                target="_blank"
-                className="text-decoration-none"
-            >
-                <i className={`zmdi ${iconName}`} style={{...styles.socalIcon}} />
-            </a>
-        </div>
-    );
 }

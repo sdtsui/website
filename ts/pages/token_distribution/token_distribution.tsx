@@ -6,6 +6,7 @@ import {TopBar} from 'ts/components/top_bar';
 import {Distribution} from 'ts/pages/token_distribution/distribution';
 import {KeyDates} from 'ts/pages/token_distribution/key_dates';
 import {TeamAndAdvisors} from 'ts/pages/home/team_and_advisors';
+import {Partnerships} from 'ts/pages/home/partnerships';
 import {NewsletterInput} from 'ts/pages/home/newsletter_input';
 
 export interface TokenDistributionProps {
@@ -49,6 +50,7 @@ export class TokenDistribution extends React.Component<TokenDistributionProps, T
                     </div>
                     <KeyDates />
                     <Distribution />
+                    <Partnerships />
                     <TeamAndAdvisors />
                 </div>
                 <Footer />
