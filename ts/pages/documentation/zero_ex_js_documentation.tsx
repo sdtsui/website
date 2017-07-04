@@ -70,6 +70,8 @@ const contractMethodOrder: {[sectionName: string]: string[]} = {
         'setProxyAllowanceAsync',
         'transferAsync',
         'transferFromAsync',
+        'subscribeAsync',
+        'stopWatchingAllEventsAsync',
     ],
     tokenRegistry: [
         'getTokensAsync',
@@ -77,6 +79,10 @@ const contractMethodOrder: {[sectionName: string]: string[]} = {
     etherToken: [
         'depositAsync',
         'withdrawAsync',
+    ],
+    proxy: [
+        'isAuthorizedAsync',
+        'getAuthorizedAddressesAsync',
     ],
 };
 
