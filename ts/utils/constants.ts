@@ -28,6 +28,8 @@ export const constants = {
     S3_DOCUMENTATION_JSON_ROOT: 'https://s3.amazonaws.com/0xjs-docs-jsons',
     UNAVAILABLE_STATUS: 503,
     TAKER_FEE: new BigNumber(0),
+    MAINNET_NAME: 'Main network',
+    MAINNET_NETWORK_ID: 1,
     TESTNET_NAME: 'Kovan',
     TESTNET_NETWORK_ID: 42,
     TESTRPC_NETWORK_ID: 50,
