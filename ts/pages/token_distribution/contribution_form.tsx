@@ -107,7 +107,7 @@ export class ContributionForm extends React.Component<ContributionFormProps, Con
             if (errorMsg === 'ADDRESS_ALREADY_REGISTERED') {
                 this.props.dispatcher.showFlashMessage('You cannot update your contribution address.');
             } else {
-                this.props.dispatcher.showFlashMessage('Address registration failed');
+                this.props.dispatcher.showFlashMessage('Address registration failed.');
             }
         } else {
             this.props.onSubmittedContributionInfo();
