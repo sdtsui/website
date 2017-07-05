@@ -38,11 +38,11 @@ export class ContributionForm extends React.Component<ContributionFormProps, Con
     public render() {
         const contributionAmountLabel = <RequiredLabel label="How much do you want to contribute"/>;
         return (
-            <div className="mx-auto left-align" style={{width: 414}}>
-                <div className="h2 my2">
+            <div className="mx-auto left-align sm-px2" style={{maxWidth: 414}}>
+                <div className="lg-h2 md-h2 sm-h3 my2 pt3">
                     Select Contribution Address & Amount
                 </div>
-                <div className="pt2" style={{width: 400}}>
+                <div className="pt2" style={{maxWidth: 400}}>
                     <IdenticonAddressInput
                         initialAddress={''}
                         isRequired={true}
@@ -50,7 +50,7 @@ export class ContributionForm extends React.Component<ContributionFormProps, Con
                         updateOrderAddress={this.onContributionAddressChanged.bind(this)}
                     />
                 </div>
-                <div style={{width: 400}}>
+                <div style={{maxWidth: 400}}>
                     <InputLabel text={contributionAmountLabel}/>
                     <EthAmountInput
                         amount={this.state.contributionAmountInBaseUnits}
@@ -67,7 +67,7 @@ export class ContributionForm extends React.Component<ContributionFormProps, Con
                     onloadCallback={_.noop}
                     verifyCallback={this.verifyCaptchaCallback.bind(this)}
                 />
-                <div className="pt3 mt1">
+                <div className="pt3 mt1 pb4">
                     <RaisedButton
                         label="Submit"
                         primary={true}

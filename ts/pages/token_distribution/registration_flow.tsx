@@ -72,9 +72,9 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                 />
                 <div
                     className="mx-auto max-width-4 center pt4"
-                    style={{height: 400, width: '100%'}}
+                    style={{width: '100%'}}
                 >
-                    <div>
+                    <div className="sm-hide xs-hide">
                         <Stepper activeStep={this.state.stepIndex}>
                             <Step>
                                 <StepLabel>Verify your identity with Civic</StepLabel>
@@ -87,7 +87,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                             </Step>
                         </Stepper>
                     </div>
-                    <div className="pt2">
+                    <Paper zDepth={1} className="mb3 lg-mx0 md-mx0 sm-mx2">
                         {this.state.stepIndex === 0 &&
                             this.renderVerifyIdentityStep()
                         }
@@ -101,7 +101,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                         {this.state.stepIndex === 2 &&
                             this.renderThankYouStep()
                         }
-                    </div>
+                    </Paper>
                 </div>
                 <FlashMessage
                     dispatcher={this.props.dispatcher}
@@ -115,16 +115,16 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
     }
     private renderThankYouStep() {
         return (
-            <div className="mx-auto" style={{width: 600}}>
-                <div className="h2 my2">
+            <div className="mx-auto" style={{maxWidth: 440}}>
+                <div className="h2 my2 pt3">
                     Registration successful!
                 </div>
-                <div style={{color: CUSTOM_GRAY}}>
+                <div className="sm-px2 pb3" style={{color: CUSTOM_GRAY}}>
                     <div className="pt2">
                         Thank you for taking the time to register for the 0x token sale. The contribution
                         period will begin on the <span className="bold">15th of August</span>.
                     </div>
-                    <div className="pt4 mx-auto" style={{width: 440}}>
+                    <div className="pt4 mx-auto" style={{maxWidth: 440}}>
                         <div className="left-align pb2">
                             Get a reminder email when the contribution period opens
                         </div>
@@ -138,19 +138,20 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         return (
             <div>
                 {this.state.isVerifyingIdentity ?
-                    <div className="mx-auto pt3" style={{width: 400}}>
-                        <Paper zDepth={1} style={{padding: 40}}>
-                            <CircularProgress />
-                            <div className="pt3">
-                                Verifying your Civic Identity...
-                            </div>
-                        </Paper>
+                    <div className="mx-auto pt3" style={{maxWidth: 400}}>
+                        <CircularProgress />
+                        <div className="pt3 pb3">
+                            Verifying your Civic Identity...
+                        </div>
                     </div> :
                     <div>
-                        <div className="h2 my2">
+                        <div className="h2 my2 pt3">
                             Verify your identity with Civic
                         </div>
-                        <div className="pt2 mx-auto" style={{width: 450, textAlign: 'left', color: CUSTOM_GRAY}}>
+                        <div
+                            className="pt2 mx-auto sm-px2"
+                            style={{maxWidth: 450, textAlign: 'left', color: CUSTOM_GRAY}}
+                        >
                             <div>
                                 0x is using <a href="https://www.civic.com/">Civic's</a> identity verification
                                 service to limit individual contributions to the token sale. Follow the steps
@@ -174,7 +175,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                                 </li>
                             </ul>
                         </div>
-                        <div className="pt1">
+                        <div className="pt1 pb4">
                             <RegisterButton
                                 onClick={this.onRegisterClick.bind(this)}
                             />
