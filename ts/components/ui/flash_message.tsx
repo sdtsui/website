@@ -9,6 +9,7 @@ interface FlashMessageProps {
     dispatcher: Dispatcher;
     flashMessage?: string;
     showDurationMs?: number;
+    bodyStyle?: React.CSSProperties;
 }
 
 interface FlashMessageState {}
@@ -16,6 +17,7 @@ interface FlashMessageState {}
 export class FlashMessage extends React.Component<FlashMessageProps, FlashMessageState> {
     public static defaultProps: Partial<FlashMessageProps> = {
         showDurationMs: SHOW_DURATION_MS,
+        bodyStyle: {},
     };
     public render() {
         if (!_.isUndefined(this.props.flashMessage)) {
@@ -25,6 +27,7 @@ export class FlashMessage extends React.Component<FlashMessageProps, FlashMessag
                     message={this.props.flashMessage}
                     autoHideDuration={this.props.showDurationMs}
                     onRequestClose={this.onClose.bind(this)}
+                    bodyStyle={this.props.bodyStyle}
                 />
             );
         } else {
