@@ -16,6 +16,11 @@ import {
     ScreenWidths,
 } from 'ts/types';
 
+// Instead of defaulting the 0x.js version to an empty string, we pre-populate it with
+// a valid version value. This does not need to be updated however, since onLoad, it
+// is always replaced with a value retrieved from our S3 bucket.
+const DEFAULT_0X_JS_VERSION = '0.7.1';
+
 export interface State {
     // OTC
     blockchainErr: BlockchainErrs;
@@ -74,8 +79,8 @@ const INITIAL_STATE: State = {
     userSuppliedOrderCache: undefined,
 
     // Docs
-    zeroExJSversion: '0.7.1',
-    availableZeroExJSVersions: ['0.7.1'],
+    zeroExJSversion: DEFAULT_0X_JS_VERSION,
+    availableZeroExJSVersions: [DEFAULT_0X_JS_VERSION],
 
     // Shared
     flashMessage: undefined,
