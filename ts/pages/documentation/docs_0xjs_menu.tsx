@@ -36,6 +36,11 @@ export const menu = {
     ],
 };
 
+const menuSubsectionToVersionWhenIntroduced = {
+    [DocSections.etherToken]: '0.7.1',
+    [DocSections.proxy]: '0.8.0',
+};
+
 interface Docs0xjsMenuProps {
     shouldDisplaySectionHeaders?: boolean;
     onMenuItemClick?: () => void;
@@ -64,20 +69,16 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
     };
     public render() {
         const finalMenu = _.cloneDeep(menu);
-        const lastVersionWithoutEtherToken = '0.7.0';
-        const versionWithoutEtherToken = compareVersions(this.props.selectedVersion, lastVersionWithoutEtherToken) <= 0;
-        if (versionWithoutEtherToken) {
-            finalMenu.contracts = _.filter(finalMenu.contracts, contractName => {
-                return contractName !== DocSections.etherToken;
-            });
-        }
-        const lastVersionWithoutProxy = '0.7.1';
-        const versionWithoutProxy = compareVersions(this.props.selectedVersion, lastVersionWithoutProxy) <= 0;
-        if (versionWithoutProxy) {
-            finalMenu.contracts = _.filter(finalMenu.contracts, contractName => {
-                return contractName !== DocSections.proxy;
-            });
-        }
+        finalMenu.contracts = _.filter(finalMenu.contracts, (contractName: string) => {
+            const versionIntroducedIfExists = menuSubsectionToVersionWhenIntroduced[contractName];
+            if (_.isUndefined(versionIntroducedIfExists)) {
+                return true;
+            } else {
+                const isIntroducedInSelectedVersion = compareVersions(this.props.selectedVersion,
+                                                                      versionIntroducedIfExists) >= 0;
+                return isIntroducedInSelectedVersion;
+            }
+        });
 
         const navigation = _.map(finalMenu, (menuItems: string[], sectionName: string) => {
             if (this.props.shouldDisplaySectionHeaders) {
