@@ -61,6 +61,8 @@ const contractMethodOrder: {[sectionName: string]: string[]} = {
         'subscribeAsync',
         'stopWatchingAllEventsAsync',
         'getContractAddressAsync',
+        'getAvailableContractAddressesAsync',
+        'getProxyAuthorizedContractAddressesAsync',
     ],
     token: [
         'getAllowanceAsync',
