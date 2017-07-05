@@ -21,7 +21,8 @@ export class Web3Wrapper {
         const injectedWeb3 = (window as any).web3;
         const doesInjectedWeb3Exist = !_.isUndefined(injectedWeb3);
 
-        const isPublicNodeAvailable = networkId === constants.TESTNET_NETWORK_ID;
+        const publicNodeUrlIfExsists = constants.PUBLIC_NODE_URL_BY_NETWORK_ID[networkId];
+        const isPublicNodeAvailable = !_.isUndefined(publicNodeUrlIfExsists);
 
         let provider;
         if (doesInjectedWeb3Exist && isPublicNodeAvailable) {
@@ -31,7 +32,7 @@ export class Web3Wrapper {
             provider.addProvider(new InjectedWeb3SubProvider(injectedWeb3));
             provider.addProvider(new FilterSubprovider());
             provider.addProvider(new RpcSubprovider({
-                rpcUrl: constants.HOSTED_TESTNET_URL,
+                rpcUrl: publicNodeUrlIfExsists,
             }));
             provider.start();
         } else if (doesInjectedWeb3Exist) {
@@ -42,7 +43,7 @@ export class Web3Wrapper {
             provider = new ProviderEngine();
             provider.addProvider(new FilterSubprovider());
             provider.addProvider(new RpcSubprovider({
-                rpcUrl: constants.HOSTED_TESTNET_URL,
+                rpcUrl: publicNodeUrlIfExsists,
             }));
             provider.start();
         }

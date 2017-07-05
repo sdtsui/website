@@ -358,3 +358,7 @@ export interface FAQSection {
     name: string;
     questions: FAQQuestion[];
 }
+
+export interface PublicNodeUrlByNetworkId {
+    [networkId: number]: string;
+};
