@@ -4,6 +4,7 @@ import MenuItem from 'material-ui/MenuItem';
 import {colors} from 'material-ui/styles';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
+import compareVersions = require('compare-versions');
 import {VersionDropDown} from 'ts/pages/documentation/version_drop_down';
 import {DocSections, Styles} from 'ts/types';
 import {Link as ScrollLink} from 'react-scroll';
@@ -28,17 +29,23 @@ export const menu = {
         DocSections.token,
         DocSections.tokenRegistry,
         DocSections.etherToken,
+        DocSections.proxy,
     ],
     types: [
         DocSections.types,
     ],
 };
 
+const menuSubsectionToVersionWhenIntroduced = {
+    [DocSections.etherToken]: '0.7.1',
+    [DocSections.proxy]: '0.8.0',
+};
+
 interface Docs0xjsMenuProps {
     shouldDisplaySectionHeaders?: boolean;
     onMenuItemClick?: () => void;
-    versions?: string[];
-    selectedVersion?: string;
+    selectedVersion: string;
+    versions: string[];
 }
 
 interface Docs0xjsMenuState {}
@@ -61,7 +68,19 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
         onMenuItemClick: _.noop,
     };
     public render() {
-        const navigation = _.map(menu, (menuItems: string[], sectionName: string) => {
+        const finalMenu = _.cloneDeep(menu);
+        finalMenu.contracts = _.filter(finalMenu.contracts, (contractName: string) => {
+            const versionIntroducedIfExists = menuSubsectionToVersionWhenIntroduced[contractName];
+            if (!_.isUndefined(versionIntroducedIfExists)) {
+                const existsInSelectedVersion = compareVersions(this.props.selectedVersion,
+                                                                versionIntroducedIfExists) >= 0;
+                return existsInSelectedVersion;
+            } else {
+                return true;
+            }
+        });
+
+        const navigation = _.map(finalMenu, (menuItems: string[], sectionName: string) => {
             if (this.props.shouldDisplaySectionHeaders) {
                 return (
                     <div

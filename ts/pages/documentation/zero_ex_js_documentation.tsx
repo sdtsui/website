@@ -3,7 +3,6 @@ import * as React from 'react';
 import * as ReactMarkdown from 'react-markdown';
 import convert = require('xml-js');
 import findVersions = require('find-versions');
-import compareVersions = require('compare-versions');
 import semverSort = require('semver-sort');
 import {colors} from 'material-ui/styles';
 import MenuItem from 'material-ui/MenuItem';
@@ -12,7 +11,8 @@ import {
     Element as ScrollElement,
     scroller,
 } from 'react-scroll';
-import {KindString, TypeDocNode, DocSections, Styles} from 'ts/types';
+import {Dispatcher} from 'ts/redux/dispatcher';
+import {KindString, TypeDocNode, DocSections, Styles, ScreenWidths} from 'ts/types';
 import {TopBar} from 'ts/components/top_bar';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
@@ -70,6 +70,8 @@ const contractMethodOrder: {[sectionName: string]: string[]} = {
         'setProxyAllowanceAsync',
         'transferAsync',
         'transferFromAsync',
+        'subscribeAsync',
+        'stopWatchingAllEventsAsync',
     ],
     tokenRegistry: [
         'getTokensAsync',
@@ -77,6 +79,10 @@ const contractMethodOrder: {[sectionName: string]: string[]} = {
     etherToken: [
         'depositAsync',
         'withdrawAsync',
+    ],
+    proxy: [
+        'isAuthorizedAsync',
+        'getAuthorizedAddressesAsync',
     ],
 };
 
@@ -94,17 +100,24 @@ const sectionNameToModulePath: {[name: string]: string} = {
     [DocSections.tokenRegistry]: '"src/contract_wrappers/token_registry_wrapper"',
     [DocSections.token]: '"src/contract_wrappers/token_wrapper"',
     [DocSections.etherToken]: '"src/contract_wrappers/ether_token_wrapper"',
+    [DocSections.proxy]: '"src/contract_wrappers/proxy_wrapper"',
     [DocSections.types]: '"src/types"',
 };
 
-export interface ZeroExJSDocumentationProps {
+export interface ZeroExJSDocumentationPassedProps {
     source: string;
     location: Location;
 }
 
+export interface ZeroExJSDocumentationAllProps {
+    source: string;
+    location: Location;
+    dispatcher: Dispatcher;
+    zeroExJSversion: string;
+    availableZeroExJSVersions: string[];
+}
+
 interface ZeroExJSDocumentationState {
-    libraryVersion: string;
-    versions: string[];
     versionDocObj: string;
 }
 
@@ -125,12 +138,10 @@ const styles: Styles = {
     },
 };
 
-export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentationProps, ZeroExJSDocumentationState> {
-    constructor(props: ZeroExJSDocumentationProps) {
+export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentationAllProps, ZeroExJSDocumentationState> {
+    constructor(props: ZeroExJSDocumentationAllProps) {
         super(props);
         this.state = {
-            libraryVersion: '',
-            versions: [],
             versionDocObj: undefined,
         };
     }
@@ -147,6 +158,8 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                 <TopBar
                     blockchainIsLoaded={false}
                     location={this.props.location}
+                    zeroExJSversion={this.props.zeroExJSversion}
+                    availableZeroExJSVersions={this.props.availableZeroExJSVersions}
                 />
                 {!_.isUndefined(this.state.versionDocObj) &&
                     <div
@@ -159,8 +172,8 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                                 style={{...styles.menuContainer, ...styles.mainContainers}}
                             >
                                 <Docs0xjsMenu
-                                    selectedVersion={this.state.libraryVersion}
-                                    versions={this.state.versions}
+                                    selectedVersion={this.props.zeroExJSversion}
+                                    versions={this.props.availableZeroExJSVersions}
                                 />
                             </div>
                         </div>
@@ -304,7 +317,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                     {property.name}: <Type type={property.type} />
                 </code>
                 <SourceLink
-                    version={this.state.libraryVersion}
+                    version={this.props.zeroExJSversion}
                     source={source}
                 />
                 {property.comment &&
@@ -334,7 +347,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                     methodSignature={signature}
                     source={source}
                     entity={entity}
-                    libraryVersion={this.state.libraryVersion}
+                    libraryVersion={this.props.zeroExJSversion}
                 />
             );
         });
@@ -346,9 +359,9 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
             methodByName[method.name] = method;
         });
         const sectionMethodOrder = contractMethodOrder[sectionName];
-        const orderedMethods = _.map(sectionMethodOrder, methodName => {
+        const orderedMethods = _.compact(_.map(sectionMethodOrder, methodName => {
             return methodByName[methodName];
-        });
+        }));
         return orderedMethods;
     }
     private getPackageDefinitionBySectionNameIfExists(sectionName: string) {
@@ -375,6 +388,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
         });
 
         const versions = _.keys(versionToFileName);
+        this.props.dispatcher.updateAvailable0xjsVersions(versions);
         const sortedVersions = semverSort.desc(versions);
         const latestVersion = sortedVersions[0];
 
@@ -385,13 +399,12 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                 versionToFetch = preferredVersionIfExists;
             }
         }
+        this.props.dispatcher.updateCurrent0xjsVersion(versionToFetch);
 
         const versionFileNameToFetch = versionToFileName[versionToFetch];
         const versionDocObj = await this.getJSONDocFileAsync(versionFileNameToFetch);
 
         this.setState({
-            libraryVersion: versionToFetch,
-            versions,
             versionDocObj,
         }, () => {
             this.scrollToHash();

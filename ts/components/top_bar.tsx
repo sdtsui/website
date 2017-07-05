@@ -24,6 +24,8 @@ interface TopBarProps {
     userAddress?: string;
     blockchainIsLoaded: boolean;
     location: Location;
+    zeroExJSversion?: string;
+    availableZeroExJSVersions?: string[];
 }
 
 interface TopBarState {
@@ -140,6 +142,8 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
                 <Docs0xjsMenu
                     shouldDisplaySectionHeaders={false}
                     onMenuItemClick={this.onMenuButtonClick.bind(this)}
+                    selectedVersion={this.props.zeroExJSversion}
+                    versions={this.props.availableZeroExJSVersions}
                 />
             </div>
         );

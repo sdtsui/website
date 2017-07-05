@@ -82,5 +82,10 @@ export const constants = {
         'LogCancelArgs',
         'LogFillArgs',
         'LogErrorContractEventArgs',
+        'TokenEvents',
+        'ExchangeContractEventArgs',
+        'TransferContractEventArgs',
+        'ApprovalContractEventArgs',
+        'TokenContractEventArgs',
     ],
 };
