@@ -71,12 +71,12 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
         const finalMenu = _.cloneDeep(menu);
         finalMenu.contracts = _.filter(finalMenu.contracts, (contractName: string) => {
             const versionIntroducedIfExists = menuSubsectionToVersionWhenIntroduced[contractName];
-            if (_.isUndefined(versionIntroducedIfExists)) {
-                return true;
+            if (!_.isUndefined(versionIntroducedIfExists)) {
+                const existsInSelectedVersion = compareVersions(this.props.selectedVersion,
+                                                                versionIntroducedIfExists) >= 0;
+                return existsInSelectedVersion;
             } else {
-                const isIntroducedInSelectedVersion = compareVersions(this.props.selectedVersion,
-                                                                      versionIntroducedIfExists) >= 0;
-                return isIntroducedInSelectedVersion;
+                return true;
             }
         });
 
