@@ -68,6 +68,7 @@ export class AddressInput extends React.Component<AddressInputProps, AddressInpu
             address,
             errMsg,
         });
-        this.props.updateAddress(isValidAddress ? address : undefined);
+        const addressIfValid = isValidAddress ? address : undefined;
+        this.props.updateAddress(addressIfValid);
     }
 }

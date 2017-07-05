@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import {connect} from 'react-redux';
 import {Store as ReduxStore, Dispatch} from 'redux';
 import {Dispatcher} from 'ts/redux/dispatcher';

@@ -2,10 +2,9 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as BigNumber from 'bignumber.js';
 import * as Recaptcha from 'react-recaptcha';
-import {constants} from 'ts/utils/constants';
 import RaisedButton from 'material-ui/RaisedButton';
-import TextField from 'material-ui/TextField';
 import {Dispatcher} from 'ts/redux/dispatcher';
+import {constants} from 'ts/utils/constants';
 import {IdenticonAddressInput} from 'ts/components/inputs/identicon_address_input';
 import {EthAmountInput} from 'ts/components/inputs/eth_amount_input';
 import {InputLabel} from 'ts/components/ui/input_label';
@@ -18,8 +17,8 @@ export interface ContributionFormProps {
 }
 
 interface ContributionFormState {
-    contributionAddress?: string;
     didRegistrationSucceed: boolean;
+    contributionAddress?: string;
     recaptchaToken?: string;
     contributionAmountInBaseUnits?: BigNumber.BigNumber;
 }
@@ -29,8 +28,8 @@ export class ContributionForm extends React.Component<ContributionFormProps, Con
     constructor(props: ContributionFormProps) {
         super(props);
         this.state = {
-            contributionAddress: undefined,
             didRegistrationSucceed: false,
+            contributionAddress: undefined,
             recaptchaToken: undefined,
             contributionAmountInBaseUnits: undefined,
         };

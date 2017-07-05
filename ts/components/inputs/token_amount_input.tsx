@@ -37,7 +37,7 @@ export class TokenAmountInput extends React.Component<TokenAmountInputProps, Tok
                     shouldShowIncompleteErrs={this.props.shouldShowIncompleteErrs}
                     onVisitBalancesPageClick={this.props.onVisitBalancesPageClick}
                 />
-                <div style={{paddingTop: 44}}>
+                <div style={{paddingTop: 39}}>
                     {this.props.token.symbol}
                 </div>
             </div>

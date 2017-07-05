@@ -9,7 +9,7 @@ import {utils} from 'ts/utils/utils';
 import {Link} from 'react-router-dom';
 
 interface BalanceBoundedInputProps {
-    label: string;
+    label?: string;
     balance: BigNumber.BigNumber;
     amount?: BigNumber.BigNumber;
     onChange: ValidatedBigNumberCallback;
