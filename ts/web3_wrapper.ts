@@ -39,7 +39,9 @@ export class Web3Wrapper {
             // Since no public node for this network, all requests go to injectedWeb3 instance
             provider = injectedWeb3.currentProvider;
         } else {
-            // If no injectedWeb3 instance, all requests go to our public hosted node
+            // If no injectedWeb3 instance, all requests fallback to our public hosted kovan node
+            // We do this so that users can still browse the OTC DApp even if they do not have web3
+            // injected into their browser.
             provider = new ProviderEngine();
             provider.addProvider(new FilterSubprovider());
             provider.addProvider(new RpcSubprovider({
