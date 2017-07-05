@@ -21,18 +21,18 @@ export class Web3Wrapper {
         const injectedWeb3 = (window as any).web3;
         const doesInjectedWeb3Exist = !_.isUndefined(injectedWeb3);
 
-        const isPublicNodeAvailable = !_.isUndefined(publicNodeUrlIfExsists);
         const publicNodeUrlIfExistsForNetworkId = constants.PUBLIC_NODE_URL_BY_NETWORK_ID[networkIdIfExists];
+        const isPublicNodeAvailableForNetworkId = !_.isUndefined(publicNodeUrlIfExistsForNetworkId);
 
         let provider;
-        if (doesInjectedWeb3Exist && isPublicNodeAvailable) {
+        if (doesInjectedWeb3Exist && isPublicNodeAvailableForNetworkId) {
             // We catch all requests involving a users account and send it to the injectedWeb3
             // instance. All other requests go to the public hosted node.
             provider = new ProviderEngine();
             provider.addProvider(new InjectedWeb3SubProvider(injectedWeb3));
             provider.addProvider(new FilterSubprovider());
             provider.addProvider(new RpcSubprovider({
-                rpcUrl: publicNodeUrlIfExsists,
+                rpcUrl: publicNodeUrlIfExistsForNetworkId,
             }));
             provider.start();
         } else if (doesInjectedWeb3Exist) {
@@ -43,7 +43,7 @@ export class Web3Wrapper {
             provider = new ProviderEngine();
             provider.addProvider(new FilterSubprovider());
             provider.addProvider(new RpcSubprovider({
-                rpcUrl: publicNodeUrlIfExsists,
+                rpcUrl: constants.PUBLIC_NODE_URL_BY_NETWORK_ID[constants.TESTNET_NETWORK_ID],
             }));
             provider.start();
         }
