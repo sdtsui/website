@@ -1,12 +1,9 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import {colors} from 'material-ui/styles';
-import RaisedButton from 'material-ui/RaisedButton';
-import TextField from 'material-ui/TextField';
 import Paper from 'material-ui/Paper';
 import CircularProgress from 'material-ui/CircularProgress';
 import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
-import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
 import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
