@@ -7,8 +7,13 @@ import {constants} from 'ts/utils/constants';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 
 const ENTER_KEY_CODE = 13;
+const onDarkInputTextStyle = {
+    color: '#e6e6e6',
+};
 
-interface NewsletterInputProps {}
+interface NewsletterInputProps {
+  isOnDarkBackground?: boolean;
+}
 
 interface NewsletterInputState {
     email: string;
@@ -18,6 +23,9 @@ interface NewsletterInputState {
 }
 
 export class NewsletterInput extends React.Component<NewsletterInputProps, NewsletterInputState> {
+    public static defaultProps: Partial<NewsletterInputProps> = {
+        isOnDarkBackground: true,
+    };
     constructor(props: NewsletterInputProps) {
         super(props);
         this.state = {
@@ -37,8 +45,8 @@ export class NewsletterInput extends React.Component<NewsletterInputProps, Newsl
                             <TextField
                                 fullWidth={true}
                                 hintText="Email address"
-                                hintStyle={{color: '#e6e6e6'}}
-                                inputStyle={{color: '#e6e6e6'}}
+                                hintStyle={this.props.isOnDarkBackground ? onDarkInputTextStyle : {}}
+                                inputStyle={this.props.isOnDarkBackground ? onDarkInputTextStyle : {}}
                                 floatingLabelFixed={true}
                                 floatingLabelStyle={{color: colors.grey500, display: 'hidden'}}
                                 errorText={errMsg}

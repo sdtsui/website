@@ -131,6 +131,7 @@ export enum BalanceErrs {
 };
 
 export const ActionTypes = strEnum([
+    // OTC
     'UPDATE_SCREEN_WIDTH',
     'UPDATE_NODE_VERSION',
     'RESET_STATE',
@@ -155,6 +156,12 @@ export const ActionTypes = strEnum([
     'UPDATE_USER_SUPPLIED_ORDER_CACHE',
     'UPDATE_ORDER_FILL_AMOUNT',
     'UPDATE_SHOULD_BLOCKCHAIN_ERR_DIALOG_BE_OPEN',
+
+    // Docs
+    'UPDATE_LIBRARY_VERSION',
+    'UPDATE_AVAILABLE_LIBRARY_VERSIONS',
+
+    // Shared
     'SHOW_FLASH_MESSAGE',
     'HIDE_FLASH_MESSAGE',
 ]);
@@ -338,9 +345,20 @@ export const DocSections = strEnum([
   'token',
   'tokenRegistry',
   'etherToken',
+  'proxy',
   'types',
 ]);
 export type DocSections = keyof typeof DocSections;
+
+interface CivicSignupOpts {
+    style: string;
+    scopeRequest: string;
+}
+export interface CivicSip {
+    ScopeRequests: any;
+    signup: (opts: CivicSignupOpts) => void;
+    on: (eventName: string, callback: (event: any) => void) => void;
+}
 
 export interface FAQQuestion {
     prompt: string;
@@ -350,3 +368,7 @@ export interface FAQSection {
     name: string;
     questions: FAQQuestion[];
 }
+
+export interface PublicNodeUrlByNetworkId {
+    [networkId: number]: string;
+};

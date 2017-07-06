@@ -8,19 +8,26 @@ const SHOW_DURATION_MS = 4000;
 interface FlashMessageProps {
     dispatcher: Dispatcher;
     flashMessage?: string;
+    showDurationMs?: number;
+    bodyStyle?: React.CSSProperties;
 }
 
 interface FlashMessageState {}
 
 export class FlashMessage extends React.Component<FlashMessageProps, FlashMessageState> {
+    public static defaultProps: Partial<FlashMessageProps> = {
+        showDurationMs: SHOW_DURATION_MS,
+        bodyStyle: {},
+    };
     public render() {
         if (!_.isUndefined(this.props.flashMessage)) {
             return (
                 <Snackbar
                     open={true}
                     message={this.props.flashMessage}
-                    autoHideDuration={SHOW_DURATION_MS}
+                    autoHideDuration={this.props.showDurationMs}
                     onRequestClose={this.onClose.bind(this)}
+                    bodyStyle={this.props.bodyStyle}
                 />
             );
         } else {

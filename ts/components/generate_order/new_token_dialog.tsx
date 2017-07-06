@@ -6,7 +6,7 @@ import Dialog from 'material-ui/Dialog';
 import {constants} from 'ts/utils/constants';
 import {Blockchain} from 'ts/blockchain';
 import {Token, TokenByAddress, AlertTypes} from 'ts/types';
-import {OrderAddressInput} from 'ts/components/inputs/order_address_input';
+import {AddressInput} from 'ts/components/inputs/address_input';
 import {Alert} from 'ts/components/ui/alert';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 import {RequiredLabel} from 'ts/components/ui/required_label';
@@ -78,13 +78,12 @@ export class NewTokenDialog extends React.Component<NewTokenDialogProps, NewToke
                         />
                     </div>
                     <div>
-                        <OrderAddressInput
+                        <AddressInput
                             isRequired={true}
                             label="Contract address"
-                            blockchain={this.props.blockchain}
-                            initialOrderAddress=""
+                            initialAddress=""
                             shouldShowIncompleteErrs={this.state.shouldShowAddressIncompleteErr}
-                            updateOrderAddress={this.onTokenAddressChanged.bind(this)}
+                            updateAddress={this.onTokenAddressChanged.bind(this)}
                         />
                     </div>
                     <div>
@@ -221,10 +220,12 @@ export class NewTokenDialog extends React.Component<NewTokenDialogProps, NewToke
             decimalsErrText,
         });
     }
-    private onTokenAddressChanged(address: string) {
-        this.setState({
-            address,
-        });
+    private onTokenAddressChanged(address?: string) {
+        if (!_.isUndefined(address)) {
+            this.setState({
+                address,
+            });
+        }
     }
     private isValidName(input: string) {
         return /^[a-z0-9 ]+$/i.test(input);

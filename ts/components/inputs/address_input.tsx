@@ -1,36 +1,36 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import {isAddress} from 'ethereum-address';
 import TextField from 'material-ui/TextField';
 import {colors} from 'material-ui/styles';
 import {Blockchain} from 'ts/blockchain';
 import {RequiredLabel} from 'ts/components/ui/required_label';
 
-interface OrderAddressInputProps {
-    blockchain: Blockchain;
+interface AddressInputProps {
     disabled?: boolean;
-    initialOrderAddress: string;
+    initialAddress: string;
     isRequired?: boolean;
     hintText?: string;
     shouldHideLabel?: boolean;
     label?: string;
     shouldShowIncompleteErrs?: boolean;
-    updateOrderAddress: (address: string) => void;
+    updateAddress: (address?: string) => void;
 }
 
-interface OrderAddressInputState {
+interface AddressInputState {
     address: string;
     errMsg: string;
 }
 
-export class OrderAddressInput extends React.Component<OrderAddressInputProps, OrderAddressInputState> {
-    constructor(props: OrderAddressInputProps) {
+export class AddressInput extends React.Component<AddressInputProps, AddressInputState> {
+    constructor(props: AddressInputProps) {
         super(props);
         this.state = {
-            address: this.props.initialOrderAddress,
+            address: this.props.initialAddress,
             errMsg: '',
         };
     }
-    public componentWillReceiveProps(nextProps: OrderAddressInputProps) {
+    public componentWillReceiveProps(nextProps: AddressInputProps) {
         if (nextProps.shouldShowIncompleteErrs && this.props.isRequired &&
             this.state.address === '') {
                 this.setState({
@@ -62,15 +62,13 @@ export class OrderAddressInput extends React.Component<OrderAddressInputProps, O
     }
     private onOrderTakerAddressUpdated(e: any) {
         const address = e.target.value.toLowerCase();
-        const isValidAddress = this.props.blockchain.isValidAddress(address) ||
-            address === '';
+        const isValidAddress = isAddress(address) || address === '';
         const errMsg = isValidAddress ? '' : 'Invalid ethereum address';
         this.setState({
             address,
             errMsg,
         });
-        if (isValidAddress) {
-            this.props.updateOrderAddress(address);
-        }
+        const addressIfValid = isValidAddress ? address : undefined;
+        this.props.updateAddress(addressIfValid);
     }
 }
