@@ -15,6 +15,11 @@ import {FlashMessage} from 'ts/components/ui/flash_message';
 import {NewsletterInput} from 'ts/pages/home/newsletter_input';
 
 const CUSTOM_GRAY = 'rgb(74, 74, 74)';
+enum RegistrationFlowSteps {
+    VERIFY_IDENTITY,
+    CONTRIBUTION_DETAILS,
+    REGISTRATION_COMPLETE,
+}
 
 export interface RegistrationFlowProps {
     location: Location;
@@ -24,7 +29,7 @@ export interface RegistrationFlowProps {
 
 interface RegistrationFlowState {
     civicUserId: string;
-    stepIndex: number;
+    stepIndex: RegistrationFlowSteps;
     isVerifyingIdentity: boolean;
 }
 
@@ -36,7 +41,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             appId: constants.CIVIC_APP_ID,
         });
         this.state = {
-            stepIndex: 0,
+            stepIndex: RegistrationFlowSteps.VERIFY_IDENTITY,
             civicUserId: undefined,
             isVerifyingIdentity: false,
         };
@@ -85,17 +90,17 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                         </Stepper>
                     </div>
                     <Paper zDepth={1} className="mb3 lg-mx0 md-mx0 sm-mx2">
-                        {this.state.stepIndex === 0 &&
+                        {this.state.stepIndex === RegistrationFlowSteps.VERIFY_IDENTITY &&
                             this.renderVerifyIdentityStep()
                         }
-                        {this.state.stepIndex === 1 &&
+                        {this.state.stepIndex === RegistrationFlowSteps.CONTRIBUTION_DETAILS &&
                             <ContributionForm
                                 civicUserId={this.state.civicUserId}
                                 dispatcher={this.props.dispatcher}
                                 onSubmittedContributionInfo={this.onSubmittedContributionInfo.bind(this)}
                             />
                         }
-                        {this.state.stepIndex === 2 &&
+                        {this.state.stepIndex === RegistrationFlowSteps.REGISTRATION_COMPLETE &&
                             this.renderThankYouStep()
                         }
                     </Paper>
@@ -184,7 +189,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
     }
     private onSubmittedContributionInfo() {
         this.setState({
-            stepIndex: 2,
+            stepIndex: RegistrationFlowSteps.REGISTRATION_COMPLETE,
         });
     }
     private onRegisterClick() {
@@ -222,7 +227,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         } else {
             const responseJSON = await response.json();
             this.setState({
-                stepIndex: 1,
+                stepIndex: RegistrationFlowSteps.CONTRIBUTION_DETAILS,
                 civicUserId: responseJSON.civicUserId,
                 isVerifyingIdentity: false,
             });
