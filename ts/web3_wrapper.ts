@@ -15,34 +15,37 @@ export class Web3Wrapper {
     private web3: Web3;
     private networkId: number;
     private watchNetworkAndBalanceIntervalId: number;
-    constructor(dispatcher: Dispatcher, networkId: number) {
+    constructor(dispatcher: Dispatcher, networkIdIfExists?: number) {
         this.dispatcher = dispatcher;
 
         const injectedWeb3 = (window as any).web3;
         const doesInjectedWeb3Exist = !_.isUndefined(injectedWeb3);
 
-        const isPublicNodeAvailable = networkId === constants.TESTNET_NETWORK_ID;
+        const publicNodeUrlIfExistsForNetworkId = constants.PUBLIC_NODE_URL_BY_NETWORK_ID[networkIdIfExists];
+        const isPublicNodeAvailableForNetworkId = !_.isUndefined(publicNodeUrlIfExistsForNetworkId);
 
         let provider;
-        if (doesInjectedWeb3Exist && isPublicNodeAvailable) {
+        if (doesInjectedWeb3Exist && isPublicNodeAvailableForNetworkId) {
             // We catch all requests involving a users account and send it to the injectedWeb3
             // instance. All other requests go to the public hosted node.
             provider = new ProviderEngine();
             provider.addProvider(new InjectedWeb3SubProvider(injectedWeb3));
             provider.addProvider(new FilterSubprovider());
             provider.addProvider(new RpcSubprovider({
-                rpcUrl: constants.HOSTED_TESTNET_URL,
+                rpcUrl: publicNodeUrlIfExistsForNetworkId,
             }));
             provider.start();
         } else if (doesInjectedWeb3Exist) {
             // Since no public node for this network, all requests go to injectedWeb3 instance
             provider = injectedWeb3.currentProvider;
         } else {
-            // If no injectedWeb3 instance, all requests go to our public hosted node
+            // If no injectedWeb3 instance, all requests fallback to our public hosted kovan node
+            // We do this so that users can still browse the OTC DApp even if they do not have web3
+            // injected into their browser.
             provider = new ProviderEngine();
             provider.addProvider(new FilterSubprovider());
             provider.addProvider(new RpcSubprovider({
-                rpcUrl: constants.HOSTED_TESTNET_URL,
+                rpcUrl: constants.PUBLIC_NODE_URL_BY_NETWORK_ID[constants.TESTNET_NETWORK_ID],
             }));
             provider.start();
         }

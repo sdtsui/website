@@ -19,6 +19,7 @@ export class Dispatcher {
     constructor(dispatch: Dispatch<State>) {
         this.dispatch = dispatch;
     }
+    // OTC
     public resetState() {
         this.dispatch({
             type: ActionTypes.RESET_STATE,
@@ -172,6 +173,22 @@ export class Dispatcher {
             type: ActionTypes.UPDATE_ORDER_FILL_AMOUNT,
         });
     }
+
+    // Docs
+    public updateCurrent0xjsVersion(version: string) {
+        this.dispatch({
+            data: version,
+            type: ActionTypes.UPDATE_LIBRARY_VERSION,
+        });
+    }
+    public updateAvailable0xjsVersions(versions: string[]) {
+        this.dispatch({
+            data: versions,
+            type: ActionTypes.UPDATE_AVAILABLE_LIBRARY_VERSIONS,
+        });
+    }
+
+    // Shared
     public showFlashMessage(msg: string) {
         this.dispatch({
             data: msg,

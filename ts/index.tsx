@@ -72,7 +72,7 @@ const muiTheme = getMuiTheme({
 const LazyOTC = createLazyComponent('OTC', () => System.import<any>(/* webpackChunkName: "otc" */'ts/containers/otc'));
 const LazyZeroExJSDocumentation = createLazyComponent(
     'ZeroExJSDocumentation',
-    () => System.import<any>(/* webpackChunkName: "docs" */'ts/pages/documentation/zero_ex_js_documentation'),
+    () => System.import<any>(/* webpackChunkName: "docs" */'ts/containers/zero_ex_js_documentation'),
 );
 
 const store: ReduxStore<State> = createStore(reducer);
