@@ -2,7 +2,7 @@ import * as React from 'react';
 import {colors} from 'material-ui/styles';
 
 export interface RequiredLabelProps {
-    label: string;
+    label: string|React.ReactNode;
 }
 
 export const RequiredLabel = (props: RequiredLabelProps) => {
