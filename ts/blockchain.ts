@@ -173,6 +173,11 @@ export class Blockchain {
         }
 
         const makerAddress = this.userAddress;
+        // If makerAddress is undefined, this means they have a web3 instance injected into their browser
+        // but no account addresses associated with it.
+        if (_.isUndefined(makerAddress)) {
+            throw new Error('Tried to send a sign request but user has no associated addresses');
+        }
         const signature = await this.web3Wrapper.signTransactionAsync(makerAddress, msgHashHex);
 
         // HACK: There is no consensus on whether the signatureHex string should be formatted as
