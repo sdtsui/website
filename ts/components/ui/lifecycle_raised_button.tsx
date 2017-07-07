@@ -16,6 +16,7 @@ enum ButtonState {
 interface LifeCycleRaisedButtonProps {
     isHidden?: boolean;
     isPrimary?: boolean;
+    isDisabled?: boolean;
     labelReady: string;
     labelLoading: string;
     labelComplete: string;
@@ -28,6 +29,9 @@ interface LifeCycleRaisedButtonState {
 
 export class LifeCycleRaisedButton extends
     React.Component<LifeCycleRaisedButtonProps, LifeCycleRaisedButtonState> {
+    public static defaultProps: Partial<LifeCycleRaisedButtonProps> = {
+        isDisabled: false,
+    };
     private buttonTimeoutId: number;
     constructor(props: LifeCycleRaisedButtonProps) {
         super(props);
@@ -63,7 +67,7 @@ export class LifeCycleRaisedButton extends
                 label={label}
                 style={{width: '100%'}}
                 onTouchTap={this.onClickAsync.bind(this)}
-                disabled={this.state.buttonState !== ButtonState.READY}
+                disabled={this.props.isDisabled || this.state.buttonState !== ButtonState.READY}
             />
         );
     }
