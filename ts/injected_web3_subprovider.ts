@@ -15,6 +15,9 @@ export class InjectedWeb3SubProvider {
     }
     public handleRequest(payload: any, next: () => void, end: (err: Error, result: any) => void) {
         switch (payload.method) {
+            case 'web3_clientVersion':
+                this.injectedWeb3.version.getNode(end);
+                return;
             case 'eth_accounts':
                 this.injectedWeb3.eth.getAccounts(end);
                 return;

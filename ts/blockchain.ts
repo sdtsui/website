@@ -162,8 +162,9 @@ export class Blockchain {
     public async sendSignRequestAsync(orderHashHex: string): Promise<SignatureData> {
         let msgHashHex;
         const isParityNode = _.includes(this.nodeVersion, 'Parity');
-        if (isParityNode) {
-            // Parity node adds the personalMessage prefix itself
+        const isTestRpc = _.includes(this.nodeVersion, 'TestRPC');
+        if (isParityNode || isTestRpc) {
+            // Parity and TestRpc nodes add the personalMessage prefix itself
             msgHashHex = orderHashHex;
         } else {
             const orderHashBuff = ethUtil.toBuffer(orderHashHex);
@@ -179,39 +180,30 @@ export class Blockchain {
         }
         const signature = await this.web3Wrapper.signTransactionAsync(makerAddress, msgHashHex);
 
-        let signatureData;
-        const [nodeVersionNumber] = findVersions(this.nodeVersion);
-        // Parity v1.6.6 and earlier returns the signatureData as vrs instead of rsv as Geth does
-        // Since this version they have updated it to rsv but for the time being we still want to
-        // support version < 1.6.6
-        // Date: May 23rd 2017
-        const latestParityVersionWithVRS = '1.6.6';
-        const isVersionBeforeParityFix = compareVersions(nodeVersionNumber, latestParityVersionWithVRS) <= 0;
-        if (isParityNode && isVersionBeforeParityFix) {
-            const signatureBuffer = ethUtil.toBuffer(signature);
-            let v = signatureBuffer[0];
-            if (v < 27) {
-                v += 27;
+        // HACK: There is no consensus on whether the signatureHex string should be formatted as
+        // v + r + s OR r + s + v, and different clients (even different versions of the same client)
+        // return the signature params in different orders. In order to support all client implementations,
+        // we parse the signature in both ways, and evaluate if either one is a valid signature.
+        const validVParamValues = [27, 28];
+        const signatureDataVRS = this.parseSignatureHexAsVRS(msgHashHex, signature);
+        if (_.includes(validVParamValues, signatureDataVRS.v)) {
+            const isValidVRSSignature = ZeroEx.isValidSignature(orderHashHex, signatureDataVRS, makerAddress);
+            if (isValidVRSSignature) {
+                this.dispatcher.updateSignatureData(signatureDataVRS);
+                return signatureDataVRS;
             }
-            signatureData = {
-                v,
-                r: signatureBuffer.slice(1, 33),
-                s: signatureBuffer.slice(33, 65),
-            };
-        } else {
-            signatureData = ethUtil.fromRpcSig(signature);
         }
 
-        const {v, r, s} = signatureData;
-        signatureData.hash = orderHashHex;
-        signatureData.r = ethUtil.bufferToHex(signatureData.r);
-        signatureData.s = ethUtil.bufferToHex(signatureData.s);
-        const isValidSignature = ZeroEx.isValidSignature(orderHashHex, signatureData, makerAddress);
-        if (!isValidSignature) {
-            throw new Error(BlockchainCallErrs.INVALID_SIGNATURE);
+        const signatureDataRSV = this.parseSignatureHexAsRSV(msgHashHex, signature);
+        if (_.includes(validVParamValues, signatureDataRSV.v)) {
+            const isValidRSVSignature = ZeroEx.isValidSignature(orderHashHex, signatureDataRSV, makerAddress);
+            if (isValidRSVSignature) {
+                this.dispatcher.updateSignatureData(signatureDataRSV);
+                return signatureDataRSV;
+            }
         }
-        this.dispatcher.updateSignatureData(signatureData);
-        return signatureData;
+
+        throw new Error(BlockchainCallErrs.INVALID_SIGNATURE);
     }
     public async mintTestTokensAsync(token: Token) {
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
@@ -507,5 +499,31 @@ export class Blockchain {
                 throw new Error(BlockchainCallErrs.UNHANDLED_ERROR);
             }
         }
+    }
+    private parseSignatureHexAsVRS(orderHashHex: string, signatureHex: string): SignatureData {
+        const signatureBuffer = ethUtil.toBuffer(signatureHex);
+        let v = signatureBuffer[0];
+        if (v < 27) {
+            v += 27;
+        }
+        const r = signatureBuffer.slice(1, 33);
+        const s = signatureBuffer.slice(33, 65);
+        const signatureData: SignatureData = {
+            v,
+            r: ethUtil.bufferToHex(r),
+            s: ethUtil.bufferToHex(s),
+            hash: orderHashHex,
+        };
+        return signatureData;
+    }
+    private parseSignatureHexAsRSV(orderHashHex: string, signatureHex: string): SignatureData {
+        const {v, r, s} = ethUtil.fromRpcSig(signatureHex);
+        const signatureData: SignatureData = {
+            v,
+            r: ethUtil.bufferToHex(r),
+            s: ethUtil.bufferToHex(s),
+            hash: orderHashHex,
+        };
+        return signatureData;
     }
 }
