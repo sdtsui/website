@@ -159,15 +159,15 @@ export class Blockchain {
         const lowercaseAddress = address.toLowerCase();
         return this.web3Wrapper.isAddress(lowercaseAddress);
     }
-    public async sendSignRequestAsync(orderHash: string): Promise<SignatureData> {
+    public async sendSignRequestAsync(orderHashHex: string): Promise<SignatureData> {
         let msgHashHex;
         const isParityNode = _.includes(this.nodeVersion, 'Parity');
         const isTestRpc = _.includes(this.nodeVersion, 'TestRPC');
         if (isParityNode || isTestRpc) {
             // Parity and TestRpc nodes add the personalMessage prefix itself
-            msgHashHex = orderHash;
+            msgHashHex = orderHashHex;
         } else {
-            const orderHashBuff = ethUtil.toBuffer(orderHash);
+            const orderHashBuff = ethUtil.toBuffer(orderHashHex);
             const msgHashBuff = ethUtil.hashPersonalMessage(orderHashBuff);
             msgHashHex = ethUtil.bufferToHex(msgHashBuff);
         }
@@ -181,9 +181,8 @@ export class Blockchain {
         // we parse the signature in both ways, and evaluate if either one is a valid signature.
         const validVParamValues = [27, 28];
         const signatureDataVRS = this.parseSignatureHexAsVRS(msgHashHex, signature);
-        console.log('signatureDataVRS', signatureDataVRS);
         if (_.includes(validVParamValues, signatureDataVRS.v)) {
-            const isValidVRSSignature = ZeroEx.isValidSignature(orderHash, signatureDataVRS, makerAddress);
+            const isValidVRSSignature = ZeroEx.isValidSignature(orderHashHex, signatureDataVRS, makerAddress);
             if (isValidVRSSignature) {
                 this.dispatcher.updateSignatureData(signatureDataVRS);
                 return signatureDataVRS;
@@ -191,9 +190,8 @@ export class Blockchain {
         }
 
         const signatureDataRSV = this.parseSignatureHexAsRSV(msgHashHex, signature);
-        console.log('signatureDataRSV', signatureDataRSV);
         if (_.includes(validVParamValues, signatureDataRSV.v)) {
-            const isValidRSVSignature = ZeroEx.isValidSignature(orderHash, signatureDataRSV, makerAddress);
+            const isValidRSVSignature = ZeroEx.isValidSignature(orderHashHex, signatureDataRSV, makerAddress);
             if (isValidRSVSignature) {
                 this.dispatcher.updateSignatureData(signatureDataRSV);
                 return signatureDataRSV;
