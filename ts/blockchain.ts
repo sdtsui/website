@@ -417,7 +417,7 @@ export class Blockchain {
         return customTokens;
     }
     private async onPageLoadInitFireAndForgetAsync() {
-        await this.onPageLoadAsync(); // wait for page to load
+        await utils.onPageLoadAsync(); // wait for page to load
 
         const injectedWeb3 = (window as any).web3;
         // Hack: We need to know the networkId the injectedWeb3 is connected to (if it is defined) in
@@ -507,13 +507,5 @@ export class Blockchain {
                 throw new Error(BlockchainCallErrs.UNHANDLED_ERROR);
             }
         }
-    }
-    private async onPageLoadAsync() {
-        if (document.readyState === 'complete') {
-            return; // Already loaded
-        }
-        return new Promise((resolve, reject) => {
-            window.onload = resolve;
-        });
     }
 }
