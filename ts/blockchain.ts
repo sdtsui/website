@@ -194,7 +194,7 @@ export class Blockchain {
                 v += 27;
             }
             signatureData = {
-                v: signatureBuffer[0],
+                v,
                 r: signatureBuffer.slice(1, 33),
                 s: signatureBuffer.slice(33, 65),
             };
