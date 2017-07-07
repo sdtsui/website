@@ -3,6 +3,7 @@ import {Store as ReduxStore, Dispatch} from 'redux';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {State} from 'ts/redux/reducer';
 import {RegistrationFlow as RegistrationFlowComponent} from 'ts/pages/token_distribution/registration_flow';
+import {BlockchainErrs} from 'ts/types';
 
 interface ConnectedDispatch {
     dispatcher: Dispatcher;
@@ -15,9 +16,21 @@ const mapDispatchToProps = (dispatch: Dispatch<State>): ConnectedDispatch => ({
 
 interface ConnectedState {
     flashMessage?: string;
+    networkId: number;
+    nodeVersion: string;
+    userAddress: string;
+    blockchainErr: BlockchainErrs;
+    shouldBlockchainErrDialogBeOpen: boolean;
 };
 
-const mapStateToProps = (state: State): ConnectedState => ({flashMessage: state.flashMessage});
+const mapStateToProps = (state: State): ConnectedState => ({
+    flashMessage: state.flashMessage,
+    networkId: state.networkId,
+    nodeVersion: state.nodeVersion,
+    userAddress: state.userAddress,
+    blockchainErr: state.blockchainErr,
+    shouldBlockchainErrDialogBeOpen: state.shouldBlockchainErrDialogBeOpen,
+});
 
 export const RegistrationFlow: React.ComponentClass<RegistrationFlowComponentPassedProps> =
   connect(mapStateToProps, mapDispatchToProps)(RegistrationFlowComponent);

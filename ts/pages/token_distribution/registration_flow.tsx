@@ -4,36 +4,49 @@ import {colors} from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
 import CircularProgress from 'material-ui/CircularProgress';
 import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
+import {Blockchain} from 'ts/blockchain';
 import {constants} from 'ts/utils/constants';
 import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
-import {ContributionForm} from 'ts/pages/token_distribution/contribution_form';
+import {ContributionAmountStep} from 'ts/pages/token_distribution/contribution_amount_step';
+import {SignatureStep} from 'ts/pages/token_distribution/signature_step';
 import {RegisterButton} from 'ts/pages/token_distribution/register_button';
-import {CivicSip} from 'ts/types';
+import {CivicSip, BlockchainErrs} from 'ts/types';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {FlashMessage} from 'ts/components/ui/flash_message';
 import {NewsletterInput} from 'ts/pages/home/newsletter_input';
+import {BlockchainErrDialog} from 'ts/components/blockchain_err_dialog';
 
 const CUSTOM_GRAY = 'rgb(74, 74, 74)';
 enum RegistrationFlowSteps {
     VERIFY_IDENTITY,
-    CONTRIBUTION_DETAILS,
+    SIGNATURE_PROOF,
+    CONTRIBUTION_AMOUNT,
     REGISTRATION_COMPLETE,
 }
 
 export interface RegistrationFlowProps {
     location: Location;
     dispatcher: Dispatcher;
+    networkId: number;
+    nodeVersion: string;
+    userAddress: string;
     flashMessage?: string;
+    blockchainErr: BlockchainErrs;
+    shouldBlockchainErrDialogBeOpen: boolean;
 }
 
 interface RegistrationFlowState {
     civicUserId: string;
     stepIndex: RegistrationFlowSteps;
     isVerifyingIdentity: boolean;
+    prevNetworkId: number;
+    prevNodeVersion: string;
+    prevUserAddress: string;
 }
 
 export class RegistrationFlow extends React.Component<RegistrationFlowProps, RegistrationFlowState> {
+    private blockchain: Blockchain;
     private civicSip: CivicSip;
     constructor(props: RegistrationFlowProps) {
         super(props);
@@ -44,7 +57,13 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             stepIndex: RegistrationFlowSteps.VERIFY_IDENTITY,
             civicUserId: undefined,
             isVerifyingIdentity: false,
+            prevNetworkId: this.props.networkId,
+            prevNodeVersion: this.props.nodeVersion,
+            prevUserAddress: this.props.userAddress,
         };
+    }
+    public componentWillMount() {
+        this.blockchain = new Blockchain(this.props.dispatcher);
     }
     public componentDidMount() {
         this.civicSip.on('auth-code-received', (event: any) => {
@@ -59,7 +78,26 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             });
         });
     }
+    public componentWillReceiveProps(nextProps: RegistrationFlowProps) {
+        if (nextProps.networkId !== this.state.prevNetworkId) {
+            this.blockchain.networkIdUpdatedFireAndForgetAsync(nextProps.networkId);
+            this.setState({
+                prevNetworkId: nextProps.networkId,
+            });
+        }
+        if (nextProps.userAddress !== this.state.prevUserAddress) {
+            this.blockchain.userAddressUpdatedFireAndForgetAsync(nextProps.userAddress);
+            this.setState({
+                prevUserAddress: nextProps.userAddress,
+            });
+        }
+        if (nextProps.nodeVersion !== this.state.prevNodeVersion) {
+            this.blockchain.nodeVersionUpdatedFireAndForgetAsync(nextProps.nodeVersion);
+        }
+    }
     public render() {
+        const updateShouldBlockchainErrDialogBeOpen = this.props.dispatcher
+                .updateShouldBlockchainErrDialogBeOpen.bind(this.props.dispatcher);
         const registrationStyle: React.CSSProperties = {
             minHeight: '100vh',
             display: 'flex',
@@ -82,7 +120,10 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                                 <StepLabel>Verify your identity with Civic</StepLabel>
                             </Step>
                             <Step>
-                                <StepLabel>Select contribution address & amount</StepLabel>
+                                <StepLabel>Signature proof</StepLabel>
+                            </Step>
+                            <Step>
+                                <StepLabel>Choose contribution amount</StepLabel>
                             </Step>
                             <Step>
                                 <StepLabel>Complete</StepLabel>
@@ -93,8 +134,17 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                         {this.state.stepIndex === RegistrationFlowSteps.VERIFY_IDENTITY &&
                             this.renderVerifyIdentityStep()
                         }
-                        {this.state.stepIndex === RegistrationFlowSteps.CONTRIBUTION_DETAILS &&
-                            <ContributionForm
+                        {this.state.stepIndex === RegistrationFlowSteps.SIGNATURE_PROOF &&
+                            <SignatureStep
+                                blockchain={this.blockchain}
+                                civicUserId={this.state.civicUserId}
+                                dispatcher={this.props.dispatcher}
+                                userAddress={this.props.userAddress}
+                                onSubmittedOwnershipProof={this.onSubmittedOwnershipProof.bind(this)}
+                            />
+                        }
+                        {this.state.stepIndex === RegistrationFlowSteps.CONTRIBUTION_AMOUNT &&
+                            <ContributionAmountStep
                                 civicUserId={this.state.civicUserId}
                                 dispatcher={this.props.dispatcher}
                                 onSubmittedContributionInfo={this.onSubmittedContributionInfo.bind(this)}
@@ -105,6 +155,13 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                         }
                     </Paper>
                 </div>
+                <BlockchainErrDialog
+                    blockchain={this.blockchain}
+                    blockchainErr={this.props.blockchainErr}
+                    isOpen={this.props.shouldBlockchainErrDialogBeOpen}
+                    userAddress={this.props.userAddress}
+                    toggleDialogFn={updateShouldBlockchainErrDialogBeOpen}
+                />
                 <FlashMessage
                     dispatcher={this.props.dispatcher}
                     flashMessage={this.props.flashMessage}
@@ -192,6 +249,11 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             stepIndex: RegistrationFlowSteps.REGISTRATION_COMPLETE,
         });
     }
+    private onSubmittedOwnershipProof() {
+        this.setState({
+            stepIndex: RegistrationFlowSteps.CONTRIBUTION_AMOUNT,
+        });
+    }
     private onRegisterClick() {
         this.setState({
             isVerifyingIdentity: true,
@@ -227,7 +289,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         } else {
             const responseJSON = await response.json();
             this.setState({
-                stepIndex: RegistrationFlowSteps.CONTRIBUTION_DETAILS,
+                stepIndex: RegistrationFlowSteps.SIGNATURE_PROOF,
                 civicUserId: responseJSON.civicUserId,
                 isVerifyingIdentity: false,
             });
