@@ -185,7 +185,7 @@ export class Blockchain {
         // return the signature params in different orders. In order to support all client implementations,
         // we parse the signature in both ways, and evaluate if either one is a valid signature.
         const validVParamValues = [27, 28];
-        const signatureDataVRS = this.parseSignatureHexAsVRS(msgHashHex, signature);
+        const signatureDataVRS = this.parseSignatureHexAsVRS(orderHashHex, signature);
         if (_.includes(validVParamValues, signatureDataVRS.v)) {
             const isValidVRSSignature = ZeroEx.isValidSignature(orderHashHex, signatureDataVRS, makerAddress);
             if (isValidVRSSignature) {
@@ -194,7 +194,7 @@ export class Blockchain {
             }
         }
 
-        const signatureDataRSV = this.parseSignatureHexAsRSV(msgHashHex, signature);
+        const signatureDataRSV = this.parseSignatureHexAsRSV(orderHashHex, signature);
         if (_.includes(validVParamValues, signatureDataRSV.v)) {
             const isValidRSVSignature = ZeroEx.isValidSignature(orderHashHex, signatureDataRSV, makerAddress);
             if (isValidRSVSignature) {
