@@ -57,7 +57,7 @@ export class TradeHistory extends React.Component<TradeHistoryProps, TradeHistor
         return _.map(this.state.sortedFills, (fill, index) => {
             return (
                 <TradeHistoryItem
-                    key={`${fill.orderHash}-${fill.filledValueT}-${index}`}
+                    key={`${fill.orderHash}-${fill.filledTakerTokenAmount}-${index}`}
                     fill={fill}
                     tokenByAddress={this.props.tokenByAddress}
                     userAddress={this.props.userAddress}
@@ -77,17 +77,17 @@ export class TradeHistory extends React.Component<TradeHistoryProps, TradeHistor
         let numNonCustomFills = 0;
         const tokens = _.values(this.props.tokenByAddress);
         _.each(this.state.sortedFills, fill => {
-            const tokenT = _.find(tokens, token => {
-                return token.address === fill.tokenT;
+            const takerToken = _.find(tokens, token => {
+                return token.address === fill.takerToken;
             });
-            const tokenM = _.find(tokens, token => {
-                return token.address === fill.tokenM;
+            const makerToken = _.find(tokens, token => {
+                return token.address === fill.makerToken;
             });
             // For now we don't show history items for orders using custom ERC20
             // tokens the client does not know how to display.
             // TODO: Try to retrieve the name/symbol of an unknown token in order to display it
             // Be sure to remove similar logic in trade_history_item.tsx
-            if (!_.isUndefined(tokenT) && !_.isUndefined(tokenM)) {
+            if (!_.isUndefined(takerToken) && !_.isUndefined(makerToken)) {
                 numNonCustomFills += 1;
             }
         });
