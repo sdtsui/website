@@ -13,7 +13,7 @@ export const zeroEx = {
                  depositTokenAddr: string, receiveTokenAddr: string, feeRecipient: string,
                  depositAmt: BigNumber.BigNumber, receiveAmt: BigNumber.BigNumber,
                  makerFee: BigNumber.BigNumber, takerFee: BigNumber.BigNumber,
-                 expiration: BigNumber.BigNumber, salt: BigNumber.BigNumber): string {
+                 expirationTimestampInSec: BigNumber.BigNumber, salt: BigNumber.BigNumber): string {
         takerAddr = takerAddr !== '' ? takerAddr : constants.NULL_ADDRESS;
         const orderParts = [
             exchangeContractAddr,
@@ -26,7 +26,7 @@ export const zeroEx = {
             receiveAmt,
             makerFee,
             takerFee,
-            expiration,
+            expirationTimestampInSec,
             salt,
         ];
         const buffHash = this.solSHA3(orderParts);
