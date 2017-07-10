@@ -128,11 +128,11 @@ export class Blockchain {
             expirationUnixTimestampSec,
             salt.toString(),
         ];
-        const fillAmountT = fillAmount.toString();
+        const fillTakerTokenAmount = fillAmount.toString();
         const response: ContractResponse = await this.exchange.fillOrder(
                                  orderAddresses,
                                  orderValues,
-                                 fillAmountT,
+                                 fillTakerTokenAmount,
                                  shouldThrowOnInsufficientBalanceOrAllowance,
                                  signatureData.v,
                                  signatureData.r,

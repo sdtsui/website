@@ -112,10 +112,10 @@ export class TradeHistoryItem extends React.Component<TradeHistoryItemProps, Tra
     }
     private renderAmounts(makerToken: Token, takerToken: Token) {
         const fill = this.props.fill;
-        const filledValueTInUnits = ZeroEx.toUnitAmount(fill.filledTakerTokenAmount, takerToken.decimals);
-        const filledValueMInUnits = ZeroEx.toUnitAmount(fill.filledMakerTokenAmount, takerToken.decimals);
-        let exchangeRate = filledValueTInUnits.div(filledValueMInUnits);
-        const fillValueM = ZeroEx.toBaseUnitAmount(filledValueMInUnits, makerToken.decimals);
+        const filledTakerTokenAmountInUnits = ZeroEx.toUnitAmount(fill.filledTakerTokenAmount, takerToken.decimals);
+        const filledMakerTokenAmountInUnits = ZeroEx.toUnitAmount(fill.filledMakerTokenAmount, takerToken.decimals);
+        let exchangeRate = filledTakerTokenAmountInUnits.div(filledMakerTokenAmountInUnits);
+        const fillMakerTokenAmount = ZeroEx.toBaseUnitAmount(filledMakerTokenAmountInUnits, makerToken.decimals);
 
         let receiveAmount;
         let receiveToken;
@@ -128,12 +128,12 @@ export class TradeHistoryItem extends React.Component<TradeHistoryItemProps, Tra
             givenToken = takerToken;
         } else if (this.props.userAddress === fill.maker) {
             receiveAmount = fill.filledTakerTokenAmount;
-            givenAmount = fillValueM;
+            givenAmount = fillMakerTokenAmount;
             receiveToken = takerToken;
             givenToken = makerToken;
             exchangeRate = new BigNumber(1).div(exchangeRate);
         } else if (this.props.userAddress === fill.taker) {
-            receiveAmount = fillValueM;
+            receiveAmount = fillMakerTokenAmount;
             givenAmount = fill.filledTakerTokenAmount;
             receiveToken = makerToken;
             givenToken = takerToken;
