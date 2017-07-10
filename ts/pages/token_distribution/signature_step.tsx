@@ -12,6 +12,7 @@ import {RequiredLabel} from 'ts/components/ui/required_label';
 import {Styles} from 'ts/types';
 import {Identicon} from 'ts/components/ui/identicon';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
+import {ProviderDropDown} from 'ts/components/provider_drop_down';
 
 export interface SignatureStepProps {
     blockchain: Blockchain;
@@ -56,6 +57,11 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                     an exchange-hosted address. Select the address you would like to contribute
                     with via Metamask, Parity Signer or Mist and once it shows up below, click
                     the button to sign the proof.
+                </div>
+                <div>
+                    <ProviderDropDown
+                        currentProviderName="Metamask"
+                    />
                 </div>
                 <div className="pt2" style={{maxWidth: 400}}>
                     {this.renderUserAddress()}
