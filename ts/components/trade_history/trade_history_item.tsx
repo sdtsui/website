@@ -26,17 +26,17 @@ export class TradeHistoryItem extends React.Component<TradeHistoryItemProps, Tra
     public render() {
         const fill = this.props.fill;
         const tokens = _.values(this.props.tokenByAddress);
-        const tokenT = _.find(tokens, token => {
-            return token.address === fill.tokenT;
+        const takerToken = _.find(tokens, token => {
+            return token.address === fill.takerToken;
         });
-        const tokenM = _.find(tokens, token => {
-            return token.address === fill.tokenM;
+        const makerToken = _.find(tokens, token => {
+            return token.address === fill.makerToken;
         });
         // For now we don't show history items for orders using custom ERC20
         // tokens the client does not know how to display.
         // TODO: Try to retrieve the name/symbol of an unknown token in order to display it
         // Be sure to remove similar logic in trade_history.tsx
-        if (_.isUndefined(tokenT) || _.isUndefined(tokenM)) {
+        if (_.isUndefined(takerToken) || _.isUndefined(makerToken)) {
             return null;
         }
 
@@ -83,7 +83,7 @@ export class TradeHistoryItem extends React.Component<TradeHistoryItemProps, Tra
                         className={amountColClassNames}
                         style={amountColStyle}
                     >
-                        {this.renderAmounts(tokenM, tokenT)}
+                        {this.renderAmounts(makerToken, takerToken)}
                     </div>
                     <div className="col col-12 lg-col-1 md-col-1 lg-pr3 md-pr3 lg-py3 md-py3 sm-pb1 sm-center">
                         <div className="pt1 lg-right md-right sm-mx-auto" style={{width: 13}}>
@@ -110,12 +110,12 @@ export class TradeHistoryItem extends React.Component<TradeHistoryItemProps, Tra
             </Paper>
         );
     }
-    private renderAmounts(tokenM: Token, tokenT: Token) {
+    private renderAmounts(makerToken: Token, takerToken: Token) {
         const fill = this.props.fill;
-        const filledValueTInUnits = ZeroEx.toUnitAmount(fill.filledValueT, tokenT.decimals);
-        const filledValueMInUnits = ZeroEx.toUnitAmount(fill.filledValueM, tokenT.decimals);
-        let exchangeRate = filledValueTInUnits.div(filledValueMInUnits);
-        const fillValueM = ZeroEx.toBaseUnitAmount(filledValueMInUnits, tokenM.decimals);
+        const filledTakerTokenAmountInUnits = ZeroEx.toUnitAmount(fill.filledTakerTokenAmount, takerToken.decimals);
+        const filledMakerTokenAmountInUnits = ZeroEx.toUnitAmount(fill.filledMakerTokenAmount, takerToken.decimals);
+        let exchangeRate = filledTakerTokenAmountInUnits.div(filledMakerTokenAmountInUnits);
+        const fillMakerTokenAmount = ZeroEx.toBaseUnitAmount(filledMakerTokenAmountInUnits, makerToken.decimals);
 
         let receiveAmount;
         let receiveToken;
@@ -124,19 +124,19 @@ export class TradeHistoryItem extends React.Component<TradeHistoryItemProps, Tra
         if (this.props.userAddress === fill.maker && this.props.userAddress === fill.taker) {
             receiveAmount = new BigNumber(0);
             givenAmount = new BigNumber(0);
-            receiveToken = tokenM;
-            givenToken = tokenT;
+            receiveToken = makerToken;
+            givenToken = takerToken;
         } else if (this.props.userAddress === fill.maker) {
-            receiveAmount = fill.filledValueT;
-            givenAmount = fillValueM;
-            receiveToken = tokenT;
-            givenToken = tokenM;
+            receiveAmount = fill.filledTakerTokenAmount;
+            givenAmount = fillMakerTokenAmount;
+            receiveToken = takerToken;
+            givenToken = makerToken;
             exchangeRate = new BigNumber(1).div(exchangeRate);
         } else if (this.props.userAddress === fill.taker) {
-            receiveAmount = fillValueM;
-            givenAmount = fill.filledValueT;
-            receiveToken = tokenM;
-            givenToken = tokenT;
+            receiveAmount = fillMakerTokenAmount;
+            givenAmount = fill.filledTakerTokenAmount;
+            receiveToken = makerToken;
+            givenToken = takerToken;
         }
 
         return (

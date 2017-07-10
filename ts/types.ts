@@ -110,12 +110,12 @@ export interface Fill {
     logIndex: number;
     maker: string;
     taker: string;
-    tokenM: string;
-    tokenT: string;
-    filledValueM: BigNumber.BigNumber;
-    filledValueT: BigNumber.BigNumber;
-    feeMPaid: BigNumber.BigNumber;
-    feeTPaid: BigNumber.BigNumber;
+    makerToken: string;
+    takerToken: string;
+    filledMakerTokenAmount: BigNumber.BigNumber;
+    filledTakerTokenAmount: BigNumber.BigNumber;
+    paidMakerFee: BigNumber.BigNumber;
+    paidTakerFee: BigNumber.BigNumber;
     orderHash: string;
     transactionHash: string;
     blockTimestamp: number;
@@ -368,7 +368,3 @@ export interface FAQSection {
     name: string;
     questions: FAQQuestion[];
 }
-
-export interface PublicNodeUrlByNetworkId {
-    [networkId: number]: string;
-};

@@ -20,6 +20,8 @@ const typeToSection: {[typeName: string]: string} = {
     ExchangeWrapper: 'exchange',
     TokenWrapper: 'token',
     TokenRegistryWrapper: 'tokenRegistry',
+    EtherTokenWrapper: 'etherToken',
+    ProxyWrapper: 'proxy',
 };
 
 interface TypeProps {

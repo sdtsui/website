@@ -1,4 +1,4 @@
-import {ExchangeContractErrs, PublicNodeUrlByNetworkId} from 'ts/types';
+import {ExchangeContractErrs} from 'ts/types';
 import * as BigNumber from 'bignumber.js';
 
 export const constants = {
@@ -10,12 +10,10 @@ export const constants = {
     BITLY_ENDPOINT: 'https://api-ssl.bitly.com',
     CIVIC_APP_ID: 'H1dfQuJEb',
     DEFAULT_TOKEN_ICON_URL: '/images/token_icons/default.png',
+    ETHER_SCAN_ENDPOINT: 'https://kovan.etherscan.io',
     ETHER_FAUCET_ENDPOINT: 'https://faucet.0xproject.com/rain',
     FEE_RECIPIENT_ADDRESS: '0x0000000000000000000000000000000000000000',
-    PUBLIC_NODE_URL_BY_NETWORK_ID: {
-        [1]: 'https://mainnet.0xproject.com',
-        [42]: 'https://kovan.0xproject.com',
-    } as PublicNodeUrlByNetworkId,
+    HOSTED_TESTNET_URL: 'https://kovan.0xproject.com',
     GITHUB_0X_JS_URL: 'https://github.com/0xProject/0x.js',
     MAKER_FEE: new BigNumber(0),
     METAMASK_CHROME_STORE_URL: 'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
@@ -30,8 +28,6 @@ export const constants = {
     S3_DOCUMENTATION_JSON_ROOT: 'https://s3.amazonaws.com/0xjs-docs-jsons',
     UNAVAILABLE_STATUS: 503,
     TAKER_FEE: new BigNumber(0),
-    MAINNET_NAME: 'Main network',
-    MAINNET_NETWORK_ID: 1,
     TESTNET_NAME: 'Kovan',
     TESTNET_NETWORK_ID: 42,
     TESTRPC_NETWORK_ID: 50,

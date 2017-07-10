@@ -112,7 +112,7 @@ export class Blockchain {
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
         taker = taker === '' ? constants.NULL_ADDRESS : taker;
-        const shouldCheckTransfer = true;
+        const shouldThrowOnInsufficientBalanceOrAllowance = true;
         const orderAddresses = [
             maker,
             taker,
@@ -128,12 +128,12 @@ export class Blockchain {
             expirationUnixTimestampSec,
             salt.toString(),
         ];
-        const fillAmountT = fillAmount.toString();
-        const response: ContractResponse = await this.exchange.fill(
+        const fillTakerTokenAmount = fillAmount.toString();
+        const response: ContractResponse = await this.exchange.fillOrder(
                                  orderAddresses,
                                  orderValues,
-                                 fillAmountT,
-                                 shouldCheckTransfer,
+                                 fillTakerTokenAmount,
+                                 shouldThrowOnInsufficientBalanceOrAllowance,
                                  signatureData.v,
                                  signatureData.r,
                                  signatureData.s, {
@@ -149,7 +149,7 @@ export class Blockchain {
     }
     public async getFillAmountAsync(orderHash: string): Promise<BigNumber.BigNumber> {
         utils.assert(ZeroEx.isValidOrderHash(orderHash), 'Must be valid orderHash');
-        const fillAmount = await this.exchange.getUnavailableValueT.call(orderHash);
+        const fillAmount = await this.exchange.getUnavailableTakerTokenAmount.call(orderHash);
         return fillAmount;
     }
     public getExchangeContractAddressIfExists() {
@@ -185,7 +185,7 @@ export class Blockchain {
         // return the signature params in different orders. In order to support all client implementations,
         // we parse the signature in both ways, and evaluate if either one is a valid signature.
         const validVParamValues = [27, 28];
-        const signatureDataVRS = this.parseSignatureHexAsVRS(msgHashHex, signature);
+        const signatureDataVRS = this.parseSignatureHexAsVRS(orderHashHex, signature);
         if (_.includes(validVParamValues, signatureDataVRS.v)) {
             const isValidVRSSignature = ZeroEx.isValidSignature(orderHashHex, signatureDataVRS, makerAddress);
             if (isValidVRSSignature) {
@@ -194,7 +194,7 @@ export class Blockchain {
             }
         }
 
-        const signatureDataRSV = this.parseSignatureHexAsRSV(msgHashHex, signature);
+        const signatureDataRSV = this.parseSignatureHexAsRSV(orderHashHex, signature);
         if (_.includes(validVParamValues, signatureDataRSV.v)) {
             const isValidRSVSignature = ZeroEx.isValidSignature(orderHashHex, signatureDataRSV, makerAddress);
             if (isValidRSVSignature) {
@@ -326,16 +326,16 @@ export class Blockchain {
                 }
                 const blockTimestamp = await this.web3Wrapper.getBlockTimestampAsync(result.blockHash);
                 const fill = {
-                    filledValueT: args.filledValueT,
-                    filledValueM: args.filledValueM,
+                    filledTakerTokenAmount: args.filledTakerTokenAmount,
+                    filledMakerTokenAmount: args.filledMakerTokenAmount,
                     logIndex: result.logIndex,
                     maker: args.maker,
                     orderHash: args.orderHash,
                     taker: args.taker,
-                    tokenM: args.tokenM,
-                    tokenT: args.tokenT,
-                    feeMPaid: args.feeMPaid,
-                    feeTPaid: args.feeTPaid,
+                    makerToken: args.makerToken,
+                    takerToken: args.takerToken,
+                    paidMakerFee: args.paidMakerFee,
+                    paidTakerFee: args.paidTakerFee,
                     transactionHash: result.transactionHash,
                     blockTimestamp,
                 };

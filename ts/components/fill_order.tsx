@@ -250,7 +250,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             const salt = new BigNumber(parsedOrder.salt);
             const parsedMakerFee = new BigNumber(parsedOrder.maker.feeAmount);
             const parsedTakerFee = new BigNumber(parsedOrder.taker.feeAmount);
-            const orderHash = zeroEx.getOrderHash(exchangeContractAddr, parsedOrder.maker.address,
+            const orderHash = zeroEx.getOrderHash(parsedOrder.exchangeContract, parsedOrder.maker.address,
                             parsedOrder.taker.address, parsedOrder.maker.token.address,
                             parsedOrder.taker.token.address, parsedOrder.feeRecipient,
                             makerAmount, takerAmount, parsedMakerFee, parsedTakerFee,
@@ -282,6 +282,12 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             if (orderJSON !== '') {
                 orderJSONErrMsg = 'Submitted order JSON is not valid JSON';
             }
+            this.setState({
+                orderJSON,
+                orderJSONErrMsg,
+                parsedOrder,
+            });
+            return;
         }
 
         let amountAlreadyFilled = new BigNumber(0);
@@ -401,7 +407,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             const makerToken = this.props.tokenByAddress[makerTokenAddress];
             const tokens = [makerToken, takerToken];
             await this.props.blockchain.updateTokenBalancesAndAllowancesAsync(tokens);
-            const orderFilledAmount = response.logs[0].args.filledValueT;
+            const orderFilledAmount = response.logs[0].args.filledTakerTokenAmount;
             this.setState({
                 didFillOrderSucceed: true,
                 globalErrMsg: '',
