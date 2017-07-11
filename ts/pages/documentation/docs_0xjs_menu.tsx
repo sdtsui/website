@@ -120,7 +120,7 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
             </div>
         );
     }
-    private renderMenuItems(menuItemNames: string[]) {
+    private renderMenuItems(menuItemNames: string[]): React.ReactNode[] {
         const menuItemStyles = this.props.shouldDisplaySectionHeaders ?
                                     styles.menuItemWithHeaders :
                                     styles.menuItemWithoutHeaders;
@@ -212,7 +212,7 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
             </ul>
         );
     }
-    private onMenuItemClick(menuItemName: string) {
+    private onMenuItemClick(menuItemName: string): void {
         utils.setUrlHash(menuItemName);
         this.props.onMenuItemClick();
     }

@@ -12,7 +12,7 @@ import {
     scroller,
 } from 'react-scroll';
 import {Dispatcher} from 'ts/redux/dispatcher';
-import {KindString, TypeDocNode, DocSections, Styles, ScreenWidths} from 'ts/types';
+import {KindString, TypeDocNode, DocSections, Styles, ScreenWidths, S3FileObject} from 'ts/types';
 import {TopBar} from 'ts/components/top_bar';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
@@ -140,7 +140,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
             </div>
         );
     }
-    private renderDocumentation() {
+    private renderDocumentation(): React.ReactNode {
         const subMenus = _.values(menu);
         const orderedSectionNames = _.flatten(subMenus);
         const sections = _.map(orderedSectionNames, sectionName => {
@@ -236,7 +236,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
 
         return sections;
     }
-    private renderZeroExConstructors(constructors: TypeDocNode[]) {
+    private renderZeroExConstructors(constructors: TypeDocNode[]): React.ReactNode {
         const isConstructor = true;
         const constructorDefs = _.map(constructors, constructor => {
             return this.renderMethodBlocks(constructor, DocSections.zeroEx, isConstructor);
@@ -247,7 +247,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
             </div>
         );
     }
-    private renderProperty(property: TypeDocNode) {
+    private renderProperty(property: TypeDocNode): React.ReactNode {
         const source = property.sources[0];
         return (
             <div
@@ -270,7 +270,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
             </div>
         );
     }
-    private renderMethodBlocks(method: TypeDocNode, sectionName: string, isConstructor: boolean) {
+    private renderMethodBlocks(method: TypeDocNode, sectionName: string, isConstructor: boolean): React.ReactNode {
         const signatures = method.signatures;
         const renderedSignatures = _.map(signatures, (signature: TypeDocNode, i: number) => {
             const source = method.sources[i];
@@ -294,7 +294,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
         });
         return renderedSignatures;
     }
-    private scrollToHash() {
+    private scrollToHash(): void {
         const hashWithPrefix = this.props.location.hash;
         let hash = hashWithPrefix.slice(1);
         if (_.isEmpty(hash)) {
@@ -303,7 +303,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
 
         scroller.scrollTo(hash, {duration: 0, offset: 0, containerId: 'documentation'});
     }
-    private async fetchJSONDocsFireAndForgetAsync(preferredVersionIfExists?: string) {
+    private async fetchJSONDocsFireAndForgetAsync(preferredVersionIfExists?: string): Promise<void> {
         const versionFileNames = await this.getVersionFileNamesAsync();
         const versionToFileName: {[version: string]: string} = {};
         _.each(versionFileNames, fileName => {
@@ -334,7 +334,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
             this.scrollToHash();
         });
     }
-    private async getVersionFileNamesAsync() {
+    private async getVersionFileNamesAsync(): Promise<string[]> {
         const response = await fetch(constants.S3_DOCUMENTATION_JSON_ROOT);
         if (response.status !== 200) {
             // TODO: Show the user an error message when the docs fail to load
@@ -345,13 +345,13 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
             compact: true,
         });
         const responseObj = JSON.parse(responseJSONString);
-        const fileObjs = responseObj.ListBucketResult.Contents;
-        const versionFileNames = _.map(fileObjs, (fileObj: any) => {
+        const fileObjs = responseObj.ListBucketResult.Contents as S3FileObject[];
+        const versionFileNames = _.map(fileObjs, fileObj => {
             return fileObj.Key._text;
         });
         return versionFileNames;
     }
-    private async getJSONDocFileAsync(fileName: string) {
+    private async getJSONDocFileAsync(fileName: string): Promise<TypeDocNode> {
         const endpoint = `${constants.S3_DOCUMENTATION_JSON_ROOT}/${fileName}`;
         const response = await fetch(endpoint);
         if (response.status !== 200) {
