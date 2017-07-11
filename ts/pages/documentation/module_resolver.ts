@@ -12,9 +12,9 @@ export const sectionNameToModulePath: {[name: string]: string} = {
 };
 
 export const moduleResolver = {
-    getModuleDefinitionBySectionNameIfExists(versionDocObj: any, sectionName: string): TypeDocNode|undefined {
+    getModuleDefinitionBySectionNameIfExists(versionDocObj: TypeDocNode, sectionName: string): TypeDocNode|undefined {
         const modulePathName = sectionNameToModulePath[sectionName];
-        const modules: TypeDocNode[] = (versionDocObj as any).children;
+        const modules = versionDocObj.children;
         const moduleWithName = _.find(modules, {name: modulePathName});
         return moduleWithName;
     },
