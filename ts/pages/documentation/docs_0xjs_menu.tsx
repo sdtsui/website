@@ -169,7 +169,7 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
         const allMembers = mainModuleExport.children;
         const allMethods = _.filter(allMembers, typeDocUtils.isMethod);
         const publicMethods = _.filter(allMethods, method => method.flags.isPublic);
-        this.renderMenuSubsections(menuItemName, publicMethods);
+        return this.renderMenuSubsections(menuItemName, publicMethods);
 
     }
     private renderTypesMenuSubsection(): React.ReactNode {
@@ -181,18 +181,22 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
     }
     private renderMenuSubsections(menuItemName: string, entities: TypeDocNode[]): React.ReactNode {
         return (
-            <ul style={{margin: 0}} key={menuItemName}>
+            <ul style={{margin: 0, listStyleType: 'none'}} key={menuItemName}>
             {_.map(entities, entity => {
                 return (
-                    <li key={entity.id}>
-                        <ScrollLink
-                            to={entity.name}
-                            duration={constants.DOCS_SCROLL_DURATION_MS}
-                            containerId={constants.DOCS_CONTAINER_ID}
-                            onTouchTap={this.onMenuItemClick.bind(this, entity.name)}
+                    <li style={{margin: '5px'}} key={entity.id}>
+                        <MenuItem
+                            onTouchTap={this.onMenuItemClick.bind(this, menuItemName)}
                         >
-                            {entity.name}
-                        </ScrollLink>
+                            <ScrollLink
+                                to={entity.name}
+                                duration={constants.DOCS_SCROLL_DURATION_MS}
+                                containerId={constants.DOCS_CONTAINER_ID}
+                                onTouchTap={this.onMenuItemClick.bind(this, entity.name)}
+                            >
+                                {entity.name}
+                            </ScrollLink>
+                        </MenuItem>
                     </li>
                 );
             })}
