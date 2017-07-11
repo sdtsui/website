@@ -329,7 +329,6 @@ export interface TypeDocNode {
     sources?: TypeDocNode[];
     children?: TypeDocNode[];
     groups?: TypeDocGroup[];
-    title?: string;
 }
 
 export const TypeDocTypes = strEnum([
