@@ -25,7 +25,7 @@ import {Alert} from 'ts/components/ui/alert';
 import {TokenAmountInput} from 'ts/components/inputs/token_amount_input';
 import {VisualOrder} from 'ts/components/visual_order';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
-import {Validator} from 'ts/schemas/validator';
+import {SchemaValidator} from 'ts/schemas/validator';
 import {orderSchema} from 'ts/schemas/order_schema';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {Blockchain} from 'ts/blockchain';
@@ -54,7 +54,7 @@ interface FillOrderState {
 }
 
 export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
-    private validator: Validator;
+    private validator: SchemaValidator;
     constructor(props: FillOrderProps) {
         super(props);
         this.state = {
@@ -66,7 +66,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             parsedOrder: this.props.initialOrder,
             amountAlreadyFilled: new BigNumber(0),
         };
-        this.validator = new Validator();
+        this.validator = new SchemaValidator();
     }
     public componentWillMount() {
         if (!_.isEmpty(this.state.orderJSON)) {

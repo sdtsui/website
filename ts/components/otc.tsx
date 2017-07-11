@@ -11,7 +11,7 @@ import {GenerateOrderForm} from 'ts/containers/generate_order_form';
 import {TokenBalances} from 'ts/components/token_balances';
 import {FillOrder} from 'ts/components/fill_order';
 import {Blockchain} from 'ts/blockchain';
-import {Validator} from 'ts/schemas/validator';
+import {SchemaValidator} from 'ts/schemas/validator';
 import {orderSchema} from 'ts/schemas/order_schema';
 import {TradeHistory} from 'ts/components/trade_history/trade_history';
 import {
@@ -257,7 +257,7 @@ export class OTC extends React.Component<OTCAllProps, OTCAllState> {
             return;
         }
 
-        const validator = new Validator();
+        const validator = new SchemaValidator();
         const order = JSON.parse(decodeURIComponent(orderPair[1]));
         const validationResult = validator.validate(order, orderSchema);
         if (validationResult.errors.length > 0) {
