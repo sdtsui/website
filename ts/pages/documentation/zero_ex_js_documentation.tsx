@@ -178,8 +178,8 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
 
             const constructors = _.filter(entities, typeDocUtils.isConstructor);
 
-            const publicProperties = _.filter(entities, e => {
-                return e.kindString === KindString.Property && !typeDocUtils.isPrivateOrProtectedProperty(e.name);
+            const publicProperties = _.filter(entities, entity => {
+                return typeDocUtils.isProperty(entity) && !typeDocUtils.isPrivateOrProtectedProperty(entity.name);
             });
             const publicPropertyDefs = _.map(publicProperties, property => this.renderProperty(property));
 

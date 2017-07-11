@@ -15,6 +15,9 @@ export const typeDocUtils = {
     isConstructor(entity: TypeDocNode): boolean {
         return entity.kindString === KindString.Constructor;
     },
+    isProperty(entity: TypeDocNode): boolean {
+        return entity.kindString === KindString.Property;
+    },
     isPrivateOrProtectedProperty(propertyName: string): boolean {
         return _.startsWith(propertyName, '_');
     },
