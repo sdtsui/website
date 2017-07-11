@@ -94,6 +94,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
         this.fetchJSONDocsFireAndForgetAsync(preferredVersionIfExists);
     }
     public render() {
+        const menuSubsections = typeDocUtils.getMenuSubsections(this.state.versionDocObj);
         return (
             <div>
                 <TopBar
@@ -101,7 +102,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                     location={this.props.location}
                     zeroExJSversion={this.props.zeroExJSversion}
                     availableZeroExJSVersions={this.props.availableZeroExJSVersions}
-                    versionDocObj={this.state.versionDocObj}
+                    menuSubsections={menuSubsections}
                     shouldFullWidth={true}
                 />
                 {!_.isUndefined(this.state.versionDocObj) &&
@@ -117,7 +118,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                                 <Docs0xjsMenu
                                     selectedVersion={this.props.zeroExJSversion}
                                     versions={this.props.availableZeroExJSVersions}
-                                    versionDocObj={this.state.versionDocObj}
+                                    menuSubsections={menuSubsections}
                                 />
                             </div>
                         </div>

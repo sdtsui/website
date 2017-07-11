@@ -10,7 +10,7 @@ import {constants} from 'ts/utils/constants';
 import {Identicon} from 'ts/components/ui/identicon';
 import {OTCMenu} from 'ts/components/otc_menu';
 import {Docs0xjsMenu} from 'ts/pages/documentation/docs_0xjs_menu';
-import {Styles, TypeDocNode} from 'ts/types';
+import {Styles, TypeDocNode, MenuSubsections} from 'ts/types';
 import {
     Link as ScrollLink,
     animateScroll,
@@ -26,7 +26,7 @@ interface TopBarProps {
     location: Location;
     zeroExJSversion?: string;
     availableZeroExJSVersions?: string[];
-    versionDocObj?: TypeDocNode;
+    menuSubsections?: MenuSubsections;
     shouldFullWidth?: boolean;
 }
 
@@ -146,11 +146,11 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
             <div className="lg-hide md-hide">
                 <div className="pl1 py1" style={{backgroundColor: SECTION_HEADER_COLOR}}>0x.js Docs</div>
                 <Docs0xjsMenu
+                    menuSubsections={this.props.menuSubsections}
                     shouldDisplaySectionHeaders={false}
                     onMenuItemClick={this.onMenuButtonClick.bind(this)}
                     selectedVersion={this.props.zeroExJSversion}
                     versions={this.props.availableZeroExJSVersions}
-                    versionDocObj={this.props.versionDocObj}
                 />
             </div>
         );

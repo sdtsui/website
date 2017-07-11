@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import {constants} from 'ts/utils/constants';
-import {TypeDocNode, KindString, DocSections} from 'ts/types';
+import {TypeDocNode, KindString, DocSections, MenuSubsections} from 'ts/types';
 
 export const sectionNameToModulePath: {[name: string]: string} = {
     [DocSections.zeroEx]: '"src/0x"',
@@ -11,6 +11,8 @@ export const sectionNameToModulePath: {[name: string]: string} = {
     [DocSections.proxy]: '"src/contract_wrappers/proxy_wrapper"',
     [DocSections.types]: '"src/types"',
 };
+
+const TYPES_MODULE_PATH = '"src/types"';
 
 export const typeDocUtils = {
     isType(entity: TypeDocNode): boolean {
@@ -39,5 +41,36 @@ export const typeDocUtils = {
         const modules = versionDocObj.children;
         const moduleWithName = _.find(modules, {name: modulePathName});
         return moduleWithName;
+    },
+    getMenuSubsections(versionDocObj?: TypeDocNode): MenuSubsections {
+        const menuSubsections = {} as MenuSubsections;
+        if (_.isUndefined(versionDocObj)) {
+            return menuSubsections;
+        }
+        const docSections = _.keys(DocSections);
+        _.each(docSections, menuItemName => {
+            // Since the `types.ts` file is the only file that does not export a module/class but
+            // instead has each type export itself, we do not need to go down two levels of nesting
+            // for it.
+            if (menuItemName === DocSections.types) {
+                const allModules = versionDocObj.children;
+                const typesModule = _.find(allModules, {name: TYPES_MODULE_PATH}) as TypeDocNode;
+                const allTypes = _.filter(typesModule.children, typeDocUtils.isType);
+                const publicTypes = _.filter(allTypes, typeDocUtils.isPublicType);
+                menuSubsections[menuItemName] = publicTypes;
+            }
+            const moduleDefinition = typeDocUtils.getModuleDefinitionBySectionNameIfExists(
+                versionDocObj, menuItemName,
+            );
+            if (_.isUndefined(moduleDefinition)) {
+                return;
+            }
+            const mainModuleExport = moduleDefinition.children[0];
+            const allMembers = mainModuleExport.children;
+            const allMethods = _.filter(allMembers, typeDocUtils.isMethod);
+            const publicMethods = _.filter(allMethods, method => method.flags.isPublic);
+            menuSubsections[menuItemName] = publicMethods;
+        });
+        return menuSubsections;
     },
 };

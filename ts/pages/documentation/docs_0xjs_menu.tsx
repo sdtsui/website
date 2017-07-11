@@ -6,7 +6,7 @@ import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
 import compareVersions = require('compare-versions');
 import {VersionDropDown} from 'ts/pages/documentation/version_drop_down';
-import {DocSections, Styles, TypeDocNode} from 'ts/types';
+import {DocSections, Styles, TypeDocNode, MenuSubsections} from 'ts/types';
 import {typeDocUtils} from 'ts/utils/typedoc_utils';
 import {Link as ScrollLink} from 'react-scroll';
 
@@ -42,14 +42,12 @@ const menuSubsectionToVersionWhenIntroduced = {
     [DocSections.proxy]: '0.8.0',
 };
 
-const TYPES_MODULE_PATH = '"src/types"';
-
 interface Docs0xjsMenuProps {
     shouldDisplaySectionHeaders?: boolean;
     onMenuItemClick?: () => void;
     selectedVersion: string;
     versions: string[];
-    versionDocObj?: TypeDocNode;
+    menuSubsections: MenuSubsections;
 }
 
 interface Docs0xjsMenuState {}
@@ -154,33 +152,10 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
         return menuItems;
     }
     private renderMenuItemSubsections(menuItemName: string): React.ReactNode {
-        if (_.isUndefined(this.props.versionDocObj)) {
+        if (_.isUndefined(this.props.menuSubsections[menuItemName])) {
             return null;
         }
-        // Since the `types.ts` file is the only file that does not export a module/class but
-        // instead has each type export itself, we do not need to go down two levels of nesting
-        // for it.
-        if (menuItemName === DocSections.types) {
-            return this.renderTypesMenuSubsection();
-        }
-        const moduleDefinition = typeDocUtils.getModuleDefinitionBySectionNameIfExists(
-            this.props.versionDocObj, menuItemName,
-        );
-        if (_.isUndefined(moduleDefinition)) {
-            return null;
-        }
-        const mainModuleExport = moduleDefinition.children[0];
-        const allMembers = mainModuleExport.children;
-        const allMethods = _.filter(allMembers, typeDocUtils.isMethod);
-        const publicMethods = _.filter(allMethods, method => method.flags.isPublic);
-        return this.renderMenuSubsections(menuItemName, publicMethods);
-    }
-    private renderTypesMenuSubsection(): React.ReactNode {
-        const allModules = this.props.versionDocObj.children;
-        const typesModule = _.find(allModules, {name: TYPES_MODULE_PATH}) as TypeDocNode;
-        const allTypes = _.filter(typesModule.children, typeDocUtils.isType);
-        const publicTypes = _.filter(allTypes, typeDocUtils.isPublicType);
-        return this.renderMenuSubsections(DocSections.types, publicTypes);
+        return this.renderMenuSubsections(menuItemName, this.props.menuSubsections[menuItemName]);
     }
     private renderMenuSubsections(menuItemName: string, entities: TypeDocNode[]): React.ReactNode {
         return (
