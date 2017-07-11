@@ -42,6 +42,8 @@ const menuSubsectionToVersionWhenIntroduced = {
     [DocSections.proxy]: '0.8.0',
 };
 
+const TYPES_MODULE_PATH = '"src/types"';
+
 interface Docs0xjsMenuProps {
     shouldDisplaySectionHeaders?: boolean;
     onMenuItemClick?: () => void;
@@ -175,7 +177,7 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
     }
     private renderTypesMenuSubsection(): React.ReactNode {
         const allModules = this.props.versionDocObj.children;
-        const typesModule = _.find(allModules, {name: '"src/types"'}) as TypeDocNode;
+        const typesModule = _.find(allModules, {name: TYPES_MODULE_PATH}) as TypeDocNode;
         const allTypes = _.filter(typesModule.children, typeDocUtils.isType);
         const publicTypes = _.filter(allTypes, typeDocUtils.isPublicType);
         return this.renderMenuSubsections(DocSections.types, publicTypes);
