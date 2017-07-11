@@ -176,7 +176,7 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
         const typesModule = _.find(allModules, {name: '"src/types"'}) as TypeDocNode;
         const allTypes = _.filter(typesModule.children, typeDocUtils.isType);
         const publicTypes = _.filter(allTypes, typeDocUtils.isPublicType);
-        return this.renderMenuSubsections('types', publicTypes);
+        return this.renderMenuSubsections(DocSections.types, publicTypes);
     }
     private renderMenuSubsections(menuItemName: string, entities: TypeDocNode[]): React.ReactNode {
         return (
