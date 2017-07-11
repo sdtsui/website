@@ -70,13 +70,13 @@ const styles: Styles = {
         right: 0,
         overflowZ: 'hidden',
         overflowY: 'scroll',
-        minHeight: 'calc(100vh - 77px)',
+        minHeight: '100vh',
         WebkitOverflowScrolling: 'touch',
     },
     menuContainer: {
         borderColor: colors.grey300,
-        width: '23vw',
-        margin: '1vw',
+        maxWidth: 330,
+        marginLeft: 20,
     },
 };
 
@@ -103,6 +103,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                     zeroExJSversion={this.props.zeroExJSversion}
                     availableZeroExJSVersions={this.props.availableZeroExJSVersions}
                     versionDocObj={this.state.versionDocObj}
+                    shouldFullWidth={true}
                 />
                 {!_.isUndefined(this.state.versionDocObj) &&
                     <div

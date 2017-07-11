@@ -132,7 +132,7 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
                     <ScrollLink
                         key={`menuItem-${menuItemName}`}
                         to={menuItemName}
-                        offset={0}
+                        offset={-60}
                         duration={constants.DOCS_SCROLL_DURATION_MS}
                         containerId={constants.DOCS_CONTAINER_ID}
                     >
@@ -181,22 +181,25 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
     }
     private renderMenuSubsections(menuItemName: string, entities: TypeDocNode[]): React.ReactNode {
         return (
-            <ul style={{margin: 0, listStyleType: 'none'}} key={menuItemName}>
+            <ul style={{margin: 0, listStyleType: 'none', paddingLeft: 0}} key={menuItemName}>
             {_.map(entities, entity => {
                 return (
-                    <li style={{margin: '5px'}} key={entity.id}>
-                        <MenuItem
-                            onTouchTap={this.onMenuItemClick.bind(this, menuItemName)}
+                    <li key={entity.id}>
+                        <ScrollLink
+                            to={entity.name}
+                            offset={-40}
+                            duration={constants.DOCS_SCROLL_DURATION_MS}
+                            containerId={constants.DOCS_CONTAINER_ID}
+                            onTouchTap={this.onMenuItemClick.bind(this, entity.name)}
                         >
-                            <ScrollLink
-                                to={entity.name}
-                                duration={constants.DOCS_SCROLL_DURATION_MS}
-                                containerId={constants.DOCS_CONTAINER_ID}
-                                onTouchTap={this.onMenuItemClick.bind(this, entity.name)}
+                            <MenuItem
+                                onTouchTap={this.onMenuItemClick.bind(this, menuItemName)}
+                                style={{minHeight: 35}}
+                                innerDivStyle={{paddingLeft: 36, fontSize: 14, lineHeight: '35px'}}
                             >
                                 {entity.name}
-                            </ScrollLink>
-                        </MenuItem>
+                            </MenuItem>
+                        </ScrollLink>
                     </li>
                 );
             })}
