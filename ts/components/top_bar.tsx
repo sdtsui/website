@@ -27,6 +27,7 @@ interface TopBarProps {
     zeroExJSversion?: string;
     availableZeroExJSVersions?: string[];
     versionDocObj?: TypeDocNode;
+    shouldFullWidth?: boolean;
 }
 
 interface TopBarState {
@@ -60,6 +61,9 @@ const styles: Styles = {
 };
 
 export class TopBar extends React.Component<TopBarProps, TopBarState> {
+    public static defaultProps: Partial<TopBarProps> = {
+        shouldFullWidth: false,
+    };
     constructor(props: TopBarProps) {
         super(props);
         this.state = {
@@ -67,9 +71,10 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
         };
     }
     public render() {
+        const parentClassNames = `flex mx-auto ${this.props.shouldFullWidth ? 'pl2' : 'max-width-4'}`;
         return (
             <div style={styles.topBar} className="pb1">
-                <div className="flex mx-auto max-width-4">
+                <div className={parentClassNames}>
                     <div className="col col-1">
                         <div
                             className="sm-pl2 md-pl2 lg-pl0"
