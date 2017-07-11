@@ -25,6 +25,8 @@ import {Comment} from 'ts/pages/documentation/comment';
 import {AnchorTitle} from 'ts/pages/documentation/anchor_title';
 import {SectionHeader} from 'ts/pages/documentation/section_header';
 import {Docs0xjsMenu, menu} from 'ts/pages/documentation/docs_0xjs_menu';
+import {moduleResolver} from 'ts/pages/documentation/module_resolver';
+import {typeDocUtils} from 'ts/utils/typedoc_utils';
 /* tslint:disable:no-var-requires */
 const IntroMarkdown = require('md/docs/0xjs/introduction');
 const InstallationMarkdown = require('md/docs/0xjs/installation');
@@ -35,75 +37,12 @@ const versioningMarkdown = require('md/docs/0xjs/versioning');
 
 const SCROLL_TO_TIMEOUT = 500;
 
-const contractMethodOrder: {[sectionName: string]: string[]} = {
-    zeroEx: [
-        'signOrderHashAsync',
-        'getOrderHashHexAsync',
-        'getAvailableAddressesAsync',
-        'setProviderAsync',
-        'isValidOrderHash',
-        'isValidSignature',
-        'generatePseudoRandomSalt',
-        'toBaseUnitAmount',
-        'toUnitAmount',
-    ],
-    exchange: [
-        'fillOrderAsync',
-        'batchFillOrderAsync',
-        'cancelOrderAsync',
-        'batchCancelOrderAsync',
-        'fillOrKillOrderAsync',
-        'batchFillOrKillAsync',
-        'fillOrdersUpToAsync',
-        'getFilledTakerAmountAsync',
-        'getCanceledTakerAmountAsync',
-        'getUnavailableTakerAmountAsync',
-        'subscribeAsync',
-        'stopWatchingAllEventsAsync',
-        'getContractAddressAsync',
-        'getAvailableContractAddressesAsync',
-        'getProxyAuthorizedContractAddressesAsync',
-    ],
-    token: [
-        'getAllowanceAsync',
-        'getBalanceAsync',
-        'getProxyAllowanceAsync',
-        'setAllowanceAsync',
-        'setProxyAllowanceAsync',
-        'transferAsync',
-        'transferFromAsync',
-        'subscribeAsync',
-        'stopWatchingAllEventsAsync',
-    ],
-    tokenRegistry: [
-        'getTokensAsync',
-    ],
-    etherToken: [
-        'depositAsync',
-        'withdrawAsync',
-    ],
-    proxy: [
-        'isAuthorizedAsync',
-        'getAuthorizedAddressesAsync',
-    ],
-};
-
 const sectionNameToMarkdown = {
     [DocSections.introduction]: IntroMarkdown,
     [DocSections.installation]: InstallationMarkdown,
     [DocSections.async]: AsyncMarkdown,
     [DocSections.errors]: ErrorsMarkdown,
     [DocSections.versioning]: versioningMarkdown,
-};
-
-const sectionNameToModulePath: {[name: string]: string} = {
-    [DocSections.zeroEx]: '"src/0x"',
-    [DocSections.exchange]: '"src/contract_wrappers/exchange_wrapper"',
-    [DocSections.tokenRegistry]: '"src/contract_wrappers/token_registry_wrapper"',
-    [DocSections.token]: '"src/contract_wrappers/token_wrapper"',
-    [DocSections.etherToken]: '"src/contract_wrappers/ether_token_wrapper"',
-    [DocSections.proxy]: '"src/contract_wrappers/proxy_wrapper"',
-    [DocSections.types]: '"src/types"',
 };
 
 export interface ZeroExJSDocumentationPassedProps {
@@ -120,7 +59,7 @@ export interface ZeroExJSDocumentationAllProps {
 }
 
 interface ZeroExJSDocumentationState {
-    versionDocObj: string;
+    versionDocObj?: TypeDocNode;
 }
 
 const styles: Styles = {
@@ -162,6 +101,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                     location={this.props.location}
                     zeroExJSversion={this.props.zeroExJSversion}
                     availableZeroExJSVersions={this.props.availableZeroExJSVersions}
+                    versionDocObj={this.state.versionDocObj}
                 />
                 {!_.isUndefined(this.state.versionDocObj) &&
                     <div
@@ -176,6 +116,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                                 <Docs0xjsMenu
                                     selectedVersion={this.props.zeroExJSversion}
                                     versions={this.props.availableZeroExJSVersions}
+                                    versionDocObj={this.state.versionDocObj}
                                 />
                             </div>
                         </div>
@@ -203,7 +144,9 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
         const subMenus = _.values(menu);
         const orderedSectionNames = _.flatten(subMenus);
         const sections = _.map(orderedSectionNames, sectionName => {
-            const packageDefinitionIfExists: TypeDocNode = this.getPackageDefinitionBySectionNameIfExists(sectionName);
+            const packageDefinitionIfExists = moduleResolver.getModuleDefinitionBySectionNameIfExists(
+                this.state.versionDocObj, sectionName,
+            );
 
             const markdownFileIfExists = sectionNameToMarkdown[sectionName];
             if (!_.isUndefined(markdownFileIfExists)) {
@@ -233,24 +176,20 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                 packageComment = !_.isUndefined(commentObj) ? commentObj.shortText : packageComment;
             }
 
-            const constructors = _.filter(entities, e => e.kindString === KindString.Constructor);
+            const constructors = _.filter(entities, typeDocUtils.isConstructor);
 
             const publicProperties = _.filter(entities, e => {
-                return e.kindString === KindString.Property && !utils.isPrivateOrProtectedProperty(e.name);
+                return e.kindString === KindString.Property && !typeDocUtils.isPrivateOrProtectedProperty(e.name);
             });
             const publicPropertyDefs = _.map(publicProperties, property => this.renderProperty(property));
 
-            const methods = _.filter(entities, e => e.kindString === KindString.Method);
-            const orderedMethods = this.orderMethods(sectionName, methods);
+            const methods = _.filter(entities, typeDocUtils.isMethod);
             const isConstructor = false;
-            const methodDefs = _.map(orderedMethods, method => {
+            const methodDefs = _.map(methods, method => {
                 return this.renderMethodBlocks(method, sectionName, isConstructor);
             });
 
-            const types = _.filter(entities, e => {
-                return e.kindString === KindString.Interface || e.kindString === KindString.Function ||
-                       e.kindString === KindString['Type alias'] || e.kindString === KindString.Variable;
-            });
+            const types = _.filter(entities, typeDocUtils.isType);
             const typeDefs = _.map(types, type => {
                 return (
                     <TypeDefinition
@@ -354,23 +293,6 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
             );
         });
         return renderedSignatures;
-    }
-    private orderMethods(sectionName: string, methods: TypeDocNode[]) {
-        const methodByName: {[name: string]: TypeDocNode} = {};
-        _.each(methods, method => {
-            methodByName[method.name] = method;
-        });
-        const sectionMethodOrder = contractMethodOrder[sectionName];
-        const orderedMethods = _.compact(_.map(sectionMethodOrder, methodName => {
-            return methodByName[methodName];
-        }));
-        return orderedMethods;
-    }
-    private getPackageDefinitionBySectionNameIfExists(sectionName: string) {
-        const modulePathName = sectionNameToModulePath[sectionName];
-        const modules: TypeDocNode[] = (this.state.versionDocObj as any).children;
-        const moduleWithName = _.find(modules, {name: modulePathName});
-        return moduleWithName;
     }
     private scrollToHash() {
         const hashWithPrefix = this.props.location.hash;

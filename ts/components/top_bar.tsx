@@ -10,7 +10,7 @@ import {constants} from 'ts/utils/constants';
 import {Identicon} from 'ts/components/ui/identicon';
 import {OTCMenu} from 'ts/components/otc_menu';
 import {Docs0xjsMenu} from 'ts/pages/documentation/docs_0xjs_menu';
-import {Styles} from 'ts/types';
+import {Styles, TypeDocNode} from 'ts/types';
 import {
     Link as ScrollLink,
     animateScroll,
@@ -26,6 +26,7 @@ interface TopBarProps {
     location: Location;
     zeroExJSversion?: string;
     availableZeroExJSVersions?: string[];
+    versionDocObj?: TypeDocNode;
 }
 
 interface TopBarState {
@@ -144,6 +145,7 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
                     onMenuItemClick={this.onMenuButtonClick.bind(this)}
                     selectedVersion={this.props.zeroExJSversion}
                     versions={this.props.availableZeroExJSVersions}
+                    versionDocObj={this.props.versionDocObj}
                 />
             </div>
         );

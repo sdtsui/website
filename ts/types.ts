@@ -300,10 +300,16 @@ export interface TypeDocType {
 export interface TypeDocFlags {
     isStatic?: boolean;
     isOptional?: boolean;
+    isPublic?: boolean;
+}
+
+export interface TypeDocGroup {
+    title: string;
+    children: number[];
 }
 
 export interface TypeDocNode {
-    id?: string;
+    id?: number;
     name?: string;
     kind?: string;
     defaultValue?: string;
@@ -322,6 +328,8 @@ export interface TypeDocNode {
     parameters?: TypeDocNode[];
     sources?: TypeDocNode[];
     children?: TypeDocNode[];
+    groups?: TypeDocGroup[];
+    title?: string;
 }
 
 export const TypeDocTypes = strEnum([
@@ -357,4 +365,8 @@ export interface FAQQuestion {
 export interface FAQSection {
     name: string;
     questions: FAQQuestion[];
+}
+
+export interface TypeDocNodeById {
+    [id: number]: TypeDocNode;
 }

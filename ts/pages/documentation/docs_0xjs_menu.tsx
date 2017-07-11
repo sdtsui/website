@@ -6,7 +6,9 @@ import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
 import compareVersions = require('compare-versions');
 import {VersionDropDown} from 'ts/pages/documentation/version_drop_down';
-import {DocSections, Styles} from 'ts/types';
+import {DocSections, Styles, TypeDocNode} from 'ts/types';
+import {moduleResolver} from 'ts/pages/documentation/module_resolver';
+import {typeDocUtils} from 'ts/utils/typedoc_utils';
 import {Link as ScrollLink} from 'react-scroll';
 
 export const menu = {
@@ -46,6 +48,7 @@ interface Docs0xjsMenuProps {
     onMenuItemClick?: () => void;
     selectedVersion: string;
     versions: string[];
+    versionDocObj?: TypeDocNode;
 }
 
 interface Docs0xjsMenuState {}
@@ -125,26 +128,89 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
                                     styles.menuItemInnerDivWithHeaders : {};
         const menuItems = _.map(menuItemNames, menuItemName => {
             return (
-                <ScrollLink
-                    key={`menuItem-${menuItemName}`}
-                    to={menuItemName}
-                    offset={0}
-                    duration={constants.DOCS_SCROLL_DURATION_MS}
-                    containerId={constants.DOCS_CONTAINER_ID}
-                >
-                    <MenuItem
-                        onTouchTap={this.onMenuItemClick.bind(this, menuItemName)}
-                        style={menuItemStyles}
-                        innerDivStyle={menuItemInnerDivStyles}
+                <div key={menuItemName}>
+                    <ScrollLink
+                        key={`menuItem-${menuItemName}`}
+                        to={menuItemName}
+                        offset={0}
+                        duration={constants.DOCS_SCROLL_DURATION_MS}
+                        containerId={constants.DOCS_CONTAINER_ID}
                     >
-                        <span style={{textTransform: 'capitalize'}}>
-                            {menuItemName}
-                        </span>
-                    </MenuItem>
-                </ScrollLink>
+                        <MenuItem
+                            onTouchTap={this.onMenuItemClick.bind(this, menuItemName)}
+                            style={menuItemStyles}
+                            innerDivStyle={menuItemInnerDivStyles}
+                        >
+                            <span style={{textTransform: 'capitalize'}}>
+                                {menuItemName}
+                            </span>
+                        </MenuItem>
+                    </ScrollLink>
+                    {this.renderMenuItemSubsections(menuItemName)}
+                </div>
             );
         });
         return menuItems;
+    }
+    private renderMenuItemSubsections(menuItemName: string): React.ReactNode {
+        if (_.isUndefined(this.props.versionDocObj)) {
+            return null;
+        }
+        if (menuItemName === 'types') {
+            return this.renderTypesMenuSubsection();
+        }
+        const moduleDefinition = moduleResolver.getModuleDefinitionBySectionNameIfExists(
+            this.props.versionDocObj, menuItemName,
+        );
+        if (_.isUndefined(moduleDefinition)) {
+            return null;
+        }
+        const mainModuleExport = moduleDefinition.children[0];
+        const allMembers = mainModuleExport.children;
+        const allMethods = _.filter(allMembers, member => member.kindString === 'Method');
+        const publicMethods = _.filter(allMethods, method => method.flags.isPublic);
+        return (
+            <ul style={{margin: 0}} key={menuItemName}>
+            {_.map(publicMethods, method => {
+                return (
+                    <li key={method.id}>
+                        <ScrollLink
+                            to={method.name}
+                            duration={constants.DOCS_SCROLL_DURATION_MS}
+                            containerId={constants.DOCS_CONTAINER_ID}
+                            onTouchTap={this.onMenuItemClick.bind(this, method.name)}
+                        >
+                            {method.name}
+                        </ScrollLink>
+                    </li>
+                );
+            })}
+            </ul>
+        );
+    }
+    private renderTypesMenuSubsection(): React.ReactNode {
+        const allModules = this.props.versionDocObj.children;
+        const typesModule = _.find(allModules, {name: '"src/types"'}) as TypeDocNode;
+        const allTypes = _.filter(typesModule.children, typeDocUtils.isType);
+        const publicTypes = _.filter(allTypes, typeDocUtils.isPublicType);
+        return (
+            <ul style={{margin: 0}} key={'types'}>
+                {_.map(publicTypes, type => {
+                    return (
+                        <li key={type.id}>
+                            <ScrollLink
+                                to={type.name}
+                                duration={constants.DOCS_SCROLL_DURATION_MS}
+                                containerId={constants.DOCS_CONTAINER_ID}
+                                onTouchTap={this.onMenuItemClick.bind(this, type.name)}
+                            >
+                                {type.name}
+                            </ScrollLink>
+                        </li>
+                    );
+                })}
+            </ul>
+        );
     }
     private onMenuItemClick(menuItemName: string) {
         utils.setUrlHash(menuItemName);

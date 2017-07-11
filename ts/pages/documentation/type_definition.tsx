@@ -9,6 +9,7 @@ import {Enum} from 'ts/pages/documentation/enum';
 import {MethodSignature} from 'ts/pages/documentation/method_signature';
 import {AnchorTitle} from 'ts/pages/documentation/anchor_title';
 import {Comment} from 'ts/pages/documentation/comment';
+import {typeDocUtils} from 'ts/utils/typedoc_utils';
 
 const KEYWORD_COLOR = '#a81ca6';
 
@@ -29,7 +30,7 @@ export class TypeDefinition extends React.Component<TypeDefinitionProps, TypeDef
     }
     public render() {
         const type = this.props.type;
-        if (!_.includes(constants.public0xjsTypes, type.name)) {
+        if (!typeDocUtils.isPublicType(type)) {
             return null; // Skip
         }
 
