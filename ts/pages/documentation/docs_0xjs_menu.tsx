@@ -167,48 +167,35 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
         }
         const mainModuleExport = moduleDefinition.children[0];
         const allMembers = mainModuleExport.children;
-        const allMethods = _.filter(allMembers, member => member.kindString === 'Method');
+        const allMethods = _.filter(allMembers, typeDocUtils.isMethod);
         const publicMethods = _.filter(allMethods, method => method.flags.isPublic);
-        return (
-            <ul style={{margin: 0}} key={menuItemName}>
-            {_.map(publicMethods, method => {
-                return (
-                    <li key={method.id}>
-                        <ScrollLink
-                            to={method.name}
-                            duration={constants.DOCS_SCROLL_DURATION_MS}
-                            containerId={constants.DOCS_CONTAINER_ID}
-                            onTouchTap={this.onMenuItemClick.bind(this, method.name)}
-                        >
-                            {method.name}
-                        </ScrollLink>
-                    </li>
-                );
-            })}
-            </ul>
-        );
+        this.renderMenuSubsections(menuItemName, publicMethods);
+
     }
     private renderTypesMenuSubsection(): React.ReactNode {
         const allModules = this.props.versionDocObj.children;
         const typesModule = _.find(allModules, {name: '"src/types"'}) as TypeDocNode;
         const allTypes = _.filter(typesModule.children, typeDocUtils.isType);
         const publicTypes = _.filter(allTypes, typeDocUtils.isPublicType);
+        return this.renderMenuSubsections('types', publicTypes);
+    }
+    private renderMenuSubsections(menuItemName: string, entities: TypeDocNode[]): React.ReactNode {
         return (
-            <ul style={{margin: 0}} key={'types'}>
-                {_.map(publicTypes, type => {
-                    return (
-                        <li key={type.id}>
-                            <ScrollLink
-                                to={type.name}
-                                duration={constants.DOCS_SCROLL_DURATION_MS}
-                                containerId={constants.DOCS_CONTAINER_ID}
-                                onTouchTap={this.onMenuItemClick.bind(this, type.name)}
-                            >
-                                {type.name}
-                            </ScrollLink>
-                        </li>
-                    );
-                })}
+            <ul style={{margin: 0}} key={menuItemName}>
+            {_.map(entities, entity => {
+                return (
+                    <li key={entity.id}>
+                        <ScrollLink
+                            to={entity.name}
+                            duration={constants.DOCS_SCROLL_DURATION_MS}
+                            containerId={constants.DOCS_CONTAINER_ID}
+                            onTouchTap={this.onMenuItemClick.bind(this, entity.name)}
+                        >
+                            {entity.name}
+                        </ScrollLink>
+                    </li>
+                );
+            })}
             </ul>
         );
     }
