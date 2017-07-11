@@ -75,7 +75,8 @@ const styles: Styles = {
     },
     menuContainer: {
         borderColor: colors.grey300,
-        width: 170,
+        width: '23vw',
+        margin: '1vw',
     },
 };
 
@@ -105,10 +106,10 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                 />
                 {!_.isUndefined(this.state.versionDocObj) &&
                     <div
-                        className="mx-auto max-width-4 flex"
+                        className="mx-auto flex"
                         style={{color: colors.grey800, paddingTop: 44}}
                     >
-                        <div className="relative col md-col-2 lg-col-2 lg-pl0 md-pl1 sm-hide xs-hide">
+                        <div className="relative col md-col-3 lg-col-3 lg-pl0 md-pl1 sm-hide xs-hide">
                             <div
                                 className="border-right absolute"
                                 style={{...styles.menuContainer, ...styles.mainContainers}}
@@ -120,7 +121,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                                 />
                             </div>
                         </div>
-                        <div className="relative col lg-col-10 md-col-10 sm-col-12 col-12 mt2 pt2">
+                        <div className="relative col lg-col-9 md-col-9 sm-col-12 col-12 mt2 pt2">
                             <div
                                 id="documentation"
                                 style={styles.mainContainers}
