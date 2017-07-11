@@ -367,10 +367,6 @@ export interface FAQSection {
     questions: FAQQuestion[];
 }
 
-export interface TypeDocNodeById {
-    [id: number]: TypeDocNode;
-}
-
 export interface S3FileObject {
     Key: {
         _text: string;
