@@ -169,7 +169,6 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
         const allMethods = _.filter(allMembers, typeDocUtils.isMethod);
         const publicMethods = _.filter(allMethods, method => method.flags.isPublic);
         return this.renderMenuSubsections(menuItemName, publicMethods);
-
     }
     private renderTypesMenuSubsection(): React.ReactNode {
         const allModules = this.props.versionDocObj.children;
