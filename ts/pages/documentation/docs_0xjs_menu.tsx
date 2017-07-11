@@ -7,7 +7,6 @@ import {constants} from 'ts/utils/constants';
 import compareVersions = require('compare-versions');
 import {VersionDropDown} from 'ts/pages/documentation/version_drop_down';
 import {DocSections, Styles, TypeDocNode} from 'ts/types';
-import {moduleResolver} from 'ts/pages/documentation/module_resolver';
 import {typeDocUtils} from 'ts/utils/typedoc_utils';
 import {Link as ScrollLink} from 'react-scroll';
 
@@ -159,7 +158,7 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
         if (menuItemName === 'types') {
             return this.renderTypesMenuSubsection();
         }
-        const moduleDefinition = moduleResolver.getModuleDefinitionBySectionNameIfExists(
+        const moduleDefinition = typeDocUtils.getModuleDefinitionBySectionNameIfExists(
             this.props.versionDocObj, menuItemName,
         );
         if (_.isUndefined(moduleDefinition)) {

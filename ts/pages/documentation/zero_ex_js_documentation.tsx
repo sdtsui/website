@@ -25,7 +25,6 @@ import {Comment} from 'ts/pages/documentation/comment';
 import {AnchorTitle} from 'ts/pages/documentation/anchor_title';
 import {SectionHeader} from 'ts/pages/documentation/section_header';
 import {Docs0xjsMenu, menu} from 'ts/pages/documentation/docs_0xjs_menu';
-import {moduleResolver} from 'ts/pages/documentation/module_resolver';
 import {typeDocUtils} from 'ts/utils/typedoc_utils';
 /* tslint:disable:no-var-requires */
 const IntroMarkdown = require('md/docs/0xjs/introduction');
@@ -146,7 +145,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
         const subMenus = _.values(menu);
         const orderedSectionNames = _.flatten(subMenus);
         const sections = _.map(orderedSectionNames, sectionName => {
-            const packageDefinitionIfExists = moduleResolver.getModuleDefinitionBySectionNameIfExists(
+            const packageDefinitionIfExists = typeDocUtils.getModuleDefinitionBySectionNameIfExists(
                 this.state.versionDocObj, sectionName,
             );
 
