@@ -129,7 +129,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                                 className="absolute"
                             >
                                 <div id="zeroExJSDocs" />
-                                <h1 className="pl3">
+                                <h1 className="md-pl2 sm-pl3">
                                     <a href={constants.GITHUB_0X_JS_URL} target="_blank">
                                         0x.js
                                     </a>
@@ -203,7 +203,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
             return (
                 <div
                     key={`section-${sectionName}`}
-                    className="py2 px3"
+                    className="py2 pr3 md-pl2 sm-pl3"
                 >
                     <SectionHeader sectionName={sectionName} />
                     <Comment
