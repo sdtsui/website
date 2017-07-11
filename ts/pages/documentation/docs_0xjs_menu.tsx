@@ -155,7 +155,10 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
         if (_.isUndefined(this.props.versionDocObj)) {
             return null;
         }
-        if (menuItemName === 'types') {
+        // Since the `types.ts` file is the only file that does not export a module/class but
+        // instead has each type export itself, we do not need to go down two levels of nesting
+        // for it.
+        if (menuItemName === DocSections.types) {
             return this.renderTypesMenuSubsection();
         }
         const moduleDefinition = typeDocUtils.getModuleDefinitionBySectionNameIfExists(
