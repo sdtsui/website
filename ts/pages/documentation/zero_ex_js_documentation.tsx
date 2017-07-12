@@ -94,7 +94,9 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
         this.fetchJSONDocsFireAndForgetAsync(preferredVersionIfExists);
     }
     public render() {
-        const menuSubsectionsBySection = typeDocUtils.getMenuSubsectionsBySection(this.state.versionDocObj);
+        const menuSubsectionsBySection = _.isUndefined(this.state.versionDocObj)
+                                         ? {}
+                                         : typeDocUtils.getMenuSubsectionsBySection(this.state.versionDocObj);
         return (
             <div>
                 <TopBar

@@ -42,7 +42,7 @@ export const typeDocUtils = {
         const moduleWithName = _.find(modules, {name: modulePathName});
         return moduleWithName;
     },
-    getMenuSubsectionsBySection(versionDocObj?: TypeDocNode): MenuSubsectionsBySection {
+    getMenuSubsectionsBySection(versionDocObj: TypeDocNode): MenuSubsectionsBySection {
         const menuSubsectionsBySection = {} as MenuSubsectionsBySection;
         if (_.isUndefined(versionDocObj)) {
             return menuSubsectionsBySection;
