@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 import {constants} from 'ts/utils/constants';
 import {TypeDocNode, KindString, DocSections, MenuSubsectionsBySection} from 'ts/types';
 
+const TYPES_MODULE_PATH = '"src/types"';
+
 export const sectionNameToModulePath: {[name: string]: string} = {
     [DocSections.zeroEx]: '"src/0x"',
     [DocSections.exchange]: '"src/contract_wrappers/exchange_wrapper"',
@@ -9,10 +11,8 @@ export const sectionNameToModulePath: {[name: string]: string} = {
     [DocSections.token]: '"src/contract_wrappers/token_wrapper"',
     [DocSections.etherToken]: '"src/contract_wrappers/ether_token_wrapper"',
     [DocSections.proxy]: '"src/contract_wrappers/proxy_wrapper"',
-    [DocSections.types]: '"src/types"',
+    [DocSections.types]: TYPES_MODULE_PATH,
 };
-
-const TYPES_MODULE_PATH = '"src/types"';
 
 export const typeDocUtils = {
     isType(entity: TypeDocNode): boolean {
