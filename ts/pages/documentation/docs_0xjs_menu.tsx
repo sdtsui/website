@@ -6,7 +6,7 @@ import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
 import compareVersions = require('compare-versions');
 import {VersionDropDown} from 'ts/pages/documentation/version_drop_down';
-import {DocSections, Styles, TypeDocNode, MenuSubsections} from 'ts/types';
+import {DocSections, Styles, TypeDocNode, MenuSubsectionsBySection} from 'ts/types';
 import {typeDocUtils} from 'ts/utils/typedoc_utils';
 import {Link as ScrollLink} from 'react-scroll';
 
@@ -47,7 +47,7 @@ interface Docs0xjsMenuProps {
     onMenuItemClick?: () => void;
     selectedVersion: string;
     versions: string[];
-    menuSubsections: MenuSubsections;
+    menuSubsectionsBySection: MenuSubsectionsBySection;
 }
 
 interface Docs0xjsMenuState {}
@@ -152,12 +152,12 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
         return menuItems;
     }
     private renderMenuItemSubsections(menuItemName: string): React.ReactNode {
-        if (_.isUndefined(this.props.menuSubsections[menuItemName])) {
+        if (_.isUndefined(this.props.menuSubsectionsBySection[menuItemName])) {
             return null;
         }
-        return this.renderMenuSubsections(menuItemName, this.props.menuSubsections[menuItemName]);
+        return this.renderMenuSubsectionsBySection(menuItemName, this.props.menuSubsectionsBySection[menuItemName]);
     }
-    private renderMenuSubsections(menuItemName: string, entities: TypeDocNode[]): React.ReactNode {
+    private renderMenuSubsectionsBySection(menuItemName: string, entities: TypeDocNode[]): React.ReactNode {
         return (
             <ul style={{margin: 0, listStyleType: 'none', paddingLeft: 0}} key={menuItemName}>
             {_.map(entities, entity => {

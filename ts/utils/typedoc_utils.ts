@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import {constants} from 'ts/utils/constants';
-import {TypeDocNode, KindString, DocSections, MenuSubsections} from 'ts/types';
+import {TypeDocNode, KindString, DocSections, MenuSubsectionsBySection} from 'ts/types';
 
 export const sectionNameToModulePath: {[name: string]: string} = {
     [DocSections.zeroEx]: '"src/0x"',
@@ -42,10 +42,10 @@ export const typeDocUtils = {
         const moduleWithName = _.find(modules, {name: modulePathName});
         return moduleWithName;
     },
-    getMenuSubsections(versionDocObj?: TypeDocNode): MenuSubsections {
-        const menuSubsections = {} as MenuSubsections;
+    getMenuSubsectionsBySection(versionDocObj?: TypeDocNode): MenuSubsectionsBySection {
+        const menuSubsectionsBySection = {} as MenuSubsectionsBySection;
         if (_.isUndefined(versionDocObj)) {
-            return menuSubsections;
+            return menuSubsectionsBySection;
         }
         const docSections = _.keys(DocSections);
         _.each(docSections, menuItemName => {
@@ -57,7 +57,7 @@ export const typeDocUtils = {
                 const typesModule = _.find(allModules, {name: TYPES_MODULE_PATH}) as TypeDocNode;
                 const allTypes = _.filter(typesModule.children, typeDocUtils.isType);
                 const publicTypes = _.filter(allTypes, typeDocUtils.isPublicType);
-                menuSubsections[menuItemName] = publicTypes;
+                menuSubsectionsBySection[menuItemName] = publicTypes;
             }
             const moduleDefinition = typeDocUtils.getModuleDefinitionBySectionNameIfExists(
                 versionDocObj, menuItemName,
@@ -69,8 +69,8 @@ export const typeDocUtils = {
             const allMembers = mainModuleExport.children;
             const allMethods = _.filter(allMembers, typeDocUtils.isMethod);
             const publicMethods = _.filter(allMethods, method => method.flags.isPublic);
-            menuSubsections[menuItemName] = publicMethods;
+            menuSubsectionsBySection[menuItemName] = publicMethods;
         });
-        return menuSubsections;
+        return menuSubsectionsBySection;
     },
 };

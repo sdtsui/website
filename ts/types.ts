@@ -372,6 +372,6 @@ export interface S3FileObject {
     };
 }
 
-export interface MenuSubsections {
+export interface MenuSubsectionsBySection {
     [section: string]: TypeDocNode[];
 }
