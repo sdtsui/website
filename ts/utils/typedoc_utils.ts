@@ -58,18 +58,19 @@ export const typeDocUtils = {
                 const allTypes = _.filter(typesModule.children, typeDocUtils.isType);
                 const publicTypes = _.filter(allTypes, typeDocUtils.isPublicType);
                 menuSubsectionsBySection[menuItemName] = publicTypes;
+            } else {
+                const moduleDefinition = typeDocUtils.getModuleDefinitionBySectionNameIfExists(
+                    versionDocObj, menuItemName,
+                );
+                if (_.isUndefined(moduleDefinition)) {
+                    return;
+                }
+                const mainModuleExport = moduleDefinition.children[0];
+                const allMembers = mainModuleExport.children;
+                const allMethods = _.filter(allMembers, typeDocUtils.isMethod);
+                const publicMethods = _.filter(allMethods, method => method.flags.isPublic);
+                menuSubsectionsBySection[menuItemName] = publicMethods;
             }
-            const moduleDefinition = typeDocUtils.getModuleDefinitionBySectionNameIfExists(
-                versionDocObj, menuItemName,
-            );
-            if (_.isUndefined(moduleDefinition)) {
-                return;
-            }
-            const mainModuleExport = moduleDefinition.children[0];
-            const allMembers = mainModuleExport.children;
-            const allMethods = _.filter(allMembers, typeDocUtils.isMethod);
-            const publicMethods = _.filter(allMethods, method => method.flags.isPublic);
-            menuSubsectionsBySection[menuItemName] = publicMethods;
         });
         return menuSubsectionsBySection;
     },
