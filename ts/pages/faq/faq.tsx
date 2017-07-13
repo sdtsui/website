@@ -379,12 +379,12 @@ const sections: FAQSection[] = [
                 ),
             },
             {
-                prompt: 'Where can I find a DEVELOPMENT roadmap?',
+                prompt: 'Where can I find a development roadmap?',
                 answer: (
                     <div>
                         Check it out{' '}
                         <a
-                            href="https://docs.google.com/document/d/1_RVa-_bkU92fWRsC8eNy4vYjcTt-WC8GtqyyjbTd-oY"
+                            href="https://drive.google.com/open?id=14IP1N8mt3YdsAoqYTyruMnZswpklUs3THyS1VXx71fo"
                             target="_blank"
                         >
                             here

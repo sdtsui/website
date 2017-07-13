@@ -6,7 +6,8 @@ import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
 import compareVersions = require('compare-versions');
 import {VersionDropDown} from 'ts/pages/documentation/version_drop_down';
-import {DocSections, Styles} from 'ts/types';
+import {DocSections, Styles, TypeDocNode, MenuSubsectionsBySection} from 'ts/types';
+import {typeDocUtils} from 'ts/utils/typedoc_utils';
 import {Link as ScrollLink} from 'react-scroll';
 
 export const menu = {
@@ -46,6 +47,7 @@ interface Docs0xjsMenuProps {
     onMenuItemClick?: () => void;
     selectedVersion: string;
     versions: string[];
+    menuSubsectionsBySection: MenuSubsectionsBySection;
 }
 
 interface Docs0xjsMenuState {}
@@ -117,7 +119,7 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
             </div>
         );
     }
-    private renderMenuItems(menuItemNames: string[]) {
+    private renderMenuItems(menuItemNames: string[]): React.ReactNode[] {
         const menuItemStyles = this.props.shouldDisplaySectionHeaders ?
                                     styles.menuItemWithHeaders :
                                     styles.menuItemWithoutHeaders;
@@ -125,28 +127,64 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
                                     styles.menuItemInnerDivWithHeaders : {};
         const menuItems = _.map(menuItemNames, menuItemName => {
             return (
-                <ScrollLink
-                    key={`menuItem-${menuItemName}`}
-                    to={menuItemName}
-                    offset={0}
-                    duration={constants.DOCS_SCROLL_DURATION_MS}
-                    containerId={constants.DOCS_CONTAINER_ID}
-                >
-                    <MenuItem
-                        onTouchTap={this.onMenuItemClick.bind(this, menuItemName)}
-                        style={menuItemStyles}
-                        innerDivStyle={menuItemInnerDivStyles}
+                <div key={menuItemName}>
+                    <ScrollLink
+                        key={`menuItem-${menuItemName}`}
+                        to={menuItemName}
+                        offset={-10}
+                        duration={constants.DOCS_SCROLL_DURATION_MS}
+                        containerId={constants.DOCS_CONTAINER_ID}
                     >
-                        <span style={{textTransform: 'capitalize'}}>
-                            {menuItemName}
-                        </span>
-                    </MenuItem>
-                </ScrollLink>
+                        <MenuItem
+                            onTouchTap={this.onMenuItemClick.bind(this, menuItemName)}
+                            style={menuItemStyles}
+                            innerDivStyle={menuItemInnerDivStyles}
+                        >
+                            <span style={{textTransform: 'capitalize'}}>
+                                {menuItemName}
+                            </span>
+                        </MenuItem>
+                    </ScrollLink>
+                    {this.renderMenuItemSubsections(menuItemName)}
+                </div>
             );
         });
         return menuItems;
     }
-    private onMenuItemClick(menuItemName: string) {
+    private renderMenuItemSubsections(menuItemName: string): React.ReactNode {
+        if (_.isUndefined(this.props.menuSubsectionsBySection[menuItemName])) {
+            return null;
+        }
+        return this.renderMenuSubsectionsBySection(menuItemName, this.props.menuSubsectionsBySection[menuItemName]);
+    }
+    private renderMenuSubsectionsBySection(menuItemName: string, entities: TypeDocNode[]): React.ReactNode {
+        return (
+            <ul style={{margin: 0, listStyleType: 'none', paddingLeft: 0}} key={menuItemName}>
+            {_.map(entities, entity => {
+                return (
+                    <li key={entity.id}>
+                        <ScrollLink
+                            to={entity.name}
+                            offset={0}
+                            duration={constants.DOCS_SCROLL_DURATION_MS}
+                            containerId={constants.DOCS_CONTAINER_ID}
+                            onTouchTap={this.onMenuItemClick.bind(this, entity.name)}
+                        >
+                            <MenuItem
+                                onTouchTap={this.onMenuItemClick.bind(this, menuItemName)}
+                                style={{minHeight: 35}}
+                                innerDivStyle={{paddingLeft: 36, fontSize: 14, lineHeight: '35px'}}
+                            >
+                                {entity.name}
+                            </MenuItem>
+                        </ScrollLink>
+                    </li>
+                );
+            })}
+            </ul>
+        );
+    }
+    private onMenuItemClick(menuItemName: string): void {
         utils.setUrlHash(menuItemName);
         this.props.onMenuItemClick();
     }

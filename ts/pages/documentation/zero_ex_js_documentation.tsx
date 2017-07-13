@@ -6,16 +6,19 @@ import findVersions = require('find-versions');
 import semverSort = require('semver-sort');
 import {colors} from 'material-ui/styles';
 import MenuItem from 'material-ui/MenuItem';
+import CircularProgress from 'material-ui/CircularProgress';
+import Paper from 'material-ui/Paper';
 import {
     Link as ScrollLink,
     Element as ScrollElement,
     scroller,
 } from 'react-scroll';
 import {Dispatcher} from 'ts/redux/dispatcher';
-import {KindString, TypeDocNode, DocSections, Styles, ScreenWidths} from 'ts/types';
+import {KindString, TypeDocNode, DocSections, Styles, ScreenWidths, S3FileObject} from 'ts/types';
 import {TopBar} from 'ts/components/top_bar';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
+import {Loading} from 'ts/components/ui/loading';
 import {MethodBlock} from 'ts/pages/documentation/method_block';
 import {SourceLink} from 'ts/pages/documentation/source_link';
 import {Type} from 'ts/pages/documentation/type';
@@ -25,6 +28,7 @@ import {Comment} from 'ts/pages/documentation/comment';
 import {AnchorTitle} from 'ts/pages/documentation/anchor_title';
 import {SectionHeader} from 'ts/pages/documentation/section_header';
 import {Docs0xjsMenu, menu} from 'ts/pages/documentation/docs_0xjs_menu';
+import {typeDocUtils} from 'ts/utils/typedoc_utils';
 /* tslint:disable:no-var-requires */
 const IntroMarkdown = require('md/docs/0xjs/introduction');
 const InstallationMarkdown = require('md/docs/0xjs/installation');
@@ -35,75 +39,12 @@ const versioningMarkdown = require('md/docs/0xjs/versioning');
 
 const SCROLL_TO_TIMEOUT = 500;
 
-const contractMethodOrder: {[sectionName: string]: string[]} = {
-    zeroEx: [
-        'signOrderHashAsync',
-        'getOrderHashHexAsync',
-        'getAvailableAddressesAsync',
-        'setProviderAsync',
-        'isValidOrderHash',
-        'isValidSignature',
-        'generatePseudoRandomSalt',
-        'toBaseUnitAmount',
-        'toUnitAmount',
-    ],
-    exchange: [
-        'fillOrderAsync',
-        'batchFillOrderAsync',
-        'cancelOrderAsync',
-        'batchCancelOrderAsync',
-        'fillOrKillOrderAsync',
-        'batchFillOrKillAsync',
-        'fillOrdersUpToAsync',
-        'getFilledTakerAmountAsync',
-        'getCanceledTakerAmountAsync',
-        'getUnavailableTakerAmountAsync',
-        'subscribeAsync',
-        'stopWatchingAllEventsAsync',
-        'getContractAddressAsync',
-        'getAvailableContractAddressesAsync',
-        'getProxyAuthorizedContractAddressesAsync',
-    ],
-    token: [
-        'getAllowanceAsync',
-        'getBalanceAsync',
-        'getProxyAllowanceAsync',
-        'setAllowanceAsync',
-        'setProxyAllowanceAsync',
-        'transferAsync',
-        'transferFromAsync',
-        'subscribeAsync',
-        'stopWatchingAllEventsAsync',
-    ],
-    tokenRegistry: [
-        'getTokensAsync',
-    ],
-    etherToken: [
-        'depositAsync',
-        'withdrawAsync',
-    ],
-    proxy: [
-        'isAuthorizedAsync',
-        'getAuthorizedAddressesAsync',
-    ],
-};
-
 const sectionNameToMarkdown = {
     [DocSections.introduction]: IntroMarkdown,
     [DocSections.installation]: InstallationMarkdown,
     [DocSections.async]: AsyncMarkdown,
     [DocSections.errors]: ErrorsMarkdown,
     [DocSections.versioning]: versioningMarkdown,
-};
-
-const sectionNameToModulePath: {[name: string]: string} = {
-    [DocSections.zeroEx]: '"src/0x"',
-    [DocSections.exchange]: '"src/contract_wrappers/exchange_wrapper"',
-    [DocSections.tokenRegistry]: '"src/contract_wrappers/token_registry_wrapper"',
-    [DocSections.token]: '"src/contract_wrappers/token_wrapper"',
-    [DocSections.etherToken]: '"src/contract_wrappers/ether_token_wrapper"',
-    [DocSections.proxy]: '"src/contract_wrappers/proxy_wrapper"',
-    [DocSections.types]: '"src/types"',
 };
 
 export interface ZeroExJSDocumentationPassedProps {
@@ -120,23 +61,25 @@ export interface ZeroExJSDocumentationAllProps {
 }
 
 interface ZeroExJSDocumentationState {
-    versionDocObj: string;
+    versionDocObj?: TypeDocNode;
 }
 
 const styles: Styles = {
     mainContainers: {
-        top: 0,
+        position: 'absolute',
+        top: 43,
         left: 0,
         bottom: 0,
         right: 0,
         overflowZ: 'hidden',
         overflowY: 'scroll',
-        minHeight: 'calc(100vh - 77px)',
+        minHeight: 'calc(100vh - 43px)',
         WebkitOverflowScrolling: 'touch',
     },
     menuContainer: {
         borderColor: colors.grey300,
-        width: 170,
+        maxWidth: 330,
+        marginLeft: 20,
     },
 };
 
@@ -155,6 +98,9 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
         this.fetchJSONDocsFireAndForgetAsync(preferredVersionIfExists);
     }
     public render() {
+        const menuSubsectionsBySection = _.isUndefined(this.state.versionDocObj)
+                                         ? {}
+                                         : typeDocUtils.getMenuSubsectionsBySection(this.state.versionDocObj);
         return (
             <div>
                 <TopBar
@@ -162,13 +108,29 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                     location={this.props.location}
                     zeroExJSversion={this.props.zeroExJSversion}
                     availableZeroExJSVersions={this.props.availableZeroExJSVersions}
+                    menuSubsectionsBySection={menuSubsectionsBySection}
+                    shouldFullWidth={true}
                 />
-                {!_.isUndefined(this.state.versionDocObj) &&
+                {_.isUndefined(this.state.versionDocObj) ?
                     <div
-                        className="mx-auto max-width-4 flex"
-                        style={{color: colors.grey800, paddingTop: 44}}
+                        className="col col-12"
+                        style={styles.mainContainers}
                     >
-                        <div className="relative col md-col-2 lg-col-2 lg-pl0 md-pl1 sm-hide xs-hide">
+                        <div
+                            className="relative sm-px2 sm-pt2 sm-m1"
+                            style={{height: 122, top: '50%', transform: 'translateY(-50%)'}}
+                        >
+                            <div className="center pb2">
+                                <CircularProgress size={40} thickness={5} />
+                            </div>
+                            <div className="center pt2" style={{paddingBottom: 11}}>Loading documentation...</div>
+                        </div>
+                    </div> :
+                    <div
+                        className="mx-auto flex"
+                        style={{color: colors.grey800, height: 43}}
+                    >
+                        <div className="relative col md-col-3 lg-col-3 lg-pl0 md-pl1 sm-hide xs-hide">
                             <div
                                 className="border-right absolute"
                                 style={{...styles.menuContainer, ...styles.mainContainers}}
@@ -176,17 +138,18 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                                 <Docs0xjsMenu
                                     selectedVersion={this.props.zeroExJSversion}
                                     versions={this.props.availableZeroExJSVersions}
+                                    menuSubsectionsBySection={menuSubsectionsBySection}
                                 />
                             </div>
                         </div>
-                        <div className="relative col lg-col-10 md-col-10 sm-col-12 col-12 mt2 pt2">
+                        <div className="relative col lg-col-9 md-col-9 sm-col-12 col-12">
                             <div
                                 id="documentation"
                                 style={styles.mainContainers}
                                 className="absolute"
                             >
                                 <div id="zeroExJSDocs" />
-                                <h1 className="pl3">
+                                <h1 className="md-pl2 sm-pl3">
                                     <a href={constants.GITHUB_0X_JS_URL} target="_blank">
                                         0x.js
                                     </a>
@@ -199,11 +162,13 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
             </div>
         );
     }
-    private renderDocumentation() {
+    private renderDocumentation(): React.ReactNode {
         const subMenus = _.values(menu);
         const orderedSectionNames = _.flatten(subMenus);
         const sections = _.map(orderedSectionNames, sectionName => {
-            const packageDefinitionIfExists: TypeDocNode = this.getPackageDefinitionBySectionNameIfExists(sectionName);
+            const packageDefinitionIfExists = typeDocUtils.getModuleDefinitionBySectionNameIfExists(
+                this.state.versionDocObj, sectionName,
+            );
 
             const markdownFileIfExists = sectionNameToMarkdown[sectionName];
             if (!_.isUndefined(markdownFileIfExists)) {
@@ -233,24 +198,20 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                 packageComment = !_.isUndefined(commentObj) ? commentObj.shortText : packageComment;
             }
 
-            const constructors = _.filter(entities, e => e.kindString === KindString.Constructor);
+            const constructors = _.filter(entities, typeDocUtils.isConstructor);
 
-            const publicProperties = _.filter(entities, e => {
-                return e.kindString === KindString.Property && !utils.isPrivateOrProtectedProperty(e.name);
+            const publicProperties = _.filter(entities, entity => {
+                return typeDocUtils.isProperty(entity) && !typeDocUtils.isPrivateOrProtectedProperty(entity.name);
             });
             const publicPropertyDefs = _.map(publicProperties, property => this.renderProperty(property));
 
-            const methods = _.filter(entities, e => e.kindString === KindString.Method);
-            const orderedMethods = this.orderMethods(sectionName, methods);
+            const methods = _.filter(entities, typeDocUtils.isMethod);
             const isConstructor = false;
-            const methodDefs = _.map(orderedMethods, method => {
+            const methodDefs = _.map(methods, method => {
                 return this.renderMethodBlocks(method, sectionName, isConstructor);
             });
 
-            const types = _.filter(entities, e => {
-                return e.kindString === KindString.Interface || e.kindString === KindString.Function ||
-                       e.kindString === KindString['Type alias'] || e.kindString === KindString.Variable;
-            });
+            const types = _.filter(entities, typeDocUtils.isType);
             const typeDefs = _.map(types, type => {
                 return (
                     <TypeDefinition
@@ -262,7 +223,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
             return (
                 <div
                     key={`section-${sectionName}`}
-                    className="py2 px3"
+                    className="py2 pr3 md-pl2 sm-pl3"
                 >
                     <SectionHeader sectionName={sectionName} />
                     <Comment
@@ -297,7 +258,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
 
         return sections;
     }
-    private renderZeroExConstructors(constructors: TypeDocNode[]) {
+    private renderZeroExConstructors(constructors: TypeDocNode[]): React.ReactNode {
         const isConstructor = true;
         const constructorDefs = _.map(constructors, constructor => {
             return this.renderMethodBlocks(constructor, DocSections.zeroEx, isConstructor);
@@ -308,7 +269,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
             </div>
         );
     }
-    private renderProperty(property: TypeDocNode) {
+    private renderProperty(property: TypeDocNode): React.ReactNode {
         const source = property.sources[0];
         return (
             <div
@@ -331,7 +292,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
             </div>
         );
     }
-    private renderMethodBlocks(method: TypeDocNode, sectionName: string, isConstructor: boolean) {
+    private renderMethodBlocks(method: TypeDocNode, sectionName: string, isConstructor: boolean): React.ReactNode {
         const signatures = method.signatures;
         const renderedSignatures = _.map(signatures, (signature: TypeDocNode, i: number) => {
             const source = method.sources[i];
@@ -355,24 +316,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
         });
         return renderedSignatures;
     }
-    private orderMethods(sectionName: string, methods: TypeDocNode[]) {
-        const methodByName: {[name: string]: TypeDocNode} = {};
-        _.each(methods, method => {
-            methodByName[method.name] = method;
-        });
-        const sectionMethodOrder = contractMethodOrder[sectionName];
-        const orderedMethods = _.compact(_.map(sectionMethodOrder, methodName => {
-            return methodByName[methodName];
-        }));
-        return orderedMethods;
-    }
-    private getPackageDefinitionBySectionNameIfExists(sectionName: string) {
-        const modulePathName = sectionNameToModulePath[sectionName];
-        const modules: TypeDocNode[] = (this.state.versionDocObj as any).children;
-        const moduleWithName = _.find(modules, {name: modulePathName});
-        return moduleWithName;
-    }
-    private scrollToHash() {
+    private scrollToHash(): void {
         const hashWithPrefix = this.props.location.hash;
         let hash = hashWithPrefix.slice(1);
         if (_.isEmpty(hash)) {
@@ -381,7 +325,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
 
         scroller.scrollTo(hash, {duration: 0, offset: 0, containerId: 'documentation'});
     }
-    private async fetchJSONDocsFireAndForgetAsync(preferredVersionIfExists?: string) {
+    private async fetchJSONDocsFireAndForgetAsync(preferredVersionIfExists?: string): Promise<void> {
         const versionFileNames = await this.getVersionFileNamesAsync();
         const versionToFileName: {[version: string]: string} = {};
         _.each(versionFileNames, fileName => {
@@ -412,7 +356,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
             this.scrollToHash();
         });
     }
-    private async getVersionFileNamesAsync() {
+    private async getVersionFileNamesAsync(): Promise<string[]> {
         const response = await fetch(constants.S3_DOCUMENTATION_JSON_ROOT);
         if (response.status !== 200) {
             // TODO: Show the user an error message when the docs fail to load
@@ -423,13 +367,13 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
             compact: true,
         });
         const responseObj = JSON.parse(responseJSONString);
-        const fileObjs = responseObj.ListBucketResult.Contents;
-        const versionFileNames = _.map(fileObjs, (fileObj: any) => {
+        const fileObjs = responseObj.ListBucketResult.Contents as S3FileObject[];
+        const versionFileNames = _.map(fileObjs, fileObj => {
             return fileObj.Key._text;
         });
         return versionFileNames;
     }
-    private async getJSONDocFileAsync(fileName: string) {
+    private async getJSONDocFileAsync(fileName: string): Promise<TypeDocNode> {
         const endpoint = `${constants.S3_DOCUMENTATION_JSON_ROOT}/${fileName}`;
         const response = await fetch(endpoint);
         if (response.status !== 200) {
