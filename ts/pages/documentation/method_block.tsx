@@ -9,6 +9,7 @@ import {SourceLink} from 'ts/pages/documentation/source_link';
 import {MethodSignature} from 'ts/pages/documentation/method_signature';
 import {AnchorTitle} from 'ts/pages/documentation/anchor_title';
 import {Comment} from 'ts/pages/documentation/comment';
+import {typeDocUtils} from 'ts/utils/typedoc_utils';
 
 interface MethodBlockProps {
     isConstructor: boolean;
@@ -43,7 +44,7 @@ export class MethodBlock extends React.Component<MethodBlockProps, MethodBlockSt
     }
     public render() {
         const methodSignature = this.props.methodSignature;
-        if (utils.isPrivateOrProtectedProperty(methodSignature.name)) {
+        if (typeDocUtils.isPrivateOrProtectedProperty(methodSignature.name)) {
             return null;
         }
 

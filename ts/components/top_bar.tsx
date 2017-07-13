@@ -10,7 +10,7 @@ import {constants} from 'ts/utils/constants';
 import {Identicon} from 'ts/components/ui/identicon';
 import {OTCMenu} from 'ts/components/otc_menu';
 import {Docs0xjsMenu} from 'ts/pages/documentation/docs_0xjs_menu';
-import {Styles} from 'ts/types';
+import {Styles, TypeDocNode, MenuSubsectionsBySection} from 'ts/types';
 import {
     Link as ScrollLink,
     animateScroll,
@@ -24,6 +24,10 @@ interface TopBarProps {
     userAddress?: string;
     blockchainIsLoaded: boolean;
     location: Location;
+    zeroExJSversion?: string;
+    availableZeroExJSVersions?: string[];
+    menuSubsectionsBySection?: MenuSubsectionsBySection;
+    shouldFullWidth?: boolean;
 }
 
 interface TopBarState {
@@ -57,6 +61,9 @@ const styles: Styles = {
 };
 
 export class TopBar extends React.Component<TopBarProps, TopBarState> {
+    public static defaultProps: Partial<TopBarProps> = {
+        shouldFullWidth: false,
+    };
     constructor(props: TopBarProps) {
         super(props);
         this.state = {
@@ -64,9 +71,10 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
         };
     }
     public render() {
+        const parentClassNames = `flex mx-auto ${this.props.shouldFullWidth ? 'pl2' : 'max-width-4'}`;
         return (
             <div style={styles.topBar} className="pb1">
-                <div className="flex mx-auto max-width-4">
+                <div className={parentClassNames}>
                     <div className="col col-1">
                         <div
                             className="sm-pl2 md-pl2 lg-pl0"
@@ -138,8 +146,11 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
             <div className="lg-hide md-hide">
                 <div className="pl1 py1" style={{backgroundColor: SECTION_HEADER_COLOR}}>0x.js Docs</div>
                 <Docs0xjsMenu
+                    menuSubsectionsBySection={this.props.menuSubsectionsBySection}
                     shouldDisplaySectionHeaders={false}
                     onMenuItemClick={this.onMenuButtonClick.bind(this)}
+                    selectedVersion={this.props.zeroExJSversion}
+                    versions={this.props.availableZeroExJSVersions}
                 />
             </div>
         );

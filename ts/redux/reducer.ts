@@ -16,7 +16,13 @@ import {
     ScreenWidths,
 } from 'ts/types';
 
+// Instead of defaulting the 0x.js version to an empty string, we pre-populate it with
+// a valid version value. This does not need to be updated however, since onLoad, it
+// is always replaced with a value retrieved from our S3 bucket.
+const DEFAULT_0X_JS_VERSION = '0.7.1';
+
 export interface State {
+    // OTC
     blockchainErr: BlockchainErrs;
     blockchainIsLoaded: boolean;
     generateOrderStep: GenerateOrderSteps;
@@ -35,10 +41,17 @@ export interface State {
     userEtherBalance: BigNumber.BigNumber;
     // Note: cache of supplied orderJSON in fill order step. Do not use for anything else.
     userSuppliedOrderCache: Order;
+
+    // Docs
+    zeroExJSversion: string;
+    availableZeroExJSVersions: string[];
+
+    // Shared
     flashMessage: string;
 };
 
 const INITIAL_STATE: State = {
+    // OTC
     blockchainErr: '',
     blockchainIsLoaded: false,
     generateOrderStep: GenerateOrderSteps.ChooseAssets,
@@ -64,11 +77,18 @@ const INITIAL_STATE: State = {
     userAddress: '',
     userEtherBalance: new BigNumber(0),
     userSuppliedOrderCache: undefined,
+
+    // Docs
+    zeroExJSversion: DEFAULT_0X_JS_VERSION,
+    availableZeroExJSVersions: [DEFAULT_0X_JS_VERSION],
+
+    // Shared
     flashMessage: undefined,
 };
 
 export function reducer(state: State = INITIAL_STATE, action: Action) {
     switch (action.type) {
+        // OTC
         case ActionTypes.RESET_STATE:
             return INITIAL_STATE;
 
@@ -250,6 +270,19 @@ export function reducer(state: State = INITIAL_STATE, action: Action) {
             });
         }
 
+        // Docs
+        case ActionTypes.UPDATE_LIBRARY_VERSION: {
+            return _.assign({}, state, {
+                zeroExJSversion: action.data,
+            });
+        }
+        case ActionTypes.UPDATE_AVAILABLE_LIBRARY_VERSIONS: {
+            return _.assign({}, state, {
+                availableZeroExJSVersions: action.data,
+            });
+        }
+
+        // Shared
         case ActionTypes.SHOW_FLASH_MESSAGE: {
             return _.assign({}, state, {
                 flashMessage: action.data,

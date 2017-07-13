@@ -25,7 +25,7 @@ import {Alert} from 'ts/components/ui/alert';
 import {TokenAmountInput} from 'ts/components/inputs/token_amount_input';
 import {VisualOrder} from 'ts/components/visual_order';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
-import {Validator} from 'ts/schemas/validator';
+import {SchemaValidator} from 'ts/schemas/validator';
 import {orderSchema} from 'ts/schemas/order_schema';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {Blockchain} from 'ts/blockchain';
@@ -54,7 +54,7 @@ interface FillOrderState {
 }
 
 export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
-    private validator: Validator;
+    private validator: SchemaValidator;
     constructor(props: FillOrderProps) {
         super(props);
         this.state = {
@@ -66,7 +66,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             parsedOrder: this.props.initialOrder,
             amountAlreadyFilled: new BigNumber(0),
         };
-        this.validator = new Validator();
+        this.validator = new SchemaValidator();
     }
     public componentWillMount() {
         if (!_.isEmpty(this.state.orderJSON)) {
@@ -250,7 +250,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             const salt = new BigNumber(parsedOrder.salt);
             const parsedMakerFee = new BigNumber(parsedOrder.maker.feeAmount);
             const parsedTakerFee = new BigNumber(parsedOrder.taker.feeAmount);
-            const orderHash = zeroEx.getOrderHash(exchangeContractAddr, parsedOrder.maker.address,
+            const orderHash = zeroEx.getOrderHash(parsedOrder.exchangeContract, parsedOrder.maker.address,
                             parsedOrder.taker.address, parsedOrder.maker.token.address,
                             parsedOrder.taker.token.address, parsedOrder.feeRecipient,
                             makerAmount, takerAmount, parsedMakerFee, parsedTakerFee,
@@ -282,6 +282,12 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             if (orderJSON !== '') {
                 orderJSONErrMsg = 'Submitted order JSON is not valid JSON';
             }
+            this.setState({
+                orderJSON,
+                orderJSONErrMsg,
+                parsedOrder,
+            });
+            return;
         }
 
         let amountAlreadyFilled = new BigNumber(0);
@@ -401,7 +407,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             const makerToken = this.props.tokenByAddress[makerTokenAddress];
             const tokens = [makerToken, takerToken];
             await this.props.blockchain.updateTokenBalancesAndAllowancesAsync(tokens);
-            const orderFilledAmount = response.logs[0].args.filledValueT;
+            const orderFilledAmount = response.logs[0].args.filledTakerTokenAmount;
             this.setState({
                 didFillOrderSucceed: true,
                 globalErrMsg: '',

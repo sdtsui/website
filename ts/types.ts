@@ -110,12 +110,12 @@ export interface Fill {
     logIndex: number;
     maker: string;
     taker: string;
-    tokenM: string;
-    tokenT: string;
-    filledValueM: BigNumber.BigNumber;
-    filledValueT: BigNumber.BigNumber;
-    feeMPaid: BigNumber.BigNumber;
-    feeTPaid: BigNumber.BigNumber;
+    makerToken: string;
+    takerToken: string;
+    filledMakerTokenAmount: BigNumber.BigNumber;
+    filledTakerTokenAmount: BigNumber.BigNumber;
+    paidMakerFee: BigNumber.BigNumber;
+    paidTakerFee: BigNumber.BigNumber;
     orderHash: string;
     transactionHash: string;
     blockTimestamp: number;
@@ -131,6 +131,7 @@ export enum BalanceErrs {
 };
 
 export const ActionTypes = strEnum([
+    // OTC
     'UPDATE_SCREEN_WIDTH',
     'UPDATE_NODE_VERSION',
     'RESET_STATE',
@@ -155,6 +156,12 @@ export const ActionTypes = strEnum([
     'UPDATE_USER_SUPPLIED_ORDER_CACHE',
     'UPDATE_ORDER_FILL_AMOUNT',
     'UPDATE_SHOULD_BLOCKCHAIN_ERR_DIALOG_BE_OPEN',
+
+    // Docs
+    'UPDATE_LIBRARY_VERSION',
+    'UPDATE_AVAILABLE_LIBRARY_VERSIONS',
+
+    // Shared
     'SHOW_FLASH_MESSAGE',
     'HIDE_FLASH_MESSAGE',
 ]);
@@ -293,10 +300,16 @@ export interface TypeDocType {
 export interface TypeDocFlags {
     isStatic?: boolean;
     isOptional?: boolean;
+    isPublic?: boolean;
+}
+
+export interface TypeDocGroup {
+    title: string;
+    children: number[];
 }
 
 export interface TypeDocNode {
-    id?: string;
+    id?: number;
     name?: string;
     kind?: string;
     defaultValue?: string;
@@ -315,6 +328,7 @@ export interface TypeDocNode {
     parameters?: TypeDocNode[];
     sources?: TypeDocNode[];
     children?: TypeDocNode[];
+    groups?: TypeDocGroup[];
 }
 
 export const TypeDocTypes = strEnum([
@@ -338,6 +352,7 @@ export const DocSections = strEnum([
   'token',
   'tokenRegistry',
   'etherToken',
+  'proxy',
   'types',
 ]);
 export type DocSections = keyof typeof DocSections;
@@ -349,4 +364,14 @@ export interface FAQQuestion {
 export interface FAQSection {
     name: string;
     questions: FAQQuestion[];
+}
+
+export interface S3FileObject {
+    Key: {
+        _text: string;
+    };
+}
+
+export interface MenuSubsectionsBySection {
+    [section: string]: TypeDocNode[];
 }
