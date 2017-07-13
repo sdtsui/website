@@ -149,9 +149,6 @@ export const utils = {
         const etherScanPrefix = networkName === 'Frontier' ? '' : `${networkName.toLowerCase()}.`;
         return `https://${etherScanPrefix}etherscan.io/${suffix}/${address}`;
     },
-    isPrivateOrProtectedProperty(propertyName: string): boolean {
-        return _.startsWith(propertyName, '_');
-    },
     setUrlHash(anchorId: string) {
         window.location.hash = anchorId;
     },
