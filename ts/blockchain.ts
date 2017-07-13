@@ -245,15 +245,15 @@ export class Blockchain {
             return [zero, zero];
         }
         const tokenContract = await this.instantiateContractIfExistsAsync(TokenArtifacts, tokenAddress);
-        let balance;
-        let allowance;
+        let balance = new BigNumber(0);
+        let allowance = new BigNumber(0);
         if (this.doesUserAddressExist()) {
             balance = await tokenContract.balanceOf.call(ownerAddress);
             allowance = await tokenContract.allowance.call(ownerAddress, this.proxy.address);
+            // We rewrap BigNumbers from web3 into our BigNumber because the version that they're using is too old
+            balance = new BigNumber(balance);
+            allowance = new BigNumber(allowance);
         }
-        // We rewrap BigNumbers from web3 into our BigNumber because the version that they're using is too old
-        balance = new BigNumber(balance);
-        allowance = new BigNumber(allowance);
         return [balance, allowance];
     }
     public async updateTokenBalancesAndAllowancesAsync(tokens: Token[]) {
