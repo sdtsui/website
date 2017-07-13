@@ -11,11 +11,12 @@ import {TopBar} from 'ts/components/top_bar';
 import {ContributionAmountStep} from 'ts/pages/token_distribution/contribution_amount_step';
 import {SignatureStep} from 'ts/pages/token_distribution/signature_step';
 import {RegisterButton} from 'ts/pages/token_distribution/register_button';
-import {CivicSip, BlockchainErrs} from 'ts/types';
+import {CivicSip, BlockchainErrs, ProviderType} from 'ts/types';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {FlashMessage} from 'ts/components/ui/flash_message';
 import {NewsletterInput} from 'ts/pages/home/newsletter_input';
 import {BlockchainErrDialog} from 'ts/components/blockchain_err_dialog';
+import {Loading} from 'ts/components/ui/loading';
 
 const CUSTOM_GRAY = 'rgb(74, 74, 74)';
 enum RegistrationFlowSteps {
@@ -28,8 +29,11 @@ enum RegistrationFlowSteps {
 export interface RegistrationFlowProps {
     location: Location;
     dispatcher: Dispatcher;
+    blockchainIsLoaded: boolean;
     networkId: number;
     nodeVersion: string;
+    providerType: ProviderType;
+    injectedProviderName: string;
     userAddress: string;
     flashMessage?: string;
     blockchainErr: BlockchainErrs;
@@ -43,6 +47,7 @@ interface RegistrationFlowState {
     prevNetworkId: number;
     prevNodeVersion: string;
     prevUserAddress: string;
+    prevProviderType: ProviderType;
 }
 
 export class RegistrationFlow extends React.Component<RegistrationFlowProps, RegistrationFlowState> {
@@ -54,12 +59,13 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             appId: constants.CIVIC_APP_ID,
         });
         this.state = {
-            stepIndex: RegistrationFlowSteps.VERIFY_IDENTITY,
+            stepIndex: RegistrationFlowSteps.SIGNATURE_PROOF,
             civicUserId: undefined,
             isVerifyingIdentity: false,
             prevNetworkId: this.props.networkId,
             prevNodeVersion: this.props.nodeVersion,
             prevUserAddress: this.props.userAddress,
+            prevProviderType: this.props.providerType,
         };
     }
     public componentWillMount() {
@@ -93,6 +99,15 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         }
         if (nextProps.nodeVersion !== this.state.prevNodeVersion) {
             this.blockchain.nodeVersionUpdatedFireAndForgetAsync(nextProps.nodeVersion);
+            this.setState({
+                prevNodeVersion: nextProps.nodeVersion,
+            });
+        }
+        if (nextProps.providerType !== this.state.prevProviderType) {
+            this.blockchain.providerTypeUpdatedFireAndForgetAsync(nextProps.providerType);
+            this.setState({
+                prevProviderType: nextProps.providerType,
+            });
         }
     }
     public render() {
@@ -135,13 +150,22 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                             this.renderVerifyIdentityStep()
                         }
                         {this.state.stepIndex === RegistrationFlowSteps.SIGNATURE_PROOF &&
-                            <SignatureStep
-                                blockchain={this.blockchain}
-                                civicUserId={this.state.civicUserId}
-                                dispatcher={this.props.dispatcher}
-                                userAddress={this.props.userAddress}
-                                onSubmittedOwnershipProof={this.onSubmittedOwnershipProof.bind(this)}
-                            />
+                            <div>
+                                {!this.props.blockchainIsLoaded ?
+                                    <div className="pt2">
+                                        <Loading />
+                                    </div> :
+                                    <SignatureStep
+                                        blockchain={this.blockchain}
+                                        civicUserId={this.state.civicUserId}
+                                        dispatcher={this.props.dispatcher}
+                                        injectedProviderName={this.props.injectedProviderName}
+                                        userAddress={this.props.userAddress}
+                                        onSubmittedOwnershipProof={this.onSubmittedOwnershipProof.bind(this)}
+                                        providerType={this.props.providerType}
+                                    />
+                                }
+                            </div>
                         }
                         {this.state.stepIndex === RegistrationFlowSteps.CONTRIBUTION_AMOUNT &&
                             <ContributionAmountStep

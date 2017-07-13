@@ -9,21 +9,25 @@ import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
 import {InputLabel} from 'ts/components/ui/input_label';
 import {RequiredLabel} from 'ts/components/ui/required_label';
-import {Styles} from 'ts/types';
+import {Styles, ProviderType} from 'ts/types';
 import {Identicon} from 'ts/components/ui/identicon';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 import {ProviderDropDown} from 'ts/components/provider_drop_down';
+import {LedgerConfigDialog} from 'ts/components/ledger_config_dialog';
 
 export interface SignatureStepProps {
     blockchain: Blockchain;
     civicUserId: string;
     dispatcher: Dispatcher;
+    injectedProviderName: string;
     userAddress: string;
     onSubmittedOwnershipProof: () => void;
+    providerType: ProviderType;
 }
 
 interface SignatureStepState {
     didSignatureProofSucceed: boolean;
+    isLedgerDialogOpen: boolean;
 }
 
 const styles: Styles = {
@@ -42,7 +46,15 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
         super(props);
         this.state = {
             didSignatureProofSucceed: false,
+            isLedgerDialogOpen: false,
         };
+    }
+    public componentWillReceiveProps(nextProps: SignatureStepProps) {
+        if (nextProps.providerType === ProviderType.LEDGER && this.props.providerType !== ProviderType.LEDGER) {
+            this.setState({
+                isLedgerDialogOpen: true,
+            });
+        }
     }
     public render() {
         return (
@@ -60,9 +72,22 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                 </div>
                 <div>
                     <ProviderDropDown
-                        currentProviderName="Metamask"
+                        dispatcher={this.props.dispatcher}
+                        initialProviderType={this.props.providerType}
+                        injectedProviderName={this.props.injectedProviderName}
                     />
                 </div>
+                {this.props.providerType === ProviderType.LEDGER && this.props.userAddress === '' &&
+                    <span>
+                        We still haven't been able to connect to your Ledger.{' '}
+                        <span
+                            style={{textDecoration: 'underline', cursor: 'pointer'}}
+                            onClick={this.onToggleLedgerDialog.bind(this, true)}
+                        >
+                            Try again
+                        </span>
+                    </span>
+                }
                 <div className="pt2" style={{maxWidth: 400}}>
                     {this.renderUserAddress()}
                 </div>
@@ -75,6 +100,12 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                         isDisabled={_.isEmpty(this.props.userAddress)}
                     />
                 </div>
+                <LedgerConfigDialog
+                    blockchain={this.props.blockchain}
+                    dispatcher={this.props.dispatcher}
+                    toggleDialogFn={this.onToggleLedgerDialog.bind(this)}
+                    isOpen={this.state.isLedgerDialogOpen}
+                />
             </div>
         );
     }
@@ -101,6 +132,11 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                 </div>
             </div>
         );
+    }
+    private onToggleLedgerDialog(isOpen: boolean) {
+        this.setState({
+            isLedgerDialogOpen: isOpen,
+        });
     }
     private async onSignProofAsync() {
         let signatureData;

@@ -5,47 +5,18 @@ import promisify = require('es6-promisify');
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
-import {InjectedWeb3SubProvider} from 'ts/injected_web3_subprovider';
-import ProviderEngine = require('web3-provider-engine');
-import FilterSubprovider = require('web3-provider-engine/subproviders/filters');
-import RpcSubprovider = require('web3-provider-engine/subproviders/rpc');
 
 export class Web3Wrapper {
     private dispatcher: Dispatcher;
     private web3: Web3;
-    private networkId: number;
+    private prevNetworkId: number;
+    private shouldPollUserAddress: boolean;
     private watchNetworkAndBalanceIntervalId: number;
-    constructor(dispatcher: Dispatcher, networkId: number) {
+    constructor(dispatcher: Dispatcher, provider: Web3.Provider, networkId: number,
+                shouldPollUserAddress: boolean) {
         this.dispatcher = dispatcher;
-
-        const injectedWeb3 = (window as any).web3;
-        const doesInjectedWeb3Exist = !_.isUndefined(injectedWeb3);
-
-        const isPublicNodeAvailable = networkId === constants.TESTNET_NETWORK_ID;
-
-        let provider;
-        if (doesInjectedWeb3Exist && isPublicNodeAvailable) {
-            // We catch all requests involving a users account and send it to the injectedWeb3
-            // instance. All other requests go to the public hosted node.
-            provider = new ProviderEngine();
-            provider.addProvider(new InjectedWeb3SubProvider(injectedWeb3));
-            provider.addProvider(new FilterSubprovider());
-            provider.addProvider(new RpcSubprovider({
-                rpcUrl: constants.HOSTED_TESTNET_URL,
-            }));
-            provider.start();
-        } else if (doesInjectedWeb3Exist) {
-            // Since no public node for this network, all requests go to injectedWeb3 instance
-            provider = injectedWeb3.currentProvider;
-        } else {
-            // If no injectedWeb3 instance, all requests go to our public hosted node
-            provider = new ProviderEngine();
-            provider.addProvider(new FilterSubprovider());
-            provider.addProvider(new RpcSubprovider({
-                rpcUrl: constants.HOSTED_TESTNET_URL,
-            }));
-            provider.start();
-        }
+        this.prevNetworkId = networkId;
+        this.shouldPollUserAddress = shouldPollUserAddress;
 
         this.web3 = new Web3();
         this.web3.setProvider(provider);
@@ -55,8 +26,12 @@ export class Web3Wrapper {
     public isAddress(address: string) {
         return this.web3.isAddress(address);
     }
-    public async getFirstAccountIfExistsAsync() {
+    public async getAccountsAsync(): Promise<string[]> {
         const addresses = await promisify(this.web3.eth.getAccounts)();
+        return addresses;
+    }
+    public async getFirstAccountIfExistsAsync() {
+        const addresses = await this.getAccountsAsync();
         if (_.isEmpty(addresses)) {
             return '';
         }
@@ -111,16 +86,15 @@ export class Web3Wrapper {
             return; // we are already emitting the state
         }
 
-        let prevNetworkId: number;
         let prevNodeVersion: string;
         let prevUserEtherBalanceInWei = new BigNumber(0);
         let prevUserAddress: string;
-        this.dispatcher.updateNetworkId(prevNetworkId);
+        this.dispatcher.updateNetworkId(this.prevNetworkId);
         this.watchNetworkAndBalanceIntervalId = window.setInterval(async () => {
             // Check for network state changes
             const currentNetworkId = await this.getNetworkIdIfExists();
-            if (currentNetworkId !== prevNetworkId) {
-                prevNetworkId = currentNetworkId;
+            if (currentNetworkId !== this.prevNetworkId) {
+                this.prevNetworkId = currentNetworkId;
                 this.dispatcher.updateNetworkId(currentNetworkId);
             }
 
@@ -131,19 +105,21 @@ export class Web3Wrapper {
                 this.dispatcher.updateNodeVersion(currentNodeVersion);
             }
 
-            const userAddressIfExists = await this.getFirstAccountIfExistsAsync();
-            // Update makerAddress on network change
-            if (prevUserAddress !== userAddressIfExists) {
-                prevUserAddress = userAddressIfExists;
-                this.dispatcher.updateUserAddress(userAddressIfExists);
-            }
+            if (this.shouldPollUserAddress) {
+                const userAddressIfExists = await this.getFirstAccountIfExistsAsync();
+                // Update makerAddress on network change
+                if (prevUserAddress !== userAddressIfExists) {
+                    prevUserAddress = userAddressIfExists;
+                    this.dispatcher.updateUserAddress(userAddressIfExists);
+                }
 
-            // Check for user ether balance changes
-            if (userAddressIfExists !== '') {
-                const balance = await this.getBalanceInEthAsync(userAddressIfExists);
-                if (!balance.eq(prevUserEtherBalanceInWei)) {
-                    prevUserEtherBalanceInWei = balance;
-                    this.dispatcher.updateUserEtherBalance(balance);
+                // Check for user ether balance changes
+                if (userAddressIfExists !== '') {
+                    const balance = await this.getBalanceInEthAsync(userAddressIfExists);
+                    if (!balance.eq(prevUserEtherBalanceInWei)) {
+                        prevUserEtherBalanceInWei = balance;
+                        this.dispatcher.updateUserEtherBalance(balance);
+                    }
                 }
             }
         }, 1000);

@@ -10,6 +10,7 @@ import {
     EtherscanLinkSuffixes,
 } from 'ts/types';
 import * as moment from 'moment';
+import * as u2f from 'ts/vendor/u2f_api';
 import deepEqual = require('deep-equal');
 import ethUtil = require('ethereumjs-util');
 import * as BigNumber from 'bignumber.js';
@@ -158,6 +159,28 @@ export const utils = {
         }
         return new Promise((resolve, reject) => {
             window.onload = resolve;
+        });
+    },
+    async isU2FSupportedAsync(): Promise<boolean> {
+        const w = (window as any);
+        return new Promise((resolve: (isSupported: boolean) => void) => {
+            if (w.u2f && !w.u2f.getApiVersion) {
+                // u2f object was found (Firefox with extension)
+                resolve(true);
+            } else {
+                // u2f object was not found. Using Google polyfill
+                // HACK: u2f.getApiVersion will simply not return a version if the
+                // U2F call fails for any reason. Because of this, we set a hard 3sec
+                // timeout to the request on our end.
+                const getApiVersionTimeoutMs = 3000;
+                const intervalId = setTimeout(() => {
+                    resolve(false);
+                }, getApiVersionTimeoutMs);
+                u2f.getApiVersion((version: number) => {
+                    clearTimeout(intervalId);
+                    resolve(true);
+                });
+            }
         });
     },
 };

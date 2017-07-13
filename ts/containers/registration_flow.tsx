@@ -3,7 +3,7 @@ import {Store as ReduxStore, Dispatch} from 'redux';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {State} from 'ts/redux/reducer';
 import {RegistrationFlow as RegistrationFlowComponent} from 'ts/pages/token_distribution/registration_flow';
-import {BlockchainErrs} from 'ts/types';
+import {BlockchainErrs, ProviderType} from 'ts/types';
 
 interface ConnectedDispatch {
     dispatcher: Dispatcher;
@@ -16,8 +16,11 @@ const mapDispatchToProps = (dispatch: Dispatch<State>): ConnectedDispatch => ({
 
 interface ConnectedState {
     flashMessage?: string;
+    blockchainIsLoaded: boolean;
     networkId: number;
     nodeVersion: string;
+    providerType: ProviderType;
+    injectedProviderName: string;
     userAddress: string;
     blockchainErr: BlockchainErrs;
     shouldBlockchainErrDialogBeOpen: boolean;
@@ -25,8 +28,11 @@ interface ConnectedState {
 
 const mapStateToProps = (state: State): ConnectedState => ({
     flashMessage: state.flashMessage,
+    blockchainIsLoaded: state.blockchainIsLoaded,
     networkId: state.networkId,
     nodeVersion: state.nodeVersion,
+    providerType: state.providerType,
+    injectedProviderName: state.injectedProviderName,
     userAddress: state.userAddress,
     blockchainErr: state.blockchainErr,
     shouldBlockchainErrDialogBeOpen: state.shouldBlockchainErrDialogBeOpen,

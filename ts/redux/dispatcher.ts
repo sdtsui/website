@@ -11,6 +11,7 @@ import {
     Order,
     ActionTypes,
     ScreenWidths,
+    ProviderType,
 } from 'ts/types';
 import * as BigNumber from 'bignumber.js';
 
@@ -198,6 +199,18 @@ export class Dispatcher {
     public hideFlashMessage() {
         this.dispatch({
             type: ActionTypes.HIDE_FLASH_MESSAGE,
+        });
+    }
+    public updateProviderType(providerType: ProviderType) {
+        this.dispatch({
+            type: ActionTypes.UPDATE_PROVIDER_TYPE,
+            data: providerType,
+        });
+    }
+    public updateInjectedProviderName(injectedProviderName: string) {
+        this.dispatch({
+            type: ActionTypes.UPDATE_INJECTED_PROVIDER_NAME,
+            data: injectedProviderName,
         });
     }
 }

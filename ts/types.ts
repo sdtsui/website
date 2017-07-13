@@ -164,6 +164,8 @@ export const ActionTypes = strEnum([
     // Shared
     'SHOW_FLASH_MESSAGE',
     'HIDE_FLASH_MESSAGE',
+    'UPDATE_PROVIDER_TYPE',
+    'UPDATE_INJECTED_PROVIDER_NAME',
 ]);
 export type ActionTypes = keyof typeof ActionTypes;
 
@@ -385,3 +387,9 @@ export interface S3FileObject {
 export interface MenuSubsectionsBySection {
     [section: string]: TypeDocNode[];
 }
+
+export const ProviderType = strEnum([
+  'INJECTED',
+  'LEDGER',
+]);
+export type ProviderType = keyof typeof ProviderType;

@@ -14,6 +14,7 @@ import {
     Action,
     ActionTypes,
     ScreenWidths,
+    ProviderType,
 } from 'ts/types';
 
 // Instead of defaulting the 0x.js version to an empty string, we pre-populate it with
@@ -48,6 +49,8 @@ export interface State {
 
     // Shared
     flashMessage: string;
+    providerType: ProviderType;
+    injectedProviderName: string;
 };
 
 const INITIAL_STATE: State = {
@@ -84,6 +87,8 @@ const INITIAL_STATE: State = {
 
     // Shared
     flashMessage: undefined,
+    providerType: ProviderType.INJECTED,
+    injectedProviderName: '',
 };
 
 export function reducer(state: State = INITIAL_STATE, action: Action) {
@@ -292,6 +297,18 @@ export function reducer(state: State = INITIAL_STATE, action: Action) {
         case ActionTypes.HIDE_FLASH_MESSAGE: {
             return _.assign({}, state, {
                 flashMessage: undefined,
+            });
+        }
+
+        case ActionTypes.UPDATE_PROVIDER_TYPE: {
+            return _.assign({}, state, {
+                providerType: action.data,
+            });
+        }
+
+        case ActionTypes.UPDATE_INJECTED_PROVIDER_NAME: {
+            return _.assign({}, state, {
+                injectedProviderName: action.data,
             });
         }
 

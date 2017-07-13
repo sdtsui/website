@@ -5,7 +5,7 @@
   "scripts": {
     "build": "NODE_ENV=production webpack && npm run minify",
     "minify": "for f in public/bundle*.js; do ./node_modules/uglify-es/bin/uglifyjs $f -o $f -m; done",
-    "dev": "webpack-dev-server --content-base public",
+    "dev": "webpack-dev-server --content-base public --https",
     "update_contracts": "copyfiles -u 4 ./../contracts/build/contracts/*.json ./contracts;",
     "deploy_staging": "npm run build; aws s3 sync ./public/. s3://staging-0xproject --profile 0xproject --region us-east-1 --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers",
     "deploy_live": "npm run build; aws s3 sync ./public/. s3://0xproject.com --profile 0xproject --region us-east-1 --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers",
@@ -31,6 +31,7 @@
     "find-versions": "^2.0.0",
     "jazzicon": "^1.5.0",
     "jsonschema": "^1.1.1",
+    "ledgerco": "^1.1.3",
     "less": "^2.7.2",
     "material-ui": "^0.17.1",
     "moment": "^2.18.1",
