@@ -63,13 +63,13 @@ interface ZeroExJSDocumentationState {
 
 const styles: Styles = {
     mainContainers: {
-        top: 0,
+        top: 43,
         left: 0,
         bottom: 0,
         right: 0,
         overflowZ: 'hidden',
         overflowY: 'scroll',
-        minHeight: '100vh',
+        minHeight: 'calc(100vh - 43px)',
         WebkitOverflowScrolling: 'touch',
     },
     menuContainer: {
@@ -110,7 +110,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                 {!_.isUndefined(this.state.versionDocObj) &&
                     <div
                         className="mx-auto flex"
-                        style={{color: colors.grey800, paddingTop: 44}}
+                        style={{color: colors.grey800, height: 43}}
                     >
                         <div className="relative col md-col-3 lg-col-3 lg-pl0 md-pl1 sm-hide xs-hide">
                             <div
@@ -124,7 +124,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                                 />
                             </div>
                         </div>
-                        <div className="relative col lg-col-9 md-col-9 sm-col-12 col-12 mt2 pt2">
+                        <div className="relative col lg-col-9 md-col-9 sm-col-12 col-12">
                             <div
                                 id="documentation"
                                 style={styles.mainContainers}

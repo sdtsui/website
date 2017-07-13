@@ -131,7 +131,7 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
                     <ScrollLink
                         key={`menuItem-${menuItemName}`}
                         to={menuItemName}
-                        offset={-60}
+                        offset={-10}
                         duration={constants.DOCS_SCROLL_DURATION_MS}
                         containerId={constants.DOCS_CONTAINER_ID}
                     >
@@ -165,7 +165,7 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
                     <li key={entity.id}>
                         <ScrollLink
                             to={entity.name}
-                            offset={-40}
+                            offset={0}
                             duration={constants.DOCS_SCROLL_DURATION_MS}
                             containerId={constants.DOCS_CONTAINER_ID}
                             onTouchTap={this.onMenuItemClick.bind(this, entity.name)}
