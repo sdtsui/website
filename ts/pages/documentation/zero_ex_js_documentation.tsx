@@ -6,6 +6,8 @@ import findVersions = require('find-versions');
 import semverSort = require('semver-sort');
 import {colors} from 'material-ui/styles';
 import MenuItem from 'material-ui/MenuItem';
+import CircularProgress from 'material-ui/CircularProgress';
+import Paper from 'material-ui/Paper';
 import {
     Link as ScrollLink,
     Element as ScrollElement,
@@ -16,6 +18,7 @@ import {KindString, TypeDocNode, DocSections, Styles, ScreenWidths, S3FileObject
 import {TopBar} from 'ts/components/top_bar';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
+import {Loading} from 'ts/components/ui/loading';
 import {MethodBlock} from 'ts/pages/documentation/method_block';
 import {SourceLink} from 'ts/pages/documentation/source_link';
 import {Type} from 'ts/pages/documentation/type';
@@ -63,6 +66,7 @@ interface ZeroExJSDocumentationState {
 
 const styles: Styles = {
     mainContainers: {
+        position: 'absolute',
         top: 43,
         left: 0,
         bottom: 0,
@@ -107,7 +111,21 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                     menuSubsectionsBySection={menuSubsectionsBySection}
                     shouldFullWidth={true}
                 />
-                {!_.isUndefined(this.state.versionDocObj) &&
+                {_.isUndefined(this.state.versionDocObj) ?
+                    <div
+                        className="col col-12"
+                        style={styles.mainContainers}
+                    >
+                        <div
+                            className="relative sm-px2 sm-pt2 sm-m1"
+                            style={{height: 122, top: '50%', transform: 'translateY(-50%)'}}
+                        >
+                            <div className="center pb2">
+                                <CircularProgress size={40} thickness={5} />
+                            </div>
+                            <div className="center pt2" style={{paddingBottom: 11}}>Loading documentation...</div>
+                        </div>
+                    </div> :
                     <div
                         className="mx-auto flex"
                         style={{color: colors.grey800, height: 43}}
