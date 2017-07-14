@@ -11,6 +11,7 @@ import {Home} from 'ts/pages/home/home';
 import {FAQ} from 'ts/pages/faq/faq';
 import {RegistrationFlow} from 'ts/containers/registration_flow';
 import {TokenLaunch} from 'ts/pages/token_launch/token_launch';
+import {RegistrationStatus} from 'ts/pages/token_distribution/registration_status';
 import {NotFound} from 'ts/pages/not_found';
 import {LazyComponent, createLazyComponent} from 'ts/lazy_component';
 import {State, reducer} from 'ts/redux/reducer';
@@ -92,6 +93,7 @@ render(
                             <Route path="/token" component={TokenLaunch as any} />
                             <Route path="/faq" component={FAQ as any} />
                             <Route path="/registration" component={RegistrationFlow as any} />
+                            <Route path="/registration_status" component={RegistrationStatus as any} />
                             <Route path="/docs/0xjs/:version?" component={LazyZeroExJSDocumentation} />
                             <Route component={NotFound as any} />
                         </Switch>

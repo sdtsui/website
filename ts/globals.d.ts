@@ -15,6 +15,7 @@ declare module 'web3-provider-engine/subproviders/hooked-wallet';
 declare module 'thenby';
 declare module 'react-highlight';
 declare module 'react-recaptcha';
+declare module 'react-document-title';
 declare module 'ledgerco';
 
 declare module '*.json' {
