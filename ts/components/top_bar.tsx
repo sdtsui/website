@@ -114,6 +114,9 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
                     <MenuItem className="py2">Whitepaper</MenuItem>
                 </a>
                 {this.renderHomepageMenuItem('team')}
+                <Link to="/token" className="text-decoration-none">
+                    <MenuItem className="py2" style={{color: 'rgb(0, 229, 255)'}}>Token sale</MenuItem>
+                </Link>
                 {this.renderHomepageMenuItem('advisors')}
                 {this.renderHomepageMenuItem('investors')}
                 <Link to="/faq" className="text-decoration-none">
