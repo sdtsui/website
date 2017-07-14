@@ -26,7 +26,7 @@ export class IdenticonAddressInput extends React.Component<IdenticonAddressInput
                 <InputLabel text={label} />
                 <div className="flex">
                     <div className="col col-1 pb1 pr1" style={{paddingTop: 13}}>
-                        <Identicon address={this.props.address} diameter={25} />
+                        <Identicon address={this.props.address} diameter={26} />
                     </div>
                     <div className="col col-11 pb1 pl1" style={{height: 65}}>
                         <OrderAddressInput
