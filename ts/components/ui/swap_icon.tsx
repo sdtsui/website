@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import {constants} from 'ts/utils/constants';
-import jazzicon = require('jazzicon');
 import {colors} from 'material-ui/styles';
 
 interface SwapIconProps {
