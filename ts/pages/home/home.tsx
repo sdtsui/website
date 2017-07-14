@@ -110,11 +110,12 @@ export class Home extends React.Component<HomeProps, HomeState> {
                                     {' '}The Protocol for Trading Tokens
                                 </div>
                                 <div className="flex sm-hide xs-hide">
-                                    <Link to="/token_sale">
+                                    <Link to="/token">
                                         <RaisedButton
-                                            label="Token sale"
+                                            label="Token Launch"
                                             primary={true}
                                             style={{marginRight: 12}}
+                                            buttonStyle={{width: 136}}
                                         />
                                     </Link>
                                     <a

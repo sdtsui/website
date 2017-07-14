@@ -12,7 +12,7 @@ type StepperOrientation = 'vertical'|'horizontal';
 const keyDates = [
     {
         date: 'June 25',
-        description: '0x announces token sale',
+        description: 'Launch announcement',
     },
     {
         date: 'August 9',
@@ -24,7 +24,7 @@ const keyDates = [
     },
     {
         date: 'August 15',
-        description: 'Sale begins',
+        description: 'Token launch',
     },
 ];
 
@@ -58,8 +58,8 @@ export class KeyDates extends React.Component<KeyDatesProps, KeyDatesState> {
                 <Step key={keyDate.date}>
                     <StepLabel>
                         <div>
-                            <div className="bold">{keyDate.date}</div>
-                            <div style={{fontSize: 14, color: CUSTOM_GRAY}}>
+                            <div className="bold" style={{color: 'white'}}>{keyDate.date}</div>
+                            <div style={{fontSize: 14, color: '#cecece'}}>
                                 {keyDate.description}
                             </div>
                         </div>
@@ -69,7 +69,7 @@ export class KeyDates extends React.Component<KeyDatesProps, KeyDatesState> {
         });
         const orientation: StepperOrientation = this.state.screenWidth === ScreenWidths.SM ? 'vertical' : 'horizontal';
         return (
-            <div className="pb4" style={{backgroundColor: 'white'}}>
+            <div className="pb4" style={{backgroundColor: '#272727', color: 'white'}}>
                 <div className="mx-auto max-width-4 center pt3">
                     <h1 className="thin pt1">KEY DATES</h1>
                     <div className="sm-px4 sm-mx2">

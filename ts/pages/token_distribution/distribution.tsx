@@ -8,23 +8,28 @@ interface DistributionProps {}
 const distributionEntities = [
     {
         percentage: '50%',
-        recipient: 'Token Launch',
+        recipient: 'Token launch',
+        color: '#00ba1e',
     },
     {
         percentage: '15%',
         recipient: 'Retained by 0x',
+        color: '#2377df',
     },
     {
         percentage: '15%',
-        recipient: 'External Developer Fund',
+        recipient: 'External development fund',
+        color: '#00aef3',
     },
     {
         percentage: '10%',
-        recipient: 'Founding Team',
+        recipient: 'Founding team',
+        color: '#00c7e5',
     },
     {
         percentage: '10%',
-        recipient: 'Early Investors & Advisors',
+        recipient: 'Early investors & advisors',
+        color: '#00953f',
     },
 ];
 
@@ -33,15 +38,15 @@ export function Distribution(props: DistributionProps) {
         <div className="pb4" style={{backgroundColor: '#eaeaea'}}>
             <div className="mx-auto max-width-4 center pt2">
                 <h1 className="thin pt2">
-                    TOKEN SALE TERMS
+                    TOKEN ALLOCATIONS
                 </h1>
                 <div className="clearfix pt2">
                     <div className="col lg-col-6 md-col-6 sm-col-12 col-12">
                         <div
-                            className="pb2 thin"
-                            style={{textAlign: 'center', fontSize: 24, color: CUSTOM_GRAY}}
+                            className="pb2"
+                            style={{textAlign: 'center', fontSize: 20, color: CUSTOM_GRAY}}
                         >
-                            ZRX Distribution
+                            ZRX Allocations
                         </div>
                         <div className="center" style={{width: '100%'}}>
                             <img
@@ -52,30 +57,27 @@ export function Distribution(props: DistributionProps) {
                     </div>
                     <div
                         className="col lg-col-6 md-col-6 sm-col-12 col-12 sm-px3 sm-pt3 lg-h3 md-h3 sm-h4"
-                        style={{textAlign: 'left'}}
+                        style={{textAlign: 'left', fontSize: 18}}
                     >
-                        <div className="pb2 thin">
+                        <div className="pb2">
                             <span style={{color: CUSTOM_GRAY}}>
-                                Maximum cap on token sale:{' '}
+                                Contribution cap:{' '}
                             </span>
                             <span className="bold">
                                 $24 million
                             </span>
                         </div>
                         <div>
-                            <span className="thin" style={{color: CUSTOM_GRAY}}>
-                                Total token supply:{' '}
+                            <span style={{color: CUSTOM_GRAY}}>
+                                Total supply:{' '}
                             </span>
                             <span className="bold">
-                                1 billion (1,000,000,000) ZRX
+                                1 billion ZRX
                             </span>
-                            <div className="thin" style={{color: CUSTOM_GRAY}}>
-                                of which:
-                            </div>
                             {renderBreakdownList()}
-                            <div className="thin" style={{color: CUSTOM_GRAY}}>
+                            <div style={{color: CUSTOM_GRAY}}>
                                 <div className="pb1">Token type: <span className="bold">Ethereum ERC20</span></div>
-                                <div>Purchase method accepted: <span className="bold">ETH</span></div>
+                                <div>Accepted purchase method: <span className="bold">ETH</span></div>
                             </div>
                         </div>
                     </div>
@@ -88,17 +90,23 @@ export function Distribution(props: DistributionProps) {
 function renderBreakdownList() {
     const listItems = _.map(distributionEntities, distributionEntity => {
         return (
-            <li key={distributionEntity.recipient}>
-                <span className="bold">{distributionEntity.percentage}</span>{' '}
-                <span className="pl1" style={{color: CUSTOM_GRAY}}>
-                    {distributionEntity.recipient}
-                </span>
-            </li>
+            <div key={distributionEntity.recipient} className="flex pb1 relative">
+                <div
+                    className="circle absolute"
+                    style={{backgroundColor: distributionEntity.color, width: 16, height: 16, top: 5}}
+                />
+                <div className="pl3">
+                    <span className="bold">{distributionEntity.percentage}</span>{' '}
+                    <span className="pl1" style={{color: CUSTOM_GRAY}}>
+                        {distributionEntity.recipient}
+                    </span>
+                </div>
+            </div>
         );
     });
     return (
-        <ul>
+        <div className="py2">
             {listItems}
-        </ul>
+        </div>
     );
 }

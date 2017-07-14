@@ -51,7 +51,9 @@ const partnershipsRow2: Partner[] = [
     },
 ];
 
-interface PartnershipsProps {}
+interface PartnershipsProps {
+    shouldCenterAlignTitle?: boolean;
+}
 
 const styles: Styles = {
     subheader: {
@@ -62,17 +64,21 @@ const styles: Styles = {
 };
 
 export function Partnerships(props: PartnershipsProps) {
+    const subheaderStyle = {
+        ...styles.subheader,
+        textAlign: props.shouldCenterAlignTitle ? 'center' : 'left',
+    };
     return (
         <div style={{backgroundColor: 'white'}}>
             <div className="mx-auto max-width-4 pb4">
                 <h1
                     id="partners"
-                    className="pt4 sm-center md-pl3 lg-pl0 thin"
-                    style={{...styles.subheader}}
+                    className="pt4 sm-center md-pl3 lg-pl0 thin sm-px4"
+                    style={subheaderStyle}
                 >
                     Projects Building on 0x
                 </h1>
-                <div className="clearfix pt3 mx-auto md-pl3 lg-pl0">
+                <div className="clearfix pt4 mx-auto md-pl3 lg-pl0">
                     {renderPartners(partnershipsRow1)}
                 </div>
                 <div className="clearfix lg-pt3 md-pt3 mx-auto md-pl3 lg-pl0">
@@ -89,12 +95,12 @@ function renderPartners(partners: Partner[]) {
         return (
             <div
                 key={!_.isUndefined(partner) ? partner.name : `anonymous-partner-${i}`}
-                className={`sm-col sm-col-${colSize} center sm-pb3`}
+                className={`col lg-col-${colSize} md-col-${colSize} col-6 center sm-pb3`}
             >
                 {_.isUndefined(partner) ?
                     null :
                     <a href={partner.url} target="_blank">
-                        <img src={partner.logo} style={{maxWidth: 200, maxHeight: 120}} />
+                        <img src={partner.logo} style={{maxWidth: 170, maxHeight: 102}} />
                     </a>
                 }
             </div>

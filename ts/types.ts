@@ -375,3 +375,9 @@ export interface S3FileObject {
 export interface MenuSubsectionsBySection {
     [section: string]: TypeDocNode[];
 }
+
+export interface Fact {
+    title: string;
+    explanation: string;
+    image: string;
+}
