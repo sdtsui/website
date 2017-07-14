@@ -41,7 +41,7 @@ export class NewsletterInput extends React.Component<NewsletterInputProps, Newsl
                                 fullWidth={true}
                                 hintText="Email"
                                 hintStyle={{color: '#e6e6e6'}}
-                                inputStyle={{color: '#e6e6e6'}}
+                                inputStyle={{color: colors.grey500}}
                                 floatingLabelFixed={true}
                                 floatingLabelStyle={{color: colors.grey500, display: 'hidden'}}
                                 errorText={errMsg}
