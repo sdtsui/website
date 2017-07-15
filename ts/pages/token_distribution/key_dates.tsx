@@ -4,7 +4,6 @@ import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
 import {utils} from 'ts/utils/utils';
 import {ScreenWidths} from 'ts/types';
 
-const CUSTOM_GRAY = '#4A4A4A';
 const THROTTLE_TIMEOUT = 100;
 
 type StepperOrientation = 'vertical'|'horizontal';
