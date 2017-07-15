@@ -63,14 +63,11 @@ export class LifeCycleRaisedButton extends
             default:
                 throw utils.spawnSwitchErr('ButtonState', this.state.buttonState);
         }
-        const buttonStyle = {
-            width: '100%',
-        };
         return (
             <RaisedButton
                 primary={this.props.isPrimary}
                 label={label}
-                style={buttonStyle}
+                style={{width: '100%'}}
                 backgroundColor={this.props.buttonBackgroundColor}
                 labelColor={this.props.buttonLabelColor}
                 onTouchTap={this.onClickAsync.bind(this)}
