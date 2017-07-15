@@ -50,14 +50,14 @@ export function Distribution(props: DistributionProps) {
                         </div>
                         <div className="center" style={{width: '100%'}}>
                             <img
-                                style={{width: 350}}
+                                style={{width: 300}}
                                 src="/images/zrx_pie_chart.png"
                             />
                         </div>
                     </div>
                     <div
                         className="col lg-col-6 md-col-6 sm-col-12 col-12 sm-px3 sm-pt3 lg-h3 md-h3 sm-h4"
-                        style={{textAlign: 'left', fontSize: 18}}
+                        style={{textAlign: 'left', fontSize: 16}}
                     >
                         <div className="pb2">
                             <span style={{color: CUSTOM_GRAY}}>

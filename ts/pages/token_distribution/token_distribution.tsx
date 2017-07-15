@@ -14,7 +14,7 @@ const TOKEN_FACTS: Fact[] = [
     {
         image: '/images/non_rent_seeking.png',
         title: 'Non rent-seeking',
-        explanation: '0x protocol is free to use, only pay fees to the exchanges built on top of it.',
+        explanation: '0x protocol is free to use. Only pay fees to the exchanges built on top of it.',
     },
     {
         image: '/images/zrx_ballot.png',
@@ -160,12 +160,12 @@ export class TokenDistribution extends React.Component<TokenDistributionProps, T
                     </div>
                     <div
                         className="mx-auto lg-left-align md-left-align"
-                        style={{color: 'white', width: 228}}
+                        style={{color: 'white', width: 256}}
                     >
                         <div className="h3 pb2">
                             {fact.title}
                         </div>
-                        <div style={{fontSize: 12, lineHeight: 1.6, width: 220}}>
+                        <div style={{fontSize: 14, lineHeight: 1.6}}>
                             {fact.explanation}
                         </div>
                     </div>

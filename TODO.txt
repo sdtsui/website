@@ -1,0 +1,14 @@
+TODO
+
+GENERAL:
+- More padding at bottom of mobile menu so OTC not cut off
+- Documentation not loading on iphone... and loading spinner not centered
+
+- Check about using Roboto Mono
+
+LEDGER
+- Show user instructions if no injected web3 found on page.
+- Show msg if does have injectedWeb3 but no user addresses found (e.g metamask might be logged out)
+- Make error try/catch for ledger connection tries to be more specific.
+- Style failed ledger connect error msg better
+- Make if such that if someone is on "Ledger" and clicks it again from dropdown, it re-summons the dialog

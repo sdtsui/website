@@ -78,10 +78,10 @@ export function Partnerships(props: PartnershipsProps) {
                 >
                     Projects Building on 0x
                 </h1>
-                <div className="clearfix pt4 mx-auto md-pl3 lg-pl0">
+                <div className="clearfix pt4 mx-auto md-pl3 lg-pl0 sm-px3">
                     {renderPartners(partnershipsRow1)}
                 </div>
-                <div className="clearfix lg-pt3 md-pt3 mx-auto md-pl3 lg-pl0">
+                <div className="clearfix lg-pt3 md-pt3 mx-auto md-pl3 lg-pl0 sm-px3">
                     {renderPartners(partnershipsRow2)}
                 </div>
             </div>
