@@ -4,11 +4,11 @@ import {DefaultPlayer as Video} from 'react-html5video';
 import {utils} from 'ts/utils/utils';
 import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
-import {Distribution} from 'ts/pages/token_distribution/distribution';
-import {KeyDates} from 'ts/pages/token_distribution/key_dates';
+import {Distribution} from 'ts/pages/token_launch/distribution';
+import {KeyDates} from 'ts/pages/token_launch/key_dates';
 import {Partnerships} from 'ts/pages/home/partnerships';
 import {NewsletterInput} from 'ts/pages/home/newsletter_input';
-import {Fact} from 'ts/types';
+import {Fact, ScreenWidths} from 'ts/types';
 
 const TOKEN_FACTS: Fact[] = [
     {
@@ -28,13 +28,18 @@ const TOKEN_FACTS: Fact[] = [
     },
 ];
 
-export interface TokenDistributionProps {
+export interface TokenLaunchPassedProps {
     location: Location;
 }
 
-interface TokenDistributionState {}
+export interface TokenLaunchAllProps {
+    location: Location;
+    screenWidth: ScreenWidths;
+}
 
-export class TokenDistribution extends React.Component<TokenDistributionProps, TokenDistributionState> {
+interface TokenLaunchState {}
+
+export class TokenLaunch extends React.Component<TokenLaunchAllProps, TokenLaunchState> {
     public componentDidMount() {
         window.scrollTo(0, 0);
     }
@@ -81,7 +86,9 @@ export class TokenDistribution extends React.Component<TokenDistributionProps, T
                             </div>
                         </div>
                     </div>
-                    <KeyDates />
+                    <KeyDates
+                        screenWidth={this.props.screenWidth}
+                    />
                     <div
                         className="lg-py4 md-py4 sm-pt1 sm-pb4"
                         style={{backgroundColor: isUserOnMobile ? 'rgb(29, 29, 29)' : '#202020'}}

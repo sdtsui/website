@@ -27,7 +27,9 @@ const keyDates = [
     },
 ];
 
-interface KeyDatesProps {}
+interface KeyDatesProps {
+    screenWidth: ScreenWidths;
+}
 
 interface KeyDatesState {
     screenWidth: ScreenWidths;
