@@ -54,23 +54,19 @@ export function Profile(props: ProfileProps) {
 }
 
 function renderSocialMediaIcons(profileInfo: ProfileInfo) {
-    const icons = [];
-    if (!_.isEmpty(profileInfo.github)) {
-        const icon = renderSocialMediaIcon('zmdi-github-box', profileInfo.github);
-        icons.push(icon);
-    }
-    if (!_.isEmpty(profileInfo.linkedIn)) {
-        const icon = renderSocialMediaIcon('zmdi-linkedin-box', profileInfo.linkedIn);
-        icons.push(icon);
-    }
-    if (!_.isEmpty(profileInfo.twitter)) {
-        const icon = renderSocialMediaIcon('zmdi-twitter-box', profileInfo.twitter);
-        icons.push(icon);
-    }
+    const icons = [
+        renderSocialMediaIcon('zmdi-github-box', profileInfo.github),
+        renderSocialMediaIcon('zmdi-linkedin-box', profileInfo.linkedIn),
+        renderSocialMediaIcon('zmdi-twitter-box', profileInfo.twitter),
+    ];
     return icons;
 }
 
 function renderSocialMediaIcon(iconName: string, url: string) {
+    if (_.isEmpty(url)) {
+        return null;
+    }
+
     return (
         <div key={url} className="pr2">
             <a
