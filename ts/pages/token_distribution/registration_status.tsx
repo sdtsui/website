@@ -30,33 +30,36 @@ export class RegistrationStatus extends React.Component<RegistrationStatusProps,
             flexDirection: 'column',
             justifyContent: 'space-between',
         };
-        const title = 'Check your registration status';
         return (
-            <DocumentTitle title={title}>
+            <DocumentTitle title="Registration check">
                 <div style={style}>
                     <TopBar
                         blockchainIsLoaded={false}
                         location={this.props.location}
                     />
                     <div
-                        className="mx-auto max-width-4"
-                        style={{paddingTop: 100, width: 600}}
+                        className="mx-auto max-width-4 pt4 mt2 sm-px3"
+                        style={{maxWidth: 600}}
                     >
-                        <h1 className="center" style={{fontWeight: 100}}>{title}</h1>
+                        <div className="lg-h2 md-h2 sm-h4 pb2 thin">
+                            Check if your contribution address is registered
+                        </div>
                         <IdenticonAddressInput
                             initialAddress={''}
-                            label={'Your ethereum address'}
+                            label={'Your contribution address'}
                             updateOrderAddress={this.updateOrderAddress.bind(this)}
                         />
-                        <div style={{width: 300}} className="right">
+                        <div style={{width: 100}} className="right">
                             <LifeCycleRaisedButton
                                 isPrimary={true}
                                 disabled={_.isUndefined(this.state.ethereum_address)}
                                 labelReady={'Check'}
-                                labelComplete={'Your address is registered!'}
+                                labelComplete={'Checked!'}
                                 labelLoading={'Checking...'}
                                 onClickAsyncFn={this.checkRegistrationStatus.bind(this)}
                             />
+                        </div>
+                        <div className="pt2">
                             {this.renderRegistrationStatus()}
                         </div>
                     </div>
@@ -71,17 +74,16 @@ export class RegistrationStatus extends React.Component<RegistrationStatusProps,
         }
         if (this.state.registered) {
             return (
-                <p>
-                    Your address is successfully registered!
-                </p>
+                <div>
+                    Your address is registered!
+                </div>
             );
         } else {
             return (
-                <p>
-                    Your address is not registered.
-                    <br/>
+                <div>
+                    Your address is not registered.{' '}
                     <Link to="/registration" style={{textDecoration: 'underline'}}>Register it now!</Link>
-                </p>
+                </div>
             );
         }
     }
