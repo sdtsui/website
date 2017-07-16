@@ -57,8 +57,8 @@ export class NewsletterInput extends React.Component<NewsletterInputProps, Newsl
                             labelLoading="Subscribing..."
                             labelComplete="Subscribed!"
                             onClickAsyncFn={this.submitEmailAsync.bind(this)}
-                            buttonBackgroundColor={this.props.buttonBackgroundColor}
-                            buttonLabelColor={this.props.buttonLabelColor}
+                            backgroundColor={this.props.buttonBackgroundColor}
+                            labelColor={this.props.buttonLabelColor}
                         />
                     </div>
                 </div>
