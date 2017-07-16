@@ -4,8 +4,6 @@ import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
 import {utils} from 'ts/utils/utils';
 import {ScreenWidths} from 'ts/types';
 
-const THROTTLE_TIMEOUT = 100;
-
 type StepperOrientation = 'vertical'|'horizontal';
 
 const keyDates = [
@@ -31,28 +29,9 @@ interface KeyDatesProps {
     screenWidth: ScreenWidths;
 }
 
-interface KeyDatesState {
-    screenWidth: ScreenWidths;
-}
+interface KeyDatesState {}
 
 export class KeyDates extends React.Component<KeyDatesProps, KeyDatesState> {
-    private throttledScreenWidthUpdate: () => void;
-    constructor(props: KeyDatesProps) {
-        super(props);
-        this.state = {
-            screenWidth: undefined,
-        };
-        this.throttledScreenWidthUpdate = _.throttle(this.updateScreenWidth.bind(this), THROTTLE_TIMEOUT);
-    }
-    public componentWillMount() {
-        this.updateScreenWidth();
-    }
-    public componentDidMount() {
-        window.addEventListener('resize', this.throttledScreenWidthUpdate);
-    }
-    public componentWillUnmount() {
-        window.removeEventListener('resize', this.throttledScreenWidthUpdate);
-    }
     public render() {
         const steps = _.map(keyDates, keyDate => {
             return (
@@ -68,7 +47,7 @@ export class KeyDates extends React.Component<KeyDatesProps, KeyDatesState> {
                 </Step>
             );
         });
-        const orientation: StepperOrientation = this.state.screenWidth === ScreenWidths.SM ? 'vertical' : 'horizontal';
+        const orientation: StepperOrientation = this.props.screenWidth === ScreenWidths.SM ? 'vertical' : 'horizontal';
         return (
             <div className="pb4" style={{backgroundColor: '#272727', color: 'white'}}>
                 <div className="mx-auto max-width-4 center pt3">
@@ -84,11 +63,5 @@ export class KeyDates extends React.Component<KeyDatesProps, KeyDatesState> {
                 </div>
             </div>
         );
-    }
-    private updateScreenWidth() {
-        const newScreenWidth = utils.getScreenWidth();
-        this.setState({
-            screenWidth: newScreenWidth,
-        });
     }
 }

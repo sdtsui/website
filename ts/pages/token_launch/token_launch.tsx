@@ -10,6 +10,8 @@ import {Partnerships} from 'ts/pages/home/partnerships';
 import {NewsletterInput} from 'ts/pages/home/newsletter_input';
 import {Fact, ScreenWidths} from 'ts/types';
 
+const THROTTLE_TIMEOUT = 100;
+
 const TOKEN_FACTS: Fact[] = [
     {
         image: '/images/non_rent_seeking.png',
@@ -28,20 +30,33 @@ const TOKEN_FACTS: Fact[] = [
     },
 ];
 
-export interface TokenLaunchPassedProps {
-    location: Location;
-}
-
-export interface TokenLaunchAllProps {
+export interface TokenLaunchProps {
     location: Location;
     screenWidth: ScreenWidths;
 }
 
-interface TokenLaunchState {}
+interface TokenLaunchState {
+    screenWidth: ScreenWidths;
+}
 
-export class TokenLaunch extends React.Component<TokenLaunchAllProps, TokenLaunchState> {
-    public componentDidMount() {
+export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchState> {
+    private throttledScreenWidthUpdate: () => void;
+    constructor(props: TokenLaunchProps) {
+        super(props);
+        this.state = {
+            screenWidth: undefined,
+        };
+        this.throttledScreenWidthUpdate = _.throttle(this.updateScreenWidth.bind(this), THROTTLE_TIMEOUT);
+    }
+    public componentWillMount() {
         window.scrollTo(0, 0);
+        this.updateScreenWidth();
+    }
+    public componentDidMount() {
+        window.addEventListener('resize', this.throttledScreenWidthUpdate);
+    }
+    public componentWillUnmount() {
+        window.removeEventListener('resize', this.throttledScreenWidthUpdate);
     }
     public render() {
         const isUserOnMobile = utils.isUserOnMobile();
@@ -87,7 +102,8 @@ export class TokenLaunch extends React.Component<TokenLaunchAllProps, TokenLaunc
                         </div>
                     </div>
                     <KeyDates
-                        screenWidth={this.props.screenWidth}
+                        key={`keyDates-${this.state.screenWidth}`}
+                        screenWidth={this.state.screenWidth}
                     />
                     <div
                         className="lg-py4 md-py4 sm-pt1 sm-pb4"
@@ -180,5 +196,11 @@ export class TokenLaunch extends React.Component<TokenLaunchAllProps, TokenLaunc
             );
         });
         return facts;
+    }
+    private updateScreenWidth() {
+        const newScreenWidth = utils.getScreenWidth();
+        this.setState({
+            screenWidth: newScreenWidth,
+        });
     }
 }
