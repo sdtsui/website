@@ -68,25 +68,26 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                 />
                 <div className="pt3">
                     <div className="mx-auto max-width-4 center pt2 mt2" style={{color: '#5D5D5D'}}>
-                        <div className="mx-auto pb2 center">
-                            <div className="mt4" style={{fontSize: 38}}>0x Token Launch</div>
+                        <div className="mx-auto center">
+                            <div className="mt4" style={{fontSize: 38}}>
+                                <span className="robotoMono">0</span>x Token Launch
+                            </div>
                         </div>
-                        <div className="mx-auto pb2 pt3">
+                        <div
+                            className="pt1 pb4"
+                            style={{fontSize: 18, color: '#B4B4B4'}}
+                        >
+                            Registration begins August 9
+                        </div>
+                        <div className="mx-auto pb2">
                             <img
                                 src="/images/zrx_token.png"
-                                style={{width: 120}}
+                                style={{width: 150}}
                             />
                         </div>
                         <div
-                            className="pt1 pb3"
-                            style={{fontSize: 18, color: 'rgb(93, 93, 93)'}}
-                        >
-                            <div>Registration begins</div>
-                            <div>August 9</div>
-                        </div>
-                        <div
-                            className="relative pt4 mx-auto sm-px3"
-                            style={{maxWidth: 308, height: 190}}
+                            className="relative pt2 mx-auto sm-px3"
+                            style={{maxWidth: 308, height: 145}}
                         >
                             <div className="absolute" style={{maxWidth: 308}}>
                                 <div style={{textAlign: 'left', fontSize: 14}}>
@@ -126,8 +127,9 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                                             className="pt2 lg-left-align md-left-align"
                                             style={{color: '#D8D8D8', lineHeight: 1.6}}
                                         >
-                                            0x tokens (ZRX) fuel trading activity across{' '}
-                                            a global network of decentralized exchanges.
+                                            0x tokens (ZRX) fuel{' '}
+                                            trading activity across a global network of decentralized{' '}
+                                            exchanges.
                                         </div>
                                     </div>
                                 </div>
