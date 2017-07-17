@@ -206,7 +206,7 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
         }
 
         const userAddress = this.props.userAddress;
-        const identiconDiameter = 25;
+        const identiconDiameter = 26;
         return (
             <div className="flex right pt1 lg-pr0 md-pr2 sm-pr2">
                 <div
