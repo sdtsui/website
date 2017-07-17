@@ -71,7 +71,6 @@ export class LedgerWallet {
 
         try {
             const derivationPath = `${this.path}/${this.pathIndex}`;
-            console.log('signing derivation path: ', derivationPath);
             const result = await (this.ledgerEthConnection as any).signPersonalMessage_async(
                 derivationPath, ethUtil.stripHexPrefix(msgParams.data),
             );
