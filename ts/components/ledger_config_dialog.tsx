@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import {colors} from 'material-ui/styles';
 import Dialog from 'material-ui/Dialog';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 import FlatButton from 'material-ui/FlatButton';
@@ -12,7 +13,6 @@ import {
     TableHeaderColumn,
     TableRowColumn,
 } from 'material-ui/Table';
-import {colors} from 'material-ui/styles';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
 import {Blockchain} from 'ts/blockchain';
@@ -71,8 +71,9 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
                 open={this.props.isOpen}
                 onRequestClose={this.props.toggleDialogFn.bind(this.props.toggleDialogFn, false)}
                 autoScrollBodyContent={true}
+                bodyStyle={{paddingBottom: 0}}
             >
-                <div className="pt2" style={{color: colors.grey700}}>
+                <div style={{color: colors.grey700, paddingTop: 1}}>
                     {this.state.stepIndex === LedgerSteps.CONNECT &&
                         this.renderConnectStep()
                     }
@@ -103,11 +104,11 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
                     </Table>
                 </div>
                 <div className="flex pt2" style={{height: 100}}>
-                    <div>
+                    <div className="overflow-hidden" style={{width: 180}}>
                         <TextField
                             floatingLabelFixed={true}
                             floatingLabelStyle={{color: colors.grey500}}
-                            floatingLabelText="Update path derivation"
+                            floatingLabelText="Update path derivation (optional)"
                             value={this.state.derivationPath}
                             errorText={this.state.derivationErrMsg}
                             onChange={this.onDerivationPathChanged.bind(this)}
@@ -140,8 +141,8 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
     private renderConnectStep() {
         return (
             <div>
-                <div className="h4">
-                    Follow these instructions before proceeding
+                <div className="h4 pt3">
+                    Follow these instructions before proceeding:
                 </div>
                 <ol>
                     <li className="pb1">
@@ -155,15 +156,16 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
                         <a href="https://www.ledgerwallet.com/apps/manager" target="_blank">Firmware >1.2</a>
                     </li>
                 </ol>
-                <div className="center">
+                <div className="center pb3">
                     <LifeCycleRaisedButton
+                        isPrimary={true}
                         labelReady="Connect to Ledger"
                         labelLoading="Connecting..."
                         labelComplete="Connected!"
                         onClickAsyncFn={this.onConnectLedgerClickAsync.bind(this, true)}
                     />
                     {this.state.didConnectFail &&
-                        <div>
+                        <div className="pt2 left-align" style={{color: colors.red200}}>
                             Failed to connect. Follow the instructions and try again.
                         </div>
                     }
@@ -189,6 +191,11 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
         }
         this.props.blockchain.updateLedgerDerivationPath(this.state.derivationPath);
         const didSucceed = await this.fetchAddressesAndBalancesAsync();
+        if (!didSucceed) {
+            this.setState({
+                derivationErrMsg: 'Failed to connect to Ledger.',
+            });
+        }
         return didSucceed;
     }
     private async fetchAddressesAndBalancesAsync() {
@@ -216,7 +223,7 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
     private onDerivationPathChanged(e: any, derivationPath: string) {
         let derivationErrMsg = '';
         if (!_.startsWith(derivationPath, VALID_ETHEREUM_DERIVATION_PATH_PREFIX)) {
-            derivationErrMsg = 'Must be a valid Ethereum derivation path.';
+            derivationErrMsg = 'Must be valid Ethereum path.';
         }
 
         this.setState({

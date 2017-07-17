@@ -14,6 +14,7 @@ export const constants = {
     ETHER_SCAN_ENDPOINT: 'https://kovan.etherscan.io',
     ETHER_FAUCET_ENDPOINT: 'https://faucet.0xproject.com/rain',
     FEE_RECIPIENT_ADDRESS: '0x0000000000000000000000000000000000000000',
+    FIREFOX_U2F_ADDON: 'https://addons.mozilla.org/en-US/firefox/addon/u2f-support-add-on/',
     HOSTED_TESTNET_URL: 'https://kovan.0xproject.com',
     GITHUB_0X_JS_URL: 'https://github.com/0xProject/0x.js',
     LEDGER_PROVIDER_NAME: 'Ledger',
@@ -23,6 +24,8 @@ export const constants = {
     GENERIC_PROVIDER_NAME: 'Injected Web3',
     MAKER_FEE: new BigNumber(0),
     METAMASK_CHROME_STORE_URL: 'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
+    PARITY_CHROME_STORE_URL: 'https://chrome.google.com/webstore/detail/parity-signer-ui/\
+    fgodinogimdopkigkcoelpfkbnpngalc',
     MIST_DOWNLOAD_URL: 'https://github.com/ethereum/mist/releases',
     NULL_ADDRESS: '0x0000000000000000000000000000000000000000',
     RECAPTCHA_SITE_KEY: '6LcXHicUAAAAAOmRl4ZpDf2MxLEiHolYp1vpdOII',
