@@ -358,8 +358,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
         });
     }
     private async getVersionFileNamesAsync(): Promise<string[]> {
-        let response;
-        response = await fetchWrapper.fetchAsync(constants.S3_DOCUMENTATION_JSON_ROOT);
+        const response = await fetchWrapper.fetchAsync(constants.S3_DOCUMENTATION_JSON_ROOT);
         if (response.status !== 200) {
             // TODO: Show the user an error message when the docs fail to load
             return;
