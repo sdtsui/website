@@ -96,11 +96,11 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
         });
     }
     private async checkRegistrationStatusAsync(): Promise<boolean> {
+        const body = JSON.stringify({
+            ethereum_address: this.state.ethereum_address,
+        });
+        const endpoint = `${constants.BACKEND_BASE_URL}/contributor_status`;
         try {
-            const body = JSON.stringify({
-                ethereum_address: this.state.ethereum_address,
-            });
-            const endpoint = `${constants.BACKEND_BASE_URL}/contributor_status`;
             const result = await fetch(
                 endpoint,
                 {
