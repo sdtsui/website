@@ -375,3 +375,9 @@ export interface S3FileObject {
 export interface MenuSubsectionsBySection {
     [section: string]: TypeDocNode[];
 }
+
+export interface FetchResponse {
+    status: number;
+    text: () => Promise<string>;
+    json: () => Promise<any>;
+}

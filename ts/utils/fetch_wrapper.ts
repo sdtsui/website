@@ -1,8 +1,9 @@
 import 'whatwg-fetch';
 import {utils} from 'ts/utils/utils';
+import {FetchResponse} from 'ts/types';
 
 export const fetchWrapper = {
-    fetchAsync: async (endpoint: string): Promise<any> => {
+    fetchAsync: async (endpoint: string): Promise<FetchResponse> => {
         let result;
         try {
             result = await fetch(endpoint);
