@@ -16,8 +16,6 @@ interface RegistrationCheckState {
     registered?: boolean;
 }
 
-const PUBLIC_NODE_URL = 'https://kovan.0xproject.com';
-
 export class RegistrationCheck extends React.Component<RegistrationCheckProps, RegistrationCheckState> {
     constructor(props: RegistrationCheckProps) {
         super(props);
