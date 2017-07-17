@@ -7,19 +7,19 @@ import {TopBar} from 'ts/components/top_bar';
 import {Footer} from 'ts/components/footer';
 import {IdenticonAddressInput} from 'ts/components/inputs/identicon_address_input';
 
-export interface RegistrationStatusProps {
+export interface RegistrationCheckProps {
     location: Location;
 }
 
-interface RegistrationStatusState {
+interface RegistrationCheckState {
     ethereum_address?: string;
     registered?: boolean;
 }
 
 const PUBLIC_NODE_URL = 'https://kovan.0xproject.com';
 
-export class RegistrationStatus extends React.Component<RegistrationStatusProps, RegistrationStatusState> {
-    constructor(props: RegistrationStatusProps) {
+export class RegistrationCheck extends React.Component<RegistrationCheckProps, RegistrationCheckState> {
+    constructor(props: RegistrationCheckProps) {
         super(props);
         this.state = {};
     }
@@ -60,7 +60,7 @@ export class RegistrationStatus extends React.Component<RegistrationStatusProps,
                             />
                         </div>
                         <div className="pt2">
-                            {this.renderRegistrationStatus()}
+                            {this.renderRegistrationCheck()}
                         </div>
                     </div>
                     <Footer/>
@@ -68,7 +68,7 @@ export class RegistrationStatus extends React.Component<RegistrationStatusProps,
             </DocumentTitle>
         );
     }
-    private renderRegistrationStatus(): React.ReactNode {
+    private renderRegistrationCheck(): React.ReactNode {
         if (_.isUndefined(this.state.registered)) {
             return null;
         }
