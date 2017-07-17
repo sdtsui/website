@@ -54,7 +54,7 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
                                 labelReady={'Check'}
                                 labelComplete={'Checked!'}
                                 labelLoading={'Checking...'}
-                                onClickAsyncFn={this.checkRegistrationStatus.bind(this)}
+                                onClickAsyncFn={this.checkRegistrationStatusAsync.bind(this)}
                             />
                         </div>
                         <div className="pt2">
@@ -90,7 +90,7 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
             ethereum_address,
         });
     }
-    private async checkRegistrationStatus(): Promise<boolean> {
+    private async checkRegistrationStatusAsync(): Promise<boolean> {
         try {
             const address = this.state.ethereum_address;
             const result = await fetch(
