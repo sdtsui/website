@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import {Link} from 'react-router-dom';
+import {utils} from 'ts/utils/utils';
 import * as DocumentTitle from 'react-document-title';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 import {TopBar} from 'ts/components/top_bar';
@@ -111,6 +112,7 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
             });
             return true;
         } catch (e) {
+            utils.consoleLog(`website backend error: ${e}`);
             return false;
         }
     }
