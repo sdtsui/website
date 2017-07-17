@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import {Link} from 'react-router-dom';
 import {utils} from 'ts/utils/utils';
+import {constants} from 'ts/utils/constants';
 import * as DocumentTitle from 'react-document-title';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 import {TopBar} from 'ts/components/top_bar';
@@ -96,8 +97,9 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
             const body = JSON.stringify({
                 ethereum_address: this.state.ethereum_address,
             });
+            const endpoint = `${constants.BACKEND_BASE_URL}/contributor_status`;
             const result = await fetch(
-                'http://localhost:3000/contributor_status',
+                endpoint,
                 {
                     method: 'post',
                     headers: {
