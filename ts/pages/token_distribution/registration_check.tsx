@@ -52,7 +52,10 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
                         <div style={{width: 100}} className="right">
                             <LifeCycleRaisedButton
                                 isPrimary={true}
-                                disabled={_.isUndefined(this.state.ethereum_address)}
+                                disabled={
+                                    _.isUndefined(this.state.ethereum_address) ||
+                                    _.isEmpty(this.state.ethereum_address)
+                                }
                                 labelReady={'Check'}
                                 labelComplete={'Checked!'}
                                 labelLoading={'Checking...'}
