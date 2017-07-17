@@ -105,9 +105,9 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
                     body,
                 },
             );
-            const json = await result.json();
+            const jsonResult = await result.json();
             this.setState({
-                registered: json.registered,
+                registered: jsonResult.registered,
             });
             return true;
         } catch (e) {
