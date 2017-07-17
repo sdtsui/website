@@ -92,7 +92,6 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
     }
     private async checkRegistrationStatusAsync(): Promise<boolean> {
         try {
-            const address = this.state.ethereum_address;
             const result = await fetch(
                 'http://localhost:3000/contributor_status',
                 {
@@ -100,7 +99,7 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ethereum_address: address}),
+                    body: JSON.stringify({ethereum_address: this.state.ethereum_address}),
                 },
             );
             const json = await result.json();
