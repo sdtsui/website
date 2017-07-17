@@ -78,7 +78,7 @@ export function Partnerships(props: PartnershipsProps) {
                 >
                     Projects Building on 0x
                 </h1>
-                <div className="clearfix pt4 mx-auto md-pl3 lg-pl0 sm-px3">
+                <div className="clearfix pt3 mx-auto md-pl3 lg-pl0 sm-px3">
                     {renderPartners(partnershipsRow1)}
                 </div>
                 <div className="clearfix lg-pt3 md-pt3 mx-auto md-pl3 lg-pl0 sm-px3">
@@ -100,7 +100,7 @@ function renderPartners(partners: Partner[]) {
                 {_.isUndefined(partner) ?
                     null :
                     <a href={partner.url} target="_blank">
-                        <img src={partner.logo} style={{maxWidth: 170, maxHeight: 102}} />
+                        <img src={partner.logo} style={{maxWidth: 200, maxHeight: 120}} />
                     </a>
                 }
             </div>
