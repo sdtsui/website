@@ -78,7 +78,7 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
                     <div className="col col-1">
                         <div
                             className="sm-pl2 md-pl2 lg-pl0"
-                            style={{fontSize: 25, color: 'black', cursor: 'pointer', paddingTop: 8}}
+                            style={{fontSize: 25, color: 'black', cursor: 'pointer', paddingTop: 5}}
                         >
                             <i
                                 className="zmdi zmdi-menu"
@@ -114,6 +114,9 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
                     <MenuItem className="py2">Whitepaper</MenuItem>
                 </a>
                 {this.renderHomepageMenuItem('team')}
+                <Link to="/token" className="text-decoration-none">
+                    <MenuItem className="py2">Token launch</MenuItem>
+                </Link>
                 {this.renderHomepageMenuItem('advisors')}
                 {this.renderHomepageMenuItem('investors')}
                 <Link to="/faq" className="text-decoration-none">

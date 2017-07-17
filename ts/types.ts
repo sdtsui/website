@@ -180,7 +180,7 @@ export interface Styles {
     [name: string]: React.CSSProperties;
 }
 
-export interface Profile {
+export interface ProfileInfo {
     name: string;
     title: string;
     description: string;
@@ -374,4 +374,10 @@ export interface S3FileObject {
 
 export interface MenuSubsectionsBySection {
     [section: string]: TypeDocNode[];
+}
+
+export interface Fact {
+    title: string;
+    explanation: string;
+    image: string;
 }
