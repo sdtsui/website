@@ -1,4 +1,3 @@
-declare module 'jazzicon';
 declare module 'react-tooltip';
 declare module 'react-router-hash-link';
 declare module 'es6-promisify';
@@ -102,4 +101,16 @@ declare interface Schema {
     // There is also an opened PR: https://github.com/tdegrunt/jsonschema/pull/218/files
     // As soon as it gets merged we should be good to use types from 'jsonschema' package
     $ref?: string;
+}
+
+// blockies declarations
+declare interface BlockiesIcon {
+    toDataURL(): string;
+}
+declare interface BlockiesConfig {
+    seed: string;
+}
+declare function blockies(config: BlockiesConfig): BlockiesIcon;
+declare module 'blockies' {
+    export = blockies;
 }

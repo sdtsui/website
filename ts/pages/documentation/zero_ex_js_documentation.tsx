@@ -361,6 +361,8 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
         const response = await fetchWrapper.fetchAsync(constants.S3_DOCUMENTATION_JSON_ROOT);
         if (response.status !== 200) {
             // TODO: Show the user an error message when the docs fail to load
+            const errMsg = await response.text();
+            utils.consoleLog(`Failed to load JSON file list: ${response.status} ${errMsg}`);
             return;
         }
         const responseXML = await response.text();
@@ -379,6 +381,8 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
         const response = await fetchWrapper.fetchAsync(endpoint);
         if (response.status !== 200) {
             // TODO: Show the user an error message when the docs fail to load
+            const errMsg = await response.text();
+            utils.consoleLog(`Failed to load Doc JSON: ${response.status} ${errMsg}`);
             return;
         }
         const jsonDocObj = await response.json();
