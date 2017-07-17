@@ -25,7 +25,7 @@ export class Identicon extends React.Component<IdenticonProps, IdenticonState> {
                 className="circle mx-auto relative transitionFix"
                 style={{width: diameter, height: diameter, overflow: 'hidden'}}
             >
-                <img src={icon.toDataURL()} style={{width: diameter, height: diameter}}/>
+                <img src={icon.toDataURL()} style={{width: diameter, height: diameter, imageRendering: 'pixelated'}}/>
             </div>
         );
     }
