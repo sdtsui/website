@@ -21,7 +21,6 @@ export class LedgerWallet {
         this.path = constants.DEFAULT_DERIVATION_PATH;
         this.pathIndex = 0;
         this.isU2FSupported = false;
-        this.ledgerEthConnection = undefined;
         this.getAccounts = this.getAccountsAsync.bind(this);
         this.signMessage = this.signPersonalMessageAsync.bind(this);
     }
