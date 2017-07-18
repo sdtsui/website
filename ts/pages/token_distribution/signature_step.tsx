@@ -225,6 +225,8 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
             const errorMsg = await response.text();
             if (errorMsg === 'ADDRESS_ALREADY_REGISTERED') {
                 this.props.dispatcher.showFlashMessage('You cannot update your contribution address.');
+            } else {
+                utils.consoleLog(`Message signing failed: ${errorMsg}`);
             }
         } else {
             this.props.onSubmittedOwnershipProof();
