@@ -12,6 +12,7 @@ import {
     TableHeaderColumn,
     TableRowColumn,
 } from 'material-ui/Table';
+import ReactTooltip = require('react-tooltip');
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
 import {Blockchain} from 'ts/blockchain';
@@ -129,7 +130,7 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
                     >
                         <TableHeader displaySelectAll={false}>
                             <TableRow>
-                                <TableHeaderColumn>Address</TableHeaderColumn>
+                                <TableHeaderColumn colSpan={2}>Address</TableHeaderColumn>
                                 <TableHeaderColumn>Balance</TableHeaderColumn>
                             </TableRow>
                         </TableHeader>
@@ -164,10 +165,29 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
     private renderAddressTableRows() {
         const rows = _.map(this.state.userAddresses, (userAddress: string, i: number) => {
             const balance = this.state.addressBalances[i];
+            const addressTooltipId = `address-${userAddress}`;
+            const balanceTooltipId = `balance-${userAddress}`;
+            const balanceString = `${balance.toString()} ETH`;
             return (
                 <TableRow key={userAddress} style={{height: 40}}>
-                    <TableRowColumn>{userAddress}</TableRowColumn>
-                    <TableRowColumn>{balance.toString()} ETH</TableRowColumn>
+                    <TableRowColumn colSpan={2}>
+                        <div
+                            data-tip={true}
+                            data-for={addressTooltipId}
+                        >
+                            {userAddress}
+                        </div>
+                        <ReactTooltip id={addressTooltipId}>{userAddress}</ReactTooltip>
+                    </TableRowColumn>
+                    <TableRowColumn>
+                        <div
+                            data-tip={true}
+                            data-for={balanceTooltipId}
+                        >
+                            {balanceString}
+                        </div>
+                        <ReactTooltip id={balanceTooltipId}>{balanceString}</ReactTooltip>
+                    </TableRowColumn>
                 </TableRow>
             );
         });
