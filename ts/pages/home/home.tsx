@@ -6,7 +6,7 @@ import FlatButton from 'material-ui/FlatButton';
 import {colors} from 'material-ui/styles';
 import {configs} from 'ts/utils/configs';
 import {constants} from 'ts/utils/constants';
-import {Styles, Profile, Partner} from 'ts/types';
+import {Styles, ProfileInfo, Partner} from 'ts/types';
 import {
     Link as ScrollLink,
     Element as ScrollElement,
@@ -16,159 +16,9 @@ import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
 import {NewsletterInput} from 'ts/pages/home/newsletter_input';
 import {Statistics} from 'ts/pages/home/statistics';
+import {TeamAndAdvisors} from 'ts/pages/home/team_and_advisors';
+import {Partnerships} from 'ts/pages/home/partnerships';
 import ReactTooltip = require('react-tooltip');
-
-const teamRow1: Profile[] = [
-    {
-        name: 'Will Warren',
-        title: 'Co-founder & CEO',
-        description: `Smart contract R&D. Previously applied physics research and simulations at Los
-                      Alamos National Laboratory. Mechanical engineering at UC San Diego. PhD dropout.`,
-        image: '/images/team/will.jpg',
-        linkedIn: 'https://www.linkedin.com/in/will-warren-92aab62b/',
-        github: 'https://github.com/willwarren89',
-        medium: 'https://medium.com/@willwarren89',
-    },
-    {
-        name: 'Amir Bandeali',
-        title: 'Co-founder & CTO',
-        description: `Full-stack web application & smart contract dev. Former fixed income trader at
-                      DRW and online poker professional. Finance at University of Illinois, Urbana-Champaign.`,
-        image: '/images/team/amir.jpeg',
-        linkedIn: 'https://www.linkedin.com/in/abandeali1/',
-        github: 'https://github.com/abandeali1',
-        medium: 'https://medium.com/@abandeali1',
-    },
-    {
-        name: 'Fabio Berger',
-        title: 'Senior Engineer',
-        description: `Blockchain engineer with extensive full-stack and devOps experience. Previously
-                      software engineer at Airtable and founder of WealthLift. Computer science at Duke.`,
-        image: '/images/team/fabio.jpg',
-        linkedIn: 'https://www.linkedin.com/in/fabio-berger-03ab261a/',
-        github: 'https://github.com/fabioberger',
-        medium: 'https://medium.com/@fabioberger',
-    },
-];
-
-const teamRow2: Profile[] = [
-    {
-        name: 'Leonid Logvinov',
-        title: 'Engineer',
-        description: `Full-stack & blockchain engineer. Previously blockchain engineer at Neufund,
-                      software engineer intern at Quora and competitive programmer. Computer science
-                      at University of Warsaw.`,
-        image: '/images/team/leonid.png',
-        linkedIn: 'https://www.linkedin.com/in/leonidlogvinov/',
-        github: 'https://github.com/LogvinovLeon',
-        medium: '',
-    },
-    {
-        name: 'Alex Xu',
-        title: 'Director of Operations',
-        description: `End-to-end business operations. Previously digital marketing consultant at
-                      Google and vendor management at Amazon. Economics at UC San Diego.`,
-        image: '/images/team/alex.jpg',
-        linkedIn: 'https://www.linkedin.com/in/alex-xu/',
-        github: '',
-        medium: '',
-    },
-    {
-        name: 'We\'re hiring',
-        title: 'Designer/UI/UX/Blockchain Engineer',
-        description: `We are looking for talented, self-starters who are passionate about decentralization
-                      to join the team! Apply at jobs@0xproject.com`,
-        image: '/images/team/anyone.png',
-        linkedIn: 'https://www.linkedin.com/company-beta/17942619/',
-        github: '',
-        medium: '',
-    },
-];
-
-const advisors: Profile[] = [
-    {
-        name: 'Fred Ehrsam',
-        title: 'Advisor',
-        description: 'Co-founder of Coinbase. Previously FX trader at Goldman Sachs. Computer Science at Duke.',
-        image: '/images/advisors/fred.jpg',
-        linkedIn: 'https://www.linkedin.com/in/fredehrsam/',
-        medium: 'https://medium.com/@FEhrsam',
-        twitter: 'https://twitter.com/FEhrsam',
-    },
-    {
-        name: 'Olaf Carlson-Wee',
-        title: 'Advisor',
-        image: '/images/advisors/olaf.png',
-        description: 'Founder of Polychain Capital. First employee at Coinbase. Angel investor.',
-        linkedIn: 'https://www.linkedin.com/in/olafcw/',
-        angellist: 'https://angel.co/olafcw',
-    },
-    {
-        name: 'Joey Krug',
-        title: 'Advisor',
-        description: `Founder of Augur. Computer Science at Pomona College dropout.
-                      Thiel Fellowship 20 Under 20 Fellow.`,
-        image: '/images/advisors/joey.jpg',
-        linkedIn: 'https://www.linkedin.com/in/joeykrug/',
-        github: 'https://github.com/joeykrug',
-        angellist: 'https://angel.co/joeykrug',
-    },
-    {
-        name: 'Linda Xie',
-        title: 'Advisor',
-        description: 'Product Manager at Coinbase. Previously Portfolio Risk at AIG.',
-        image: '/images/advisors/linda.jpg',
-        linkedIn: 'https://www.linkedin.com/in/lindaxie/',
-        medium: 'https://medium.com/@linda.xie',
-        twitter: 'https://twitter.com/ljxie',
-    },
-];
-
-const partnershipsRow1: Partner[] = [
-    {
-        name: 'Augur',
-        logo: '/images/logos/augur.png',
-        url: 'https://augur.net/',
-    },
-    {
-        name: 'Maker',
-        logo: '/images/logos/maker.png',
-        url: 'http://makerdao.com/',
-    },
-    {
-        name: 'Aragon',
-        logo: '/images/logos/aragon.png',
-        url: 'https://aragon.one/',
-    },
-    {
-        name: 'Chronobank.io',
-        logo: '/images/logos/chronobank.png',
-        url: 'https://chronobank.io/',
-    },
-];
-
-const partnershipsRow2: Partner[] = [
-    {
-        name: 'Melonport',
-        logo: '/images/logos/melonport.png',
-        url: 'https://melonport.com/',
-    },
-    {
-        name: 'District0x',
-        logo: '/images/logos/district0x.png',
-        url: 'https://district0x.io/',
-    },
-    {
-        name: 'Dharma',
-        logo: '/images/logos/dharma.png',
-        url: 'https://dharma.io/',
-    },
-    {
-        name: 'OpenANX',
-        logo: '/images/logos/openANX.png',
-        url: 'https://anxintl.com/',
-    },
-];
 
 const investorsRow1: Partner[] = [
     {
@@ -209,9 +59,6 @@ export interface HomeProps {
 interface HomeState {}
 
 const styles: Styles = {
-    thin: {
-        fontWeight: 100,
-    },
     paragraph: {
         lineHeight: 1.4,
         fontSize: 18,
@@ -263,14 +110,20 @@ export class Home extends React.Component<HomeProps, HomeState> {
                                     {' '}The Protocol for Trading Tokens
                                 </div>
                                 <div className="flex sm-hide xs-hide">
+                                    <Link to="/token">
+                                        <RaisedButton
+                                            label="Token Launch"
+                                            primary={true}
+                                            style={{marginRight: 12}}
+                                            buttonStyle={{width: 136}}
+                                        />
+                                    </Link>
                                     <a
                                         target="_blank"
                                         href="/pdfs/0x_white_paper.pdf"
                                     >
-                                        <RaisedButton
+                                        <FlatButton
                                             label="Whitepaper"
-                                            primary={true}
-                                            style={{marginRight: 12}}
                                         />
                                     </a>
                                     <Link to="/faq">
@@ -299,14 +152,14 @@ export class Home extends React.Component<HomeProps, HomeState> {
                     <div className="clearfix mx-auto max-width-4 pb2" style={{color: 'white'}}>
                         <div className="col lg-col-6 md-col-6 sm-col-12 sm-px2 sm-pb4">
                             <h1
-                                className="pt4 sm-center md-pl3 lg-pl0"
-                                style={{...styles.subheader, ...styles.thin}}
+                                className="pt4 sm-center md-pl3 lg-pl0 thin"
+                                style={{...styles.subheader}}
                             >
                                 Newsletter
                             </h1>
                             <div
-                                className="pt2 sm-center sm-px3 md-pl3 lg-pl0"
-                                style={{...styles.paragraph, ...styles.thin}}
+                                className="pt2 sm-center sm-px3 md-pl3 lg-pl0 thin"
+                                style={{...styles.paragraph}}
                             >
                                 Stay up to date with the latest 0x developments
                             </div>
@@ -324,14 +177,14 @@ export class Home extends React.Component<HomeProps, HomeState> {
                 <div className="relative" style={{backgroundColor: '#eaeaea'}}>
                     <div className="mx-auto max-width-4 pt2 relative" style={{zIndex: 2}}>
                         <h1
-                            className="pt4 lg-h0 xm-center sm-center md-pl3 lg-pl0"
-                            style={{textTransform: 'uppercase', ...styles.thin}}
+                            className="pt4 lg-h0 xm-center sm-center md-pl3 lg-pl0 thin"
+                            style={{textTransform: 'uppercase'}}
                         >
                             The World is Becoming Tokenized
                         </h1>
                         <div
-                            className="lg-pb4 md-pb4 sm-pb0 sm-center sm-px3 md-pl3 lg-pl0"
-                            style={{maxWidth: 750, ...styles.paragraph, ...styles.thin}}
+                            className="lg-pb4 md-pb4 sm-pb0 sm-center sm-px3 md-pl3 lg-pl0 thin"
+                            style={{maxWidth: 750, ...styles.paragraph}}
                         >
                             <p>
                                 The Ethereum blockchain has become host to a{' '}
@@ -362,67 +215,14 @@ export class Home extends React.Component<HomeProps, HomeState> {
                         style={{bottom: 0, right: 0, zIndex: 0, width: 550}}
                     />
                 </div>
-                <div style={{backgroundColor: 'white'}}>
-                    <div className="mx-auto max-width-4 pb4">
-                        <h1
-                            id="partners"
-                            className="pt4 sm-center md-pl3 lg-pl0"
-                            style={{...styles.subheader, ...styles.thin}}
-                        >
-                            Projects Building on 0x
-                        </h1>
-                        <div className="clearfix pt3 mx-auto md-pl3 lg-pl0">
-                            {this.renderPartners(partnershipsRow1)}
-                        </div>
-                        <div className="clearfix lg-pt3 md-pt3 mx-auto md-pl3 lg-pl0">
-                            {this.renderPartners(partnershipsRow2)}
-                        </div>
-                    </div>
-                </div>
-                <div
-                    className="relative"
-                    style={{backgroundColor: '#272727'}}
-                >
-                    <ScrollElement name="team">
-                        <div className="mx-auto max-width-4 pb4" style={{color: colors.grey50}}>
-                            <h1
-                                id="team"
-                                className="pt4 sm-center md-pl3 lg-pl0"
-                                style={{...styles.subheader, ...styles.thin, color: 'white'}}
-                            >
-                                Team
-                            </h1>
-                            <div className="clearfix pt3 mx-auto" style={{maxWidth: 1022}}>
-                                {this.renderProfiles(teamRow1)}
-                            </div>
-                            <div className="clearfix pt3 mx-auto" style={{maxWidth: 1022}}>
-                                {this.renderProfiles(teamRow2)}
-                            </div>
-                        </div>
-                    </ScrollElement>
-                </div>
-                <div className="relative" style={{backgroundColor: '#eaeaea'}}>
-                    <ScrollElement name="advisors">
-                        <div className="mx-auto max-width-4 pb4" style={{color: colors.grey800}}>
-                            <h1
-                                id="advisors"
-                                className="pt4 sm-center md-pl3 lg-pl0"
-                                style={{...styles.subheader, ...styles.thin, color: colors.grey800}}
-                            >
-                                Advisors
-                            </h1>
-                            <div className="pt3 mx-auto clearfix">
-                                {this.renderProfiles(advisors)}
-                            </div>
-                        </div>
-                    </ScrollElement>
-                </div>
+                <Partnerships />
+                <TeamAndAdvisors />
                 <div style={{backgroundColor: 'white'}}>
                     <div className="mx-auto max-width-4 pb4">
                         <h1
                             id="investors"
-                            className="pt4 sm-center md-pl3 lg-pl0"
-                            style={{...styles.subheader, ...styles.thin}}
+                            className="pt4 sm-center md-pl3 lg-pl0 thin"
+                            style={{...styles.subheader}}
                         >
                             Backed by
                         </h1>
@@ -459,74 +259,5 @@ export class Home extends React.Component<HomeProps, HomeState> {
                 </div>
             );
         });
-    }
-    private renderProfiles(profiles: Profile[]) {
-        const numIndiv = profiles.length;
-        const colSize = utils.getColSize(profiles.length);
-        return _.map(profiles, profile => {
-            return (
-                <div
-                    key={profile.name}
-                    className={`sm-col sm-col-${colSize}`}
-                >
-                    <div className="mx-auto" style={{width: 200}}>
-                        <div>
-                            <img src={profile.image} />
-                        </div>
-                        <div
-                            className="pt1"
-                            style={{fontSize: 18, fontWeight: 'bold'}}
-                        >
-                            {profile.name}
-                        </div>
-                        <div
-                            className="pb2 pt1"
-                            style={{...styles.thin, fontSize: 16}}
-                        >
-                            {profile.title}
-                        </div>
-                        <div
-                            style={{fontSize: 13, minHeight: 60, ...styles.thin}}
-                            className="pb2"
-                        >
-                            {profile.description}
-                        </div>
-                        <div className="flex pb3">
-                            {this.renderSocialMediaIcons(profile)}
-                        </div>
-                    </div>
-                </div>
-            );
-        });
-    }
-    private renderSocialMediaIcons(profile: Profile) {
-        const icons = [];
-        if (!_.isEmpty(profile.github)) {
-            const icon = this.renderSocialMediaIcon('zmdi-github-box', profile.github);
-            icons.push(icon);
-        }
-        if (!_.isEmpty(profile.linkedIn)) {
-            const icon = this.renderSocialMediaIcon('zmdi-linkedin-box', profile.linkedIn);
-            icons.push(icon);
-        }
-        if (!_.isEmpty(profile.twitter)) {
-            const icon = this.renderSocialMediaIcon('zmdi-twitter-box', profile.twitter);
-            icons.push(icon);
-        }
-        return icons;
-    }
-    private renderSocialMediaIcon(iconName: string, url: string) {
-        return (
-            <div key={url} className="pr2">
-                <a
-                    href={url}
-                    style={{color: 'inherit'}}
-                    target="_blank"
-                    className="text-decoration-none"
-                >
-                    <i className={`zmdi ${iconName}`} style={{...styles.socalIcon}} />
-                </a>
-            </div>
-        );
     }
 }

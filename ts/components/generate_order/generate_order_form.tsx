@@ -9,7 +9,7 @@ import {colors} from 'material-ui/styles';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {zeroEx} from 'ts/utils/zero_ex';
 import {utils} from 'ts/utils/utils';
-import {Validator} from 'ts/schemas/validator';
+import {SchemaValidator} from 'ts/schemas/validator';
 import {orderSchema} from 'ts/schemas/order_schema';
 import {Alert} from 'ts/components/ui/alert';
 import {OrderJSON} from 'ts/components/order_json';
@@ -71,7 +71,7 @@ const style = {
 };
 
 export class GenerateOrderForm extends React.Component<GenerateOrderFormProps, any> {
-    private validator: Validator;
+    private validator: SchemaValidator;
     constructor(props: GenerateOrderFormProps) {
         super(props);
         this.state = {
@@ -79,7 +79,7 @@ export class GenerateOrderForm extends React.Component<GenerateOrderFormProps, a
             shouldShowIncompleteErrs: false,
             signingState: SigningState.UNSIGNED,
         };
-        this.validator = new Validator();
+        this.validator = new SchemaValidator();
     }
     public componentDidMount() {
         window.scrollTo(0, 0);

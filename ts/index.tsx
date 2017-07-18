@@ -1,3 +1,6 @@
+// Polyfills
+import 'whatwg-fetch';
+
 import * as React from 'react';
 import {render} from 'react-dom';
 import {Provider} from 'react-redux';
@@ -7,6 +10,7 @@ import {configs} from 'ts/utils/configs';
 import {Home} from 'ts/pages/home/home';
 import {FAQ} from 'ts/pages/faq/faq';
 import {RegistrationFlow} from 'ts/containers/registration_flow';
+import {TokenLaunch} from 'ts/pages/token_launch/token_launch';
 import {NotFound} from 'ts/pages/not_found';
 import {LazyComponent, createLazyComponent} from 'ts/lazy_component';
 import {State, reducer} from 'ts/redux/reducer';
@@ -85,6 +89,7 @@ render(
                         <Switch>
                             <Route exact={true} path="/" component={Home as any} />
                             <Route path="/otc" component={LazyOTC} />
+                            <Route path="/token" component={TokenLaunch as any} />
                             <Route path="/faq" component={FAQ as any} />
                             <Route path="/registration" component={RegistrationFlow as any} />
                             <Route path="/docs/0xjs/:version?" component={LazyZeroExJSDocumentation} />

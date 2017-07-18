@@ -180,7 +180,7 @@ export interface Styles {
     [name: string]: React.CSSProperties;
 }
 
-export interface Profile {
+export interface ProfileInfo {
     name: string;
     title: string;
     description: string;
@@ -300,10 +300,16 @@ export interface TypeDocType {
 export interface TypeDocFlags {
     isStatic?: boolean;
     isOptional?: boolean;
+    isPublic?: boolean;
+}
+
+export interface TypeDocGroup {
+    title: string;
+    children: number[];
 }
 
 export interface TypeDocNode {
-    id?: string;
+    id?: number;
     name?: string;
     kind?: string;
     defaultValue?: string;
@@ -322,6 +328,7 @@ export interface TypeDocNode {
     parameters?: TypeDocNode[];
     sources?: TypeDocNode[];
     children?: TypeDocNode[];
+    groups?: TypeDocGroup[];
 }
 
 export const TypeDocTypes = strEnum([
@@ -367,4 +374,20 @@ export interface FAQQuestion {
 export interface FAQSection {
     name: string;
     questions: FAQQuestion[];
+}
+
+export interface S3FileObject {
+    Key: {
+        _text: string;
+    };
+}
+
+export interface MenuSubsectionsBySection {
+    [section: string]: TypeDocNode[];
+}
+
+export interface Fact {
+    title: string;
+    explanation: string;
+    image: string;
 }

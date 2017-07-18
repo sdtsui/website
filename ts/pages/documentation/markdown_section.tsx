@@ -25,7 +25,7 @@ export class MarkdownSection extends React.Component<MarkdownSectionProps, Markd
         const sectionName = this.props.sectionName;
         return (
             <div
-                className="pt2 px3"
+                className="pt2 pr3 md-pl2 sm-pl3"
                 onMouseOver={this.setAnchorVisibility.bind(this, true)}
                 onMouseOut={this.setAnchorVisibility.bind(this, false)}
             >

@@ -130,7 +130,10 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                         <div className="left-align pb2">
                             Get a reminder email when the contribution period opens
                         </div>
-                        <NewsletterInput isOnDarkBackground={false} />
+                        <NewsletterInput
+                            buttonBackgroundColor="#575757"
+                            buttonLabelColor="white"
+                        />
                     </div>
                 </div>
             </div>
