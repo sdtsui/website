@@ -78,7 +78,7 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
                     <div className="col col-1">
                         <div
                             className="sm-pl2 md-pl2 lg-pl0"
-                            style={{fontSize: 25, color: 'black', cursor: 'pointer', paddingTop: 5}}
+                            style={{fontSize: 25, color: 'black', cursor: 'pointer', paddingTop: 8}}
                         >
                             <i
                                 className="zmdi zmdi-menu"
