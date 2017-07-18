@@ -399,3 +399,24 @@ export interface Fact {
     explanation: string;
     image: string;
 }
+
+interface LedgerGetAddressResult {
+    address: string;
+}
+interface LedgerSignResult {
+    v: string;
+    r: string;
+    s: string;
+}
+interface LedgerCommunication {
+    close_async: () => void;
+}
+export interface LedgerEthConnection {
+    getAddress_async: (derivationPath: string, askForDeviceConfirmation: boolean,
+                       shouldGetChainCode: boolean) => Promise<LedgerGetAddressResult>;
+    signPersonalMessage_async: (derivationPath: string, messageHex: string) => Promise<LedgerSignResult>;
+    comm: LedgerCommunication;
+}
+export interface SignPersonalMessageParams {
+    data: string;
+}
