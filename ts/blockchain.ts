@@ -553,7 +553,7 @@ export class Blockchain {
         return provider;
     }
     private getNameGivenProvider(provider: Web3.Provider): string {
-        if ((provider as any).isMetaMask) {
+        if (!_.isUndefined((provider as any).isMetaMask)) {
             return constants.METAMASK_PROVIDER_NAME;
         }
 
