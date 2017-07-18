@@ -15,7 +15,7 @@ export interface RegistrationCheckProps {
 
 interface RegistrationCheckState {
     ethereum_address?: string;
-    registered?: boolean;
+    isRegistered?: boolean;
 }
 
 export class RegistrationCheck extends React.Component<RegistrationCheckProps, RegistrationCheckState> {
@@ -72,10 +72,10 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
         );
     }
     private renderRegistrationCheck(): React.ReactNode {
-        if (_.isUndefined(this.state.registered)) {
+        if (_.isUndefined(this.state.isRegistered)) {
             return null;
         }
-        if (this.state.registered) {
+        if (this.state.isRegistered) {
             return (
                 <div>
                     Your address is registered!
