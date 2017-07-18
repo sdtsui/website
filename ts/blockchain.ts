@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
 import {ZeroEx} from '0x.js';
+import * as BigNumber from 'bignumber.js';
 import Web3 = require('web3');
 import promisify = require('es6-promisify');
 import findVersions = require('find-versions');
 import compareVersions = require('compare-versions');
 import contract = require('truffle-contract');
-import * as BigNumber from 'bignumber.js';
 import ethUtil = require('ethereumjs-util');
 import ProviderEngine = require('web3-provider-engine');
 import FilterSubprovider = require('web3-provider-engine/subproviders/filters');
@@ -90,13 +90,13 @@ export class Blockchain {
     }
     public updateLedgerDerivationPath(path: string) {
         if (_.isUndefined(this.ledgerSubProvider)) {
-            return;
+            return; // noop
         }
         this.ledgerSubProvider.setPath(path);
     }
     public updateLedgerDerivationIndex(pathIndex: number) {
         if (_.isUndefined(this.ledgerSubProvider)) {
-            return;
+            return; // noop
         }
         this.ledgerSubProvider.setPathIndex(pathIndex);
     }
