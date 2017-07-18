@@ -14,7 +14,7 @@ export interface RegistrationCheckProps {
 }
 
 interface RegistrationCheckState {
-    ethereum_address?: string;
+    ethereumAddress?: string;
     isRegistered?: boolean;
 }
 
@@ -90,14 +90,14 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
             );
         }
     }
-    private updateOrderAddress(ethereum_address: string): void {
+    private updateOrderAddress(ethereumAddress: string): void {
         this.setState({
-            ethereum_address,
+            ethereumAddress,
         });
     }
     private async checkRegistrationStatusAsync(): Promise<boolean> {
         const body = JSON.stringify({
-            ethereum_address: this.state.ethereum_address,
+            ethereum_address: this.state.ethereumAddress,
         });
         const endpoint = `${constants.BACKEND_BASE_URL}/contributor_status`;
         try {
@@ -113,7 +113,7 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
             );
             const jsonResult = await result.json();
             this.setState({
-                registered: jsonResult.registered,
+                isRegistered: jsonResult.registered,
             });
             return true;
         } catch (e) {
