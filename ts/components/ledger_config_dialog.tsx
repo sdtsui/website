@@ -143,7 +143,7 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
                         <TextField
                             floatingLabelFixed={true}
                             floatingLabelStyle={{color: colors.grey500}}
-                            floatingLabelText="Update path derivation (optional)"
+                            floatingLabelText="Update path derivation (advanced)"
                             value={this.state.derivationPath}
                             errorText={this.state.derivationErrMsg}
                             onChange={this.onDerivationPathChanged.bind(this)}
