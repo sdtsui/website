@@ -132,11 +132,11 @@ export class Blockchain {
                 if (_.isUndefined(this.cachedProvider)) {
                     return; // Going from injected to injected, so we noop
                 }
-                delete this.ledgerSubProvider;
                 provider = this.cachedProvider;
                 const shouldPollUserAddress = true;
                 this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, this.networkId, shouldPollUserAddress);
-                this.cachedProvider = undefined;
+                delete this.ledgerSubProvider;
+                delete this.cachedProvider;
                 break;
             }
 
