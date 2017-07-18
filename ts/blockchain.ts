@@ -119,7 +119,7 @@ export class Blockchain {
                 provider.addProvider(this.ledgerSubProvider);
                 provider.addProvider(new FilterSubprovider());
                 provider.addProvider(new RpcSubprovider({
-                    rpcUrl: constants.HOSTED_TESTNET_URL,
+                    rpcUrl: constants.HOSTED_TESTNET_URL, // TODO: use mainnet url here after contracts deployed
                 }));
                 provider.start();
                 this.web3Wrapper.destroy();
