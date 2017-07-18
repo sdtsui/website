@@ -29,11 +29,14 @@ export class LedgerWallet {
     }
     public setPath(derivationPath: string) {
         this.path = derivationPath;
+        // HACK: Must re-assign getAccounts and signMessage since they were
+        // previously bound to old values of this.path
         this.getAccounts = this.getAccountsAsync.bind(this);
         this.signMessage = this.signPersonalMessageAsync.bind(this);
     }
     public setPathIndex(pathIndex: number) {
         this.pathIndex = pathIndex;
+        // HACK: Must re-assign signMessage since they it was previously bound to old values of this.path
         this.signMessage = this.signPersonalMessageAsync.bind(this);
     }
     public async getAccountsAsync(callback: (err: Error, accounts: string[]) => void) {
