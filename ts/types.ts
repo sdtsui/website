@@ -376,12 +376,6 @@ export interface MenuSubsectionsBySection {
     [section: string]: TypeDocNode[];
 }
 
-export interface FetchResponse {
-    status: number;
-    text: () => Promise<string>;
-    json: () => Promise<any>;
-}
-
 export interface Fact {
     title: string;
     explanation: string;
