@@ -214,7 +214,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
             civicUserId: this.props.civicUserId,
             signatureData,
         });
-        const response = await fetch(`${constants.BACKEND_BASE_URL}/register_address`, {
+        const response = await fetch(`${constants.BACKEND_BASE_URL}/signature_proof`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
