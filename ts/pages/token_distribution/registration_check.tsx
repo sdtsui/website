@@ -116,8 +116,8 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
                 isRegistered: jsonResult.registered,
             });
             return true;
-        } catch (e) {
-            utils.consoleLog(`website backend error: ${e}`);
+        } catch (err) {
+            utils.consoleLog(`website backend error: ${err}`);
             return false;
         }
     }
