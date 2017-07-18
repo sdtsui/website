@@ -14,6 +14,7 @@ export const constants = {
     FEE_RECIPIENT_ADDRESS: '0x0000000000000000000000000000000000000000',
     HOSTED_TESTNET_URL: 'https://kovan.0xproject.com',
     GITHUB_0X_JS_URL: 'https://github.com/0xProject/0x.js',
+    LINKEDIN_0X_URL: 'https://www.linkedin.com/company/0x',
     MAKER_FEE: new BigNumber(0),
     METAMASK_CHROME_STORE_URL: 'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
     MIST_DOWNLOAD_URL: 'https://github.com/ethereum/mist/releases',
