@@ -8,7 +8,6 @@ import {colors} from 'material-ui/styles';
 import MenuItem from 'material-ui/MenuItem';
 import CircularProgress from 'material-ui/CircularProgress';
 import Paper from 'material-ui/Paper';
-import {fetchWrapper} from 'ts/utils/fetch_wrapper';
 import {
     Link as ScrollLink,
     Element as ScrollElement,
@@ -358,7 +357,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
         });
     }
     private async getVersionFileNamesAsync(): Promise<string[]> {
-        const response = await fetchWrapper.fetchAsync(constants.S3_DOCUMENTATION_JSON_ROOT);
+        const response = await fetch(constants.S3_DOCUMENTATION_JSON_ROOT);
         if (response.status !== 200) {
             // TODO: Show the user an error message when the docs fail to load
             const errMsg = await response.text();
@@ -378,7 +377,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
     }
     private async getJSONDocFileAsync(fileName: string): Promise<TypeDocNode> {
         const endpoint = `${constants.S3_DOCUMENTATION_JSON_ROOT}/${fileName}`;
-        const response = await fetchWrapper.fetchAsync(endpoint);
+        const response = await fetch(endpoint);
         if (response.status !== 200) {
             // TODO: Show the user an error message when the docs fail to load
             const errMsg = await response.text();

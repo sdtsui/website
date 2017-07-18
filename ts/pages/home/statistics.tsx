@@ -4,7 +4,6 @@ import Paper from 'material-ui/Paper';
 import {utils} from 'ts/utils/utils';
 import {colors} from 'material-ui/styles';
 import {constants} from 'ts/utils/constants';
-import {fetchWrapper} from 'ts/utils/fetch_wrapper';
 import {StatisticByKey, Statistic, ERC20MarketInfo} from 'ts/types';
 
 const ONE_BILLION = 1000000000;
@@ -88,7 +87,7 @@ export class Statistics extends React.Component<StatisticsProps, StatisticsState
     }
     private async fetchAndSetERC20MarketInfo() {
         const endpoint = `${constants.BACKEND_BASE_URL}/erc20_market_info`;
-        const response = await fetchWrapper.fetchAsync(endpoint);
+        const response = await fetch(endpoint);
         if (response.status !== 200) {
             return; // fail silently
         }

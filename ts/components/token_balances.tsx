@@ -16,7 +16,6 @@ import {
 import ReactTooltip = require('react-tooltip');
 import * as BigNumber from 'bignumber.js';
 import firstBy = require('thenby');
-import {fetchWrapper} from 'ts/utils/fetch_wrapper';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {
     TokenByAddress,
@@ -406,7 +405,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
 
         await utils.sleepAsync(ARTIFICIAL_ETHER_REQUEST_DELAY);
 
-        const response = await fetchWrapper.fetchAsync(`${constants.ETHER_FAUCET_ENDPOINT}/${this.props.userAddress}`);
+        const response = await fetch(`${constants.ETHER_FAUCET_ENDPOINT}/${this.props.userAddress}`);
         const responseBody = await response.text();
         if (response.status !== constants.SUCCESS_STATUS) {
             utils.consoleLog(`Unexpected status code: ${response.status} -> ${responseBody}`);

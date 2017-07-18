@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import {utils} from 'ts/utils/utils';
-import {fetchWrapper} from 'ts/utils/fetch_wrapper';
 import {colors} from 'material-ui/styles';
 import {constants} from 'ts/utils/constants';
 import {configs} from 'ts/utils/configs';
@@ -141,7 +140,7 @@ You can see and fill it here: ${this.state.shareLink}`);
         const bitlyRequestUrl = constants.BITLY_ENDPOINT + '/v3/shorten?' +
                                      'access_token=' + constants.BITLY_ACCESS_TOKEN +
                                      '&longUrl=' + longUrl;
-        const response = await fetchWrapper.fetchAsync(bitlyRequestUrl);
+        const response = await fetch(bitlyRequestUrl);
         const responseBody = await response.text();
         const bodyObj = JSON.parse(responseBody);
         if (response.status !== 200 || bodyObj.status_code !== 200) {
