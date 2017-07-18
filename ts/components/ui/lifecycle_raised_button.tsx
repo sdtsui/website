@@ -21,6 +21,8 @@ interface LifeCycleRaisedButtonProps {
     labelLoading: string;
     labelComplete: string;
     onClickAsyncFn: () => boolean;
+    backgroundColor?: string;
+    labelColor?: string;
 }
 
 interface LifeCycleRaisedButtonState {
@@ -31,6 +33,8 @@ export class LifeCycleRaisedButton extends
     React.Component<LifeCycleRaisedButtonProps, LifeCycleRaisedButtonState> {
     public static defaultProps: Partial<LifeCycleRaisedButtonProps> = {
         isDisabled: false,
+        backgroundColor: 'white',
+        labelColor: 'rgb(97, 97, 97)',
     };
     private buttonTimeoutId: number;
     constructor(props: LifeCycleRaisedButtonProps) {
@@ -66,6 +70,8 @@ export class LifeCycleRaisedButton extends
                 primary={this.props.isPrimary}
                 label={label}
                 style={{width: '100%'}}
+                backgroundColor={this.props.backgroundColor}
+                labelColor={this.props.labelColor}
                 onTouchTap={this.onClickAsync.bind(this)}
                 disabled={this.props.isDisabled || this.state.buttonState !== ButtonState.READY}
             />

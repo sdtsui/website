@@ -182,7 +182,7 @@ export interface Styles {
     [name: string]: React.CSSProperties;
 }
 
-export interface Profile {
+export interface ProfileInfo {
     name: string;
     title: string;
     description: string;
@@ -393,3 +393,9 @@ export const ProviderType = strEnum([
   'LEDGER',
 ]);
 export type ProviderType = keyof typeof ProviderType;
+
+export interface Fact {
+    title: string;
+    explanation: string;
+    image: string;
+}

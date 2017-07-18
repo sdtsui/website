@@ -7,12 +7,10 @@ import {constants} from 'ts/utils/constants';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 
 const ENTER_KEY_CODE = 13;
-const onDarkInputTextStyle = {
-    color: '#e6e6e6',
-};
 
 interface NewsletterInputProps {
-  isOnDarkBackground?: boolean;
+    buttonBackgroundColor?: string;
+    buttonLabelColor?: string;
 }
 
 interface NewsletterInputState {
@@ -23,9 +21,6 @@ interface NewsletterInputState {
 }
 
 export class NewsletterInput extends React.Component<NewsletterInputProps, NewsletterInputState> {
-    public static defaultProps: Partial<NewsletterInputProps> = {
-        isOnDarkBackground: true,
-    };
     constructor(props: NewsletterInputProps) {
         super(props);
         this.state = {
@@ -40,13 +35,13 @@ export class NewsletterInput extends React.Component<NewsletterInputProps, Newsl
         return (
             <div>
                 <div className="clearfix">
-                    <div className="col lg-col-9 md-col-9 col-12">
-                        <div className="lg-pr2 md-pr2 mb1" style={{height: 74}}>
+                    <div className="col lg-col-7 md-col-7 col-12">
+                        <div className="lg-pr2 md-pr2" style={{height: 74}}>
                             <TextField
                                 fullWidth={true}
-                                hintText="Email address"
-                                hintStyle={this.props.isOnDarkBackground ? onDarkInputTextStyle : {}}
-                                inputStyle={this.props.isOnDarkBackground ? onDarkInputTextStyle : {}}
+                                hintText="Email"
+                                hintStyle={{color: '#e6e6e6'}}
+                                inputStyle={{color: colors.grey500}}
                                 floatingLabelFixed={true}
                                 floatingLabelStyle={{color: colors.grey500, display: 'hidden'}}
                                 errorText={errMsg}
@@ -56,12 +51,14 @@ export class NewsletterInput extends React.Component<NewsletterInputProps, Newsl
                             />
                         </div>
                     </div>
-                    <div className="col lg-col-3 md-col-3 col-12">
+                    <div className="col lg-col-5 md-col-5 col-12">
                         <LifeCycleRaisedButton
                             labelReady="Subscribe"
                             labelLoading="Subscribing..."
                             labelComplete="Subscribed!"
                             onClickAsyncFn={this.submitEmailAsync.bind(this)}
+                            backgroundColor={this.props.buttonBackgroundColor}
+                            labelColor={this.props.buttonLabelColor}
                         />
                     </div>
                 </div>
