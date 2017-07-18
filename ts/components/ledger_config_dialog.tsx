@@ -84,6 +84,41 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
             </Dialog>
         );
     }
+    private renderConnectStep() {
+        return (
+            <div>
+                <div className="h4 pt3">
+                    Follow these instructions before proceeding:
+                </div>
+                <ol>
+                    <li className="pb1">
+                        Connect your Ledger Nano S & Open the Ethereum application
+                    </li>
+                    <li className="pb1">
+                        Verify that Browser Support is enabled in Settings
+                    </li>
+                    <li className="pb1">
+                        If no Browser Support is found in settings, verify that you have{' '}
+                        <a href="https://www.ledgerwallet.com/apps/manager" target="_blank">Firmware >1.2</a>
+                    </li>
+                </ol>
+                <div className="center pb3">
+                    <LifeCycleRaisedButton
+                        isPrimary={true}
+                        labelReady="Connect to Ledger"
+                        labelLoading="Connecting..."
+                        labelComplete="Connected!"
+                        onClickAsyncFn={this.onConnectLedgerClickAsync.bind(this, true)}
+                    />
+                    {this.state.didConnectFail &&
+                        <div className="pt2 left-align" style={{color: colors.red200}}>
+                            Failed to connect. Follow the instructions and try again.
+                        </div>
+                    }
+                </div>
+            </div>
+        );
+    }
     private renderSelectAddressStep() {
         return (
             <div>
@@ -138,50 +173,15 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
         });
         return rows;
     }
-    private renderConnectStep() {
-        return (
-            <div>
-                <div className="h4 pt3">
-                    Follow these instructions before proceeding:
-                </div>
-                <ol>
-                    <li className="pb1">
-                        Connect your Ledger Nano S & Open the Ethereum application
-                    </li>
-                    <li className="pb1">
-                        Verify that Browser Support is enabled in Settings
-                    </li>
-                    <li className="pb1">
-                        If no Browser Support is found in settings, verify that you have{' '}
-                        <a href="https://www.ledgerwallet.com/apps/manager" target="_blank">Firmware >1.2</a>
-                    </li>
-                </ol>
-                <div className="center pb3">
-                    <LifeCycleRaisedButton
-                        isPrimary={true}
-                        labelReady="Connect to Ledger"
-                        labelLoading="Connecting..."
-                        labelComplete="Connected!"
-                        onClickAsyncFn={this.onConnectLedgerClickAsync.bind(this, true)}
-                    />
-                    {this.state.didConnectFail &&
-                        <div className="pt2 left-align" style={{color: colors.red200}}>
-                            Failed to connect. Follow the instructions and try again.
-                        </div>
-                    }
-                </div>
-            </div>
-        );
-    }
     private onAddressSelected(selectedRowIndexes: number[]) {
         const selectedRowIndex = selectedRowIndexes[0];
         this.props.blockchain.updateLedgerDerivationIndex(selectedRowIndex);
         const selectedAddress = this.state.userAddresses[selectedRowIndex];
         this.props.dispatcher.updateUserAddress(selectedAddress);
-        const isOpen = false;
         this.setState({
             stepIndex: LedgerSteps.CONNECT,
         });
+        const isOpen = false;
         this.props.toggleDialogFn(isOpen);
     }
     private async onFetchAddressesForDerivationPathAsync() {
