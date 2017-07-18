@@ -646,6 +646,14 @@ export class Blockchain {
             }
         }
     }
+    private async onPageLoadAsync() {
+        if (document.readyState === 'complete') {
+            return; // Already loaded
+        }
+        return new Promise((resolve, reject) => {
+            window.onload = resolve;
+        });
+    }
     private parseSignatureHexAsVRS(orderHashHex: string, signatureHex: string): SignatureData {
         const signatureBuffer = ethUtil.toBuffer(signatureHex);
         let v = signatureBuffer[0];
@@ -671,13 +679,5 @@ export class Blockchain {
             hash: orderHashHex,
         };
         return signatureData;
-    }
-    private async onPageLoadAsync() {
-        if (document.readyState === 'complete') {
-            return; // Already loaded
-        }
-        return new Promise((resolve, reject) => {
-            window.onload = resolve;
-        });
     }
 }
