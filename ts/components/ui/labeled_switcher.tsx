@@ -27,14 +27,14 @@ export class LabeledSwitcher extends React.Component<LabeledSwitcherProps, Label
         };
     }
     public render() {
-        const isLabelOneSelected = this.state.selectedLabel === Labels.LEFT;
+        const isLeftLabelSelected = this.state.selectedLabel === Labels.LEFT;
         return (
             <div
                 className="rounded clearfix"
                 style={{border: `1px solid ${colors.grey300}`}}
             >
-                {this.renderLabel(this.props.labelLeft, Labels.LEFT, isLabelOneSelected)}
-                {this.renderLabel(this.props.labelRight, Labels.RIGHT, !isLabelOneSelected)}
+                {this.renderLabel(this.props.labelLeft, Labels.LEFT, isLeftLabelSelected)}
+                {this.renderLabel(this.props.labelRight, Labels.RIGHT, !isLeftLabelSelected)}
             </div>
         );
     }
