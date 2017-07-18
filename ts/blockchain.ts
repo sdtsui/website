@@ -508,16 +508,25 @@ export class Blockchain {
         }
 
         const provider = await this.getProviderAsync(injectedWeb3, networkId);
-
+        await this.updateProviderName(injectedWeb3);
         const shouldPollUserAddress = true;
         this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, networkId, shouldPollUserAddress);
+    }
+    private updateProviderName(injectedWeb3: Web3) {
+        const doesInjectedWeb3Exist = !_.isUndefined(injectedWeb3);
+        let providerName;
+        if (doesInjectedWeb3Exist) {
+            providerName = this.getNameGivenProvider(injectedWeb3.currentProvider);
+        } else {
+            providerName = constants.PUBLIC_PROVIDER_NAME;
+        }
+        this.dispatcher.updateInjectedProviderName(providerName);
     }
     private async getProviderAsync(injectedWeb3: Web3, networkId: number) {
         const doesInjectedWeb3Exist = !_.isUndefined(injectedWeb3);
         const isPublicNodeAvailable = networkId === constants.TESTNET_NETWORK_ID;
 
         let provider;
-        let injectedProviderName;
         if (doesInjectedWeb3Exist && isPublicNodeAvailable) {
             // We catch all requests involving a users account and send it to the injectedWeb3
             // instance. All other requests go to the public hosted node.
@@ -528,11 +537,9 @@ export class Blockchain {
                 rpcUrl: constants.HOSTED_TESTNET_URL,
             }));
             provider.start();
-            injectedProviderName = this.getProviderName(injectedWeb3.currentProvider);
         } else if (doesInjectedWeb3Exist) {
             // Since no public node for this network, all requests go to injectedWeb3 instance
             provider = injectedWeb3.currentProvider;
-            injectedProviderName = this.getProviderName(injectedWeb3.currentProvider);
         } else {
             // If no injectedWeb3 instance, all requests go to our public hosted node
             provider = new ProviderEngine();
@@ -541,13 +548,11 @@ export class Blockchain {
                 rpcUrl: constants.HOSTED_TESTNET_URL,
             }));
             provider.start();
-            injectedProviderName = constants.PUBLIC_PROVIDER_NAME;
         }
 
-        this.dispatcher.updateInjectedProviderName(injectedProviderName);
         return provider;
     }
-    private getProviderName(provider: Web3.Provider): string {
+    private getNameGivenProvider(provider: Web3.Provider): string {
         if ((provider as any).isMetaMask) {
             return constants.METAMASK_PROVIDER_NAME;
         }
