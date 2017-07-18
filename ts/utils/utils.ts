@@ -153,14 +153,6 @@ export const utils = {
     setUrlHash(anchorId: string) {
         window.location.hash = anchorId;
     },
-    async onPageLoadAsync() {
-        if (document.readyState === 'complete') {
-            return; // Already loaded
-        }
-        return new Promise((resolve, reject) => {
-            window.onload = resolve;
-        });
-    },
     async isU2FSupportedAsync(): Promise<boolean> {
         const w = (window as any);
         return new Promise((resolve: (isSupported: boolean) => void) => {

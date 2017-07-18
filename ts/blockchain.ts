@@ -489,7 +489,7 @@ export class Blockchain {
         return customTokens;
     }
     private async onPageLoadInitFireAndForgetAsync() {
-        await utils.onPageLoadAsync(); // wait for page to load
+        await this.onPageLoadAsync(); // wait for page to load
 
         // Hack: We need to know the networkId the injectedWeb3 is connected to (if it is defined) in
         // order to properly instantiate the web3Wrapper. Since we must use the async call, we cannot
@@ -666,5 +666,13 @@ export class Blockchain {
             hash: orderHashHex,
         };
         return signatureData;
+    }
+    private async onPageLoadAsync() {
+        if (document.readyState === 'complete') {
+            return; // Already loaded
+        }
+        return new Promise((resolve, reject) => {
+            window.onload = resolve;
+        });
     }
 }
