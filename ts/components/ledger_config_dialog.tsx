@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import {colors} from 'material-ui/styles';
 import Dialog from 'material-ui/Dialog';
-import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import {
@@ -17,6 +16,7 @@ import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
 import {Blockchain} from 'ts/blockchain';
 import {Dispatcher} from 'ts/redux/dispatcher';
+import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 
 const VALID_ETHEREUM_DERIVATION_PATH_PREFIX = `44'/60'`;
 
