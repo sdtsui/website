@@ -152,4 +152,16 @@ export const utils = {
     setUrlHash(anchorId: string) {
         window.location.hash = anchorId;
     },
+    // This checks the error message returned from an injected Web3 instance on the page
+    // after a user was prompted to sign a message or send a transaction and decided to
+    // reject the request.
+    didUserDenyWeb3Request(errMsg: string) {
+        const metamaskDenialErrMsg = 'User denied message';
+        const paritySignerDenialErrMsg = 'Request has been rejected';
+        if (_.includes(errMsg, metamaskDenialErrMsg) ||
+            _.includes(errMsg, paritySignerDenialErrMsg)) {
+            return true;
+        }
+        return false;
+    },
 };
