@@ -209,7 +209,7 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
         if (currentlySetPath === this.state.derivationPath) {
             return;
         }
-        this.props.blockchain.updateLedgerDerivationPath(this.state.derivationPath);
+        this.props.blockchain.updateLedgerDerivationPathIfExists(this.state.derivationPath);
         const didSucceed = await this.fetchAddressesAndBalancesAsync();
         if (!didSucceed) {
             this.setState({

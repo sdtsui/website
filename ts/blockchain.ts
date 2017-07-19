@@ -89,7 +89,7 @@ export class Blockchain {
         const path = this.ledgerSubProvider.getPath();
         return path;
     }
-    public updateLedgerDerivationPath(path: string) {
+    public updateLedgerDerivationPathIfExists(path: string) {
         if (_.isUndefined(this.ledgerSubProvider)) {
             return; // noop
         }
