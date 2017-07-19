@@ -46,7 +46,7 @@ export class LedgerWallet {
             callback(null, []);
             return;
         }
-        this.ledgerEthConnection = await this.getLedgerConnectionAsync();
+        this.ledgerEthConnection = await this.createLedgerConnectionAsync();
 
         const accounts = [];
         for (let i = 0; i < NUM_ADDRESSES_TO_FETCH; i++) {
@@ -72,7 +72,7 @@ export class LedgerWallet {
             callback(new Error('Another request is in progress.'));
             return;
         }
-        this.ledgerEthConnection = await this.getLedgerConnectionAsync();
+        this.ledgerEthConnection = await this.createLedgerConnectionAsync();
 
         try {
             const derivationPath = `${this.path}/${this.pathIndex}`;
@@ -92,7 +92,7 @@ export class LedgerWallet {
             callback(err, null);
         }
     }
-    private async getLedgerConnectionAsync() {
+    private async createLedgerConnectionAsync() {
         if (!_.isUndefined(this.ledgerEthConnection)) {
             throw new Error('Multiple open connections to the Ledger disallowed.');
         }
