@@ -254,14 +254,9 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
     private async onConnectLedgerClickAsync() {
         const didSucceed = await this.fetchAddressesAndBalancesAsync();
         if (didSucceed) {
-            // HACK: We transition to the next view after a timeout so that the
-            // LifeCycleRaisedButton component can properly transition to it's
-            // final state before being unmounted.
-            window.setTimeout(() => {
-                this.setState({
-                    stepIndex: LedgerSteps.SELECT_ADDRESS,
-                });
-            }, 400);
+            this.setState({
+                stepIndex: LedgerSteps.SELECT_ADDRESS,
+            });
         }
         return didSucceed;
     }
