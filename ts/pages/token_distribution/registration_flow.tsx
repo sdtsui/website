@@ -82,6 +82,12 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                 isVerifyingIdentity: false,
             });
         });
+
+        this.civicSip.on('user-cancelled', (event: any) => {
+            this.setState({
+                isVerifyingIdentity: false,
+            });
+        });
     }
     public componentWillReceiveProps(nextProps: RegistrationFlowProps) {
         if (nextProps.networkId !== this.state.prevNetworkId) {
