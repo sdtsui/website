@@ -15,6 +15,7 @@ enum ButtonState {
 
 interface LifeCycleRaisedButtonProps {
     isHidden?: boolean;
+    isDisabled?: boolean;
     isPrimary?: boolean;
     isDisabled?: boolean;
     labelReady: string;
