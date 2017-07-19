@@ -25,6 +25,7 @@ import {
     BlockchainCallErrs,
     ContractInstance,
     ProviderType,
+    LedgerWalletSubprovider,
 } from 'ts/types';
 import {Web3Wrapper} from 'ts/web3_wrapper';
 import {errorReporter} from 'ts/utils/error_reporter';
@@ -50,7 +51,7 @@ export class Blockchain {
     private tokenRegistry: ContractInstance;
     private userAddress: string;
     private cachedProvider: Web3.Provider;
-    private ledgerSubProvider: LedgerWallet;
+    private ledgerSubProvider: LedgerWalletSubprovider;
     constructor(dispatcher: Dispatcher) {
         this.dispatcher = dispatcher;
         this.userAddress = '';

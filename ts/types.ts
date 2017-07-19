@@ -420,3 +420,9 @@ export interface LedgerEthConnection {
 export interface SignPersonalMessageParams {
     data: string;
 }
+
+export interface LedgerWalletSubprovider {
+    getPath: () => string;
+    setPath: (path: string) => void;
+    setPathIndex: (pathIndex: number) => void;
+}
