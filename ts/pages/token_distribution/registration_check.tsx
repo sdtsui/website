@@ -52,9 +52,9 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
                         <div style={{width: 100}} className="right">
                             <LifeCycleRaisedButton
                                 isPrimary={true}
-                                disabled={
-                                    _.isUndefined(this.state.ethereum_address) ||
-                                    _.isEmpty(this.state.ethereum_address)
+                                isDisabled={
+                                    _.isUndefined(this.state.ethereumAddress) ||
+                                    _.isEmpty(this.state.ethereumAddress)
                                 }
                                 labelReady={'Check'}
                                 labelComplete={'Checked!'}
@@ -97,7 +97,7 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
     }
     private async checkRegistrationStatusAsync(): Promise<boolean> {
         const body = JSON.stringify({
-            ethereum_address: this.state.ethereumAddress,
+            ethereumAddress: this.state.ethereumAddress,
         });
         const endpoint = `${constants.BACKEND_BASE_URL}/contributor_status`;
         try {
