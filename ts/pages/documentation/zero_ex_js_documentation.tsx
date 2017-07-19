@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactMarkdown from 'react-markdown';
+import DocumentTitle = require('react-document-title');
 import convert = require('xml-js');
 import findVersions = require('find-versions');
 import semverSort = require('semver-sort');
@@ -103,6 +104,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                                          : typeDocUtils.getMenuSubsectionsBySection(this.state.versionDocObj);
         return (
             <div>
+                <DocumentTitle title="0x.js Documentation"/>
                 <TopBar
                     blockchainIsLoaded={false}
                     location={this.props.location}

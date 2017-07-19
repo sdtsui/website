@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import * as DocumentTitle from 'react-document-title';
 import RaisedButton from 'material-ui/RaisedButton';
 import {colors} from 'material-ui/styles';
 import {Styles, FAQSection, FAQQuestion} from 'ts/types';
@@ -445,6 +446,7 @@ export class FAQ extends React.Component<FAQProps, FAQState> {
     public render() {
         return (
             <div>
+                <DocumentTitle title="0x FAQ"/>
                 <TopBar
                     blockchainIsLoaded={false}
                     location={this.props.location}

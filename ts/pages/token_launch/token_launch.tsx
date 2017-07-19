@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import * as DocumentTitle from 'react-document-title';
 import {DefaultPlayer as Video} from 'react-html5video';
 import {utils} from 'ts/utils/utils';
 import {Footer} from 'ts/components/footer';
@@ -62,6 +63,7 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
         const isUserOnMobile = utils.isUserOnMobile();
         return (
             <div>
+                <DocumentTitle title="0x Token Launch"/>
                 <TopBar
                     blockchainIsLoaded={false}
                     location={this.props.location}
