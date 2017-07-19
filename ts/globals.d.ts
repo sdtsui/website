@@ -11,9 +11,11 @@ declare module 'whatwg-fetch';
 declare module 'react-html5video';
 declare module 'web3-provider-engine/subproviders/filters';
 declare module 'web3-provider-engine/subproviders/rpc';
+declare module 'web3-provider-engine/subproviders/hooked-wallet';
 declare module 'thenby';
 declare module 'react-highlight';
 declare module 'react-recaptcha';
+declare module 'ledgerco';
 
 declare module '*.json' {
     const json: any;

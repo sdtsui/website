@@ -4,36 +4,53 @@ import {colors} from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
 import CircularProgress from 'material-ui/CircularProgress';
 import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
+import {Blockchain} from 'ts/blockchain';
 import {constants} from 'ts/utils/constants';
 import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
-import {ContributionForm} from 'ts/pages/token_distribution/contribution_form';
+import {ContributionAmountStep} from 'ts/pages/token_distribution/contribution_amount_step';
+import {SignatureStep} from 'ts/pages/token_distribution/signature_step';
 import {RegisterButton} from 'ts/pages/token_distribution/register_button';
-import {CivicSip} from 'ts/types';
+import {CivicSip, BlockchainErrs, ProviderType} from 'ts/types';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {FlashMessage} from 'ts/components/ui/flash_message';
 import {NewsletterInput} from 'ts/pages/home/newsletter_input';
+import {BlockchainErrDialog} from 'ts/components/blockchain_err_dialog';
 
-const CUSTOM_GRAY = 'rgb(74, 74, 74)';
+const CUSTOM_GRAY = '#635F5E';
 enum RegistrationFlowSteps {
     VERIFY_IDENTITY,
-    CONTRIBUTION_DETAILS,
+    SIGNATURE_PROOF,
+    CONTRIBUTION_AMOUNT,
     REGISTRATION_COMPLETE,
 }
 
 export interface RegistrationFlowProps {
     location: Location;
     dispatcher: Dispatcher;
+    blockchainIsLoaded: boolean;
+    networkId: number;
+    nodeVersion: string;
+    providerType: ProviderType;
+    injectedProviderName: string;
+    userAddress: string;
     flashMessage?: string;
+    blockchainErr: BlockchainErrs;
+    shouldBlockchainErrDialogBeOpen: boolean;
 }
 
 interface RegistrationFlowState {
     civicUserId: string;
     stepIndex: RegistrationFlowSteps;
     isVerifyingIdentity: boolean;
+    prevNetworkId: number;
+    prevNodeVersion: string;
+    prevUserAddress: string;
+    prevProviderType: ProviderType;
 }
 
 export class RegistrationFlow extends React.Component<RegistrationFlowProps, RegistrationFlowState> {
+    private blockchain: Blockchain;
     private civicSip: CivicSip;
     constructor(props: RegistrationFlowProps) {
         super(props);
@@ -44,7 +61,14 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             stepIndex: RegistrationFlowSteps.VERIFY_IDENTITY,
             civicUserId: undefined,
             isVerifyingIdentity: false,
+            prevNetworkId: this.props.networkId,
+            prevNodeVersion: this.props.nodeVersion,
+            prevUserAddress: this.props.userAddress,
+            prevProviderType: this.props.providerType,
         };
+    }
+    public componentWillMount() {
+        this.blockchain = new Blockchain(this.props.dispatcher);
     }
     public componentDidMount() {
         this.civicSip.on('auth-code-received', (event: any) => {
@@ -58,8 +82,42 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                 isVerifyingIdentity: false,
             });
         });
+
+        this.civicSip.on('user-cancelled', (event: any) => {
+            this.setState({
+                isVerifyingIdentity: false,
+            });
+        });
+    }
+    public componentWillReceiveProps(nextProps: RegistrationFlowProps) {
+        if (nextProps.networkId !== this.state.prevNetworkId) {
+            this.blockchain.networkIdUpdatedFireAndForgetAsync(nextProps.networkId);
+            this.setState({
+                prevNetworkId: nextProps.networkId,
+            });
+        }
+        if (nextProps.userAddress !== this.state.prevUserAddress) {
+            this.blockchain.userAddressUpdatedFireAndForgetAsync(nextProps.userAddress);
+            this.setState({
+                prevUserAddress: nextProps.userAddress,
+            });
+        }
+        if (nextProps.nodeVersion !== this.state.prevNodeVersion) {
+            this.blockchain.nodeVersionUpdatedFireAndForgetAsync(nextProps.nodeVersion);
+            this.setState({
+                prevNodeVersion: nextProps.nodeVersion,
+            });
+        }
+        if (nextProps.providerType !== this.state.prevProviderType) {
+            this.blockchain.providerTypeUpdatedFireAndForgetAsync(nextProps.providerType);
+            this.setState({
+                prevProviderType: nextProps.providerType,
+            });
+        }
     }
     public render() {
+        const updateShouldBlockchainErrDialogBeOpen = this.props.dispatcher
+                .updateShouldBlockchainErrDialogBeOpen.bind(this.props.dispatcher);
         const registrationStyle: React.CSSProperties = {
             minHeight: '100vh',
             display: 'flex',
@@ -82,29 +140,51 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                                 <StepLabel>Verify your identity with Civic</StepLabel>
                             </Step>
                             <Step>
-                                <StepLabel>Select contribution address & amount</StepLabel>
+                                <StepLabel>Signature proof</StepLabel>
+                            </Step>
+                            <Step>
+                                <StepLabel>Choose contribution amount</StepLabel>
                             </Step>
                             <Step>
                                 <StepLabel>Complete</StepLabel>
                             </Step>
                         </Stepper>
                     </div>
-                    <Paper zDepth={1} className="mb3 lg-mx0 md-mx0 sm-mx2">
-                        {this.state.stepIndex === RegistrationFlowSteps.VERIFY_IDENTITY &&
-                            this.renderVerifyIdentityStep()
-                        }
-                        {this.state.stepIndex === RegistrationFlowSteps.CONTRIBUTION_DETAILS &&
-                            <ContributionForm
+                    {this.state.stepIndex === RegistrationFlowSteps.VERIFY_IDENTITY &&
+                        this.renderVerifyIdentityStep()
+                    }
+                    {this.state.stepIndex === RegistrationFlowSteps.SIGNATURE_PROOF &&
+                        <div>
+                            <SignatureStep
+                                blockchain={this.blockchain}
+                                blockchainIsLoaded={this.props.blockchainIsLoaded}
                                 civicUserId={this.state.civicUserId}
                                 dispatcher={this.props.dispatcher}
-                                onSubmittedContributionInfo={this.onSubmittedContributionInfo.bind(this)}
+                                injectedProviderName={this.props.injectedProviderName}
+                                userAddress={this.props.userAddress}
+                                onSubmittedOwnershipProof={this.onSubmittedOwnershipProof.bind(this)}
+                                providerType={this.props.providerType}
                             />
-                        }
-                        {this.state.stepIndex === RegistrationFlowSteps.REGISTRATION_COMPLETE &&
-                            this.renderThankYouStep()
-                        }
-                    </Paper>
+                        </div>
+                    }
+                    {this.state.stepIndex === RegistrationFlowSteps.CONTRIBUTION_AMOUNT &&
+                        <ContributionAmountStep
+                            civicUserId={this.state.civicUserId}
+                            dispatcher={this.props.dispatcher}
+                            onSubmittedContributionInfo={this.onSubmittedContributionInfo.bind(this)}
+                        />
+                    }
+                    {this.state.stepIndex === RegistrationFlowSteps.REGISTRATION_COMPLETE &&
+                        this.renderThankYouStep()
+                    }
                 </div>
+                <BlockchainErrDialog
+                    blockchain={this.blockchain}
+                    blockchainErr={this.props.blockchainErr}
+                    isOpen={this.props.shouldBlockchainErrDialogBeOpen}
+                    userAddress={this.props.userAddress}
+                    toggleDialogFn={updateShouldBlockchainErrDialogBeOpen}
+                />
                 <FlashMessage
                     dispatcher={this.props.dispatcher}
                     flashMessage={this.props.flashMessage}
@@ -117,16 +197,22 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
     }
     private renderThankYouStep() {
         return (
-            <div className="mx-auto" style={{maxWidth: 440}}>
-                <div className="h2 my2 pt3">
+            <div className="mx-auto" style={{maxWidth: 440, color: CUSTOM_GRAY}}>
+                <div className="my2 pt3" style={{fontSize: 28}}>
                     Registration successful!
                 </div>
                 <div className="sm-px2 pb3" style={{color: CUSTOM_GRAY}}>
-                    <div className="pt2">
+                    <div className="py2">
                         Thank you for taking the time to register for the 0x token sale. The contribution
                         period will begin on the <span className="bold">15th of August</span>.
                     </div>
-                    <div className="pt4 mx-auto" style={{maxWidth: 440}}>
+                    <div className="mx-auto pt3">
+                        <img
+                            src="/images/zrx_token.png"
+                            style={{width: 150}}
+                        />
+                    </div>
+                    <div className="pt3 mx-auto" style={{maxWidth: 440}}>
                         <div className="left-align pb2">
                             Get a reminder email when the contribution period opens
                         </div>
@@ -143,47 +229,75 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         return (
             <div>
                 {this.state.isVerifyingIdentity ?
-                    <div className="mx-auto pt3" style={{maxWidth: 400}}>
-                        <CircularProgress />
-                        <div className="pt3 pb3">
-                            Verifying your Civic Identity...
+                    <div className="mx-auto pt3" style={{maxWidth: 400, height: 409}}>
+                        <div
+                            className="relative"
+                            style={{top: '50%', transform: 'translateY(-50%)', height: 95}}
+                        >
+                            <CircularProgress />
+                            <div className="pt3 pb3">
+                                Verifying your Civic Identity...
+                            </div>
                         </div>
                     </div> :
-                    <div>
-                        <div className="h2 my2 pt3">
-                            Verify your identity with Civic
-                        </div>
-                        <div
-                            className="pt2 mx-auto sm-px2"
-                            style={{maxWidth: 450, textAlign: 'left', color: CUSTOM_GRAY}}
-                        >
-                            <div>
-                                0x is using <a href="https://www.civic.com/">Civic's</a> identity verification
-                                service to limit individual contributions to the token sale. Follow the steps
-                                below to get verified:
+                    <div className="pt3" style={{color: CUSTOM_GRAY}}>
+                        <div className="clearfix mx-auto">
+                            <div className="col col-4 pt4 sm-hide xs-hide">
+                                <div className="pt2 pr4 right-align">
+                                    <img
+                                        src="/images/qr_code_icon.png"
+                                        style={{width: 90}}
+                                    />
+                                </div>
                             </div>
-                            <ul>
-                                <li className="pb1">Install the{' '}
-                                    <a
-                                        href="https://www.civic.com/app"
-                                        target="_blank"
-                                        style={{textDecoration: 'underline'}}
-                                    >
-                                        Civic mobile app
-                                    </a>
-                                </li>
-                                <li className="pb1">
-                                    Verify your email and phone number through the app.
-                                </li>
-                                <li className="pb1">
-                                    Click the button below, scan the QR code and authenticate with 0x.
-                                </li>
-                            </ul>
+                            <div className="col lg-col-8 md-col-8 col-12 sm-px2">
+                                <div className="my2 lg-left-align md-left-align" style={{fontSize: 28}}>
+                                    Verify your identity with Civic
+                                </div>
+                                <div
+                                    className="pt3 sm-px2 left-align sm-mx-auto"
+                                    style={{maxWidth: 450}}
+                                >
+                                    <div>
+                                        Follow the steps below to get verified:
+                                    </div>
+                                    <ul style={{paddingLeft: 19}}>
+                                        <li className="pb1">Install the{' '}
+                                            <a
+                                                href="https://www.civic.com/app"
+                                                target="_blank"
+                                                style={{textDecoration: 'underline'}}
+                                            >
+                                                Civic mobile app
+                                            </a>
+                                        </li>
+                                        <li className="pb1">
+                                            Verify your email and phone number through the app.
+                                        </li>
+                                        <li className="pb1">
+                                            Click the button below, scan the QR code and authenticate with 0x.
+                                        </li>
+                                    </ul>
+                                    <div className="pt1 pb4 left-align" style={{maxWidth: 357}}>
+                                        <RegisterButton
+                                            onClick={this.onRegisterClick.bind(this)}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="pt1 pb4">
-                            <RegisterButton
-                                onClick={this.onRegisterClick.bind(this)}
-                            />
+                        <div className="py3 mx-auto sm-px3" style={{color: '#A5A5A5', maxWidth: 500}}>
+                            *0x is using{' '}
+                            <a
+                                href="https://www.civic.com/"
+                                target="_blank"
+                                style={{color: '#A5A5A5'}}
+                                className="underline"
+                            >
+                                Civic
+                            </a>'s
+                            {' '}identity verification service to limit individual contributions to
+                            the token sale.
                         </div>
                     </div>
                 }
@@ -193,6 +307,11 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
     private onSubmittedContributionInfo() {
         this.setState({
             stepIndex: RegistrationFlowSteps.REGISTRATION_COMPLETE,
+        });
+    }
+    private onSubmittedOwnershipProof() {
+        this.setState({
+            stepIndex: RegistrationFlowSteps.CONTRIBUTION_AMOUNT,
         });
     }
     private onRegisterClick() {
@@ -230,7 +349,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         } else {
             const responseJSON = await response.json();
             this.setState({
-                stepIndex: RegistrationFlowSteps.CONTRIBUTION_DETAILS,
+                stepIndex: RegistrationFlowSteps.SIGNATURE_PROOF,
                 civicUserId: responseJSON.civicUserId,
                 isVerifyingIdentity: false,
             });

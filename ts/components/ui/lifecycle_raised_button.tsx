@@ -16,6 +16,7 @@ enum ButtonState {
 interface LifeCycleRaisedButtonProps {
     isHidden?: boolean;
     isPrimary?: boolean;
+    isDisabled?: boolean;
     labelReady: string;
     labelLoading: string;
     labelComplete: string;
@@ -31,10 +32,12 @@ interface LifeCycleRaisedButtonState {
 export class LifeCycleRaisedButton extends
     React.Component<LifeCycleRaisedButtonProps, LifeCycleRaisedButtonState> {
     public static defaultProps: Partial<LifeCycleRaisedButtonProps> = {
+        isDisabled: false,
         backgroundColor: 'white',
         labelColor: 'rgb(97, 97, 97)',
     };
     private buttonTimeoutId: number;
+    private didUnmount: boolean;
     constructor(props: LifeCycleRaisedButtonProps) {
         super(props);
         this.state = {
@@ -43,6 +46,7 @@ export class LifeCycleRaisedButton extends
     }
     public componentWillUnmount() {
         clearTimeout(this.buttonTimeoutId);
+        this.didUnmount = true;
     }
     public render() {
         if (this.props.isHidden === true) {
@@ -71,7 +75,7 @@ export class LifeCycleRaisedButton extends
                 backgroundColor={this.props.backgroundColor}
                 labelColor={this.props.labelColor}
                 onTouchTap={this.onClickAsync.bind(this)}
-                disabled={this.state.buttonState !== ButtonState.READY}
+                disabled={this.props.isDisabled || this.state.buttonState !== ButtonState.READY}
             />
         );
     }
@@ -80,6 +84,9 @@ export class LifeCycleRaisedButton extends
             buttonState: ButtonState.LOADING,
         });
         const didSucceed = await this.props.onClickAsyncFn();
+        if (this.didUnmount) {
+            return; // noop since unmount called before async callback returned.
+        }
         if (didSucceed) {
             this.setState({
                 buttonState: ButtonState.COMPLETE,

@@ -164,6 +164,8 @@ export const ActionTypes = strEnum([
     // Shared
     'SHOW_FLASH_MESSAGE',
     'HIDE_FLASH_MESSAGE',
+    'UPDATE_PROVIDER_TYPE',
+    'UPDATE_INJECTED_PROVIDER_NAME',
 ]);
 export type ActionTypes = keyof typeof ActionTypes;
 
@@ -386,8 +388,41 @@ export interface MenuSubsectionsBySection {
     [section: string]: TypeDocNode[];
 }
 
+export const ProviderType = strEnum([
+  'INJECTED',
+  'LEDGER',
+]);
+export type ProviderType = keyof typeof ProviderType;
+
 export interface Fact {
     title: string;
     explanation: string;
     image: string;
+}
+
+interface LedgerGetAddressResult {
+    address: string;
+}
+interface LedgerSignResult {
+    v: string;
+    r: string;
+    s: string;
+}
+interface LedgerCommunication {
+    close_async: () => void;
+}
+export interface LedgerEthConnection {
+    getAddress_async: (derivationPath: string, askForDeviceConfirmation: boolean,
+                       shouldGetChainCode: boolean) => Promise<LedgerGetAddressResult>;
+    signPersonalMessage_async: (derivationPath: string, messageHex: string) => Promise<LedgerSignResult>;
+    comm: LedgerCommunication;
+}
+export interface SignPersonalMessageParams {
+    data: string;
+}
+
+export interface LedgerWalletSubprovider {
+    getPath: () => string;
+    setPath: (path: string) => void;
+    setPathIndex: (pathIndex: number) => void;
 }

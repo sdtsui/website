@@ -1,8 +1,17 @@
 import * as _ from 'lodash';
 import {ZeroEx} from '0x.js';
+import * as BigNumber from 'bignumber.js';
+import Web3 = require('web3');
 import promisify = require('es6-promisify');
 import findVersions = require('find-versions');
 import compareVersions = require('compare-versions');
+import contract = require('truffle-contract');
+import ethUtil = require('ethereumjs-util');
+import ProviderEngine = require('web3-provider-engine');
+import FilterSubprovider = require('web3-provider-engine/subproviders/filters');
+import RpcSubprovider = require('web3-provider-engine/subproviders/rpc');
+import {InjectedWeb3SubProvider} from 'ts/subproviders/injected_web3_subprovider';
+import {ledgerWalletSubproviderFactory, LedgerWallet} from 'ts/subproviders/ledger_wallet_subprovider_factory';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
@@ -15,6 +24,8 @@ import {
     ContractResponse,
     BlockchainCallErrs,
     ContractInstance,
+    ProviderType,
+    LedgerWalletSubprovider,
 } from 'ts/types';
 import {Web3Wrapper} from 'ts/web3_wrapper';
 import {errorReporter} from 'ts/utils/error_reporter';
@@ -26,9 +37,6 @@ import * as TokenRegistryArtifacts from '../contracts/TokenRegistry.json';
 import * as TokenArtifacts from '../contracts/Token.json';
 import * as MintableArtifacts from '../contracts/Mintable.json';
 import * as EtherTokenArtifacts from '../contracts/EtherToken.json';
-import contract = require('truffle-contract');
-import * as BigNumber from 'bignumber.js';
-import ethUtil = require('ethereumjs-util');
 
 const ALLOWANCE_TO_ZERO_GAS_AMOUNT = 45730;
 
@@ -42,6 +50,8 @@ export class Blockchain {
     private proxy: ContractInstance;
     private tokenRegistry: ContractInstance;
     private userAddress: string;
+    private cachedProvider: Web3.Provider;
+    private ledgerSubProvider: LedgerWalletSubprovider;
     constructor(dispatcher: Dispatcher) {
         this.dispatcher = dispatcher;
         this.userAddress = '';
@@ -70,6 +80,70 @@ export class Blockchain {
     public async nodeVersionUpdatedFireAndForgetAsync(nodeVersion: string) {
         if (this.nodeVersion !== nodeVersion) {
             this.nodeVersion = nodeVersion;
+        }
+    }
+    public getLedgerDerivationPathIfExists(): string {
+        if (_.isUndefined(this.ledgerSubProvider)) {
+            return undefined;
+        }
+        const path = this.ledgerSubProvider.getPath();
+        return path;
+    }
+    public updateLedgerDerivationPathIfExists(path: string) {
+        if (_.isUndefined(this.ledgerSubProvider)) {
+            return; // noop
+        }
+        this.ledgerSubProvider.setPath(path);
+    }
+    public updateLedgerDerivationIndex(pathIndex: number) {
+        if (_.isUndefined(this.ledgerSubProvider)) {
+            return; // noop
+        }
+        this.ledgerSubProvider.setPathIndex(pathIndex);
+    }
+    public async providerTypeUpdatedFireAndForgetAsync(providerType: ProviderType) {
+        // Should actually be Web3.Provider|ProviderEngine union type but it causes issues
+        // later on in the logic.
+        switch (providerType) {
+            case ProviderType.LEDGER: {
+                const isU2FSupported = await utils.isU2FSupportedAsync();
+                if (!isU2FSupported) {
+                    throw new Error('Cannot update providerType to LEDGER without U2F support');
+                }
+
+                // Cache injected provider so that we can switch the user back to it easily
+                this.cachedProvider = this.web3Wrapper.getProviderObj();
+
+                this.dispatcher.updateUserAddress(''); // Clear old userAddress
+
+                const provider = new ProviderEngine();
+                this.ledgerSubProvider = ledgerWalletSubproviderFactory();
+                provider.addProvider(this.ledgerSubProvider);
+                provider.addProvider(new FilterSubprovider());
+                provider.addProvider(new RpcSubprovider({
+                    rpcUrl: constants.HOSTED_TESTNET_URL, // TODO: use mainnet url here after contracts deployed
+                }));
+                provider.start();
+                this.web3Wrapper.destroy();
+                const shouldPollUserAddress = false;
+                this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, this.networkId, shouldPollUserAddress);
+                break;
+            }
+
+            case ProviderType.INJECTED: {
+                if (_.isUndefined(this.cachedProvider)) {
+                    return; // Going from injected to injected, so we noop
+                }
+                const provider = this.cachedProvider;
+                const shouldPollUserAddress = true;
+                this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, this.networkId, shouldPollUserAddress);
+                delete this.ledgerSubProvider;
+                delete this.cachedProvider;
+                break;
+            }
+
+            default:
+                throw utils.spawnSwitchErr('providerType', providerType);
         }
     }
     public async setExchangeAllowanceAsync(token: Token, amountInBaseUnits: BigNumber.BigNumber) {
@@ -215,6 +289,10 @@ export class Blockchain {
         const balanceDelta = constants.MINT_AMOUNT;
         this.dispatcher.updateTokenBalanceByAddress(token.address, balanceDelta);
     }
+    public async getBalanceInEthAsync(owner: string): Promise<BigNumber.BigNumber> {
+        const balance = await this.web3Wrapper.getBalanceInEthAsync(owner);
+        return balance;
+    }
     public async convertEthToWrappedEthTokensAsync(amount: BigNumber.BigNumber) {
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
@@ -245,15 +323,15 @@ export class Blockchain {
             return [zero, zero];
         }
         const tokenContract = await this.instantiateContractIfExistsAsync(TokenArtifacts, tokenAddress);
-        let balance;
-        let allowance;
+        let balance = new BigNumber(0);
+        let allowance = new BigNumber(0);
         if (this.doesUserAddressExist()) {
             balance = await tokenContract.balanceOf.call(ownerAddress);
             allowance = await tokenContract.allowance.call(ownerAddress, this.proxy.address);
+            // We rewrap BigNumbers from web3 into our BigNumber because the version that they're using is too old
+            balance = new BigNumber(balance);
+            allowance = new BigNumber(allowance);
         }
-        // We rewrap BigNumbers from web3 into our BigNumber because the version that they're using is too old
-        balance = new BigNumber(balance);
-        allowance = new BigNumber(allowance);
         return [balance, allowance];
     }
     public async updateTokenBalancesAndAllowancesAsync(tokens: Token[]) {
@@ -269,6 +347,10 @@ export class Blockchain {
             }));
         }
         this.dispatcher.updateTokenByAddress(updatedTokens);
+    }
+    public async getUserAccountsAsync() {
+        const userAddressIfExists = await this.web3Wrapper.getAccountsAsync();
+        return userAddressIfExists;
     }
     private doesUserAddressExist(): boolean {
         return this.userAddress !== '';
@@ -411,14 +493,80 @@ export class Blockchain {
     private async onPageLoadInitFireAndForgetAsync() {
         await this.onPageLoadAsync(); // wait for page to load
 
-        const injectedWeb3 = (window as any).web3;
         // Hack: We need to know the networkId the injectedWeb3 is connected to (if it is defined) in
         // order to properly instantiate the web3Wrapper. Since we must use the async call, we cannot
         // retrieve it from within the web3Wrapper constructor. This is and should remain the only
         // call to a web3 instance outside of web3Wrapper in the entire dapp.
-        const networkId = !_.isUndefined(injectedWeb3) ? await promisify(injectedWeb3.version.getNetwork)() :
-                                                             undefined;
-        this.web3Wrapper = new Web3Wrapper(this.dispatcher, networkId);
+        // In addition, if the user has an injectedWeb3 instance that is disconnected from a backing
+        // Ethereum node, this call will throw. We need to handle this case gracefully
+        const injectedWeb3 = (window as any).web3;
+        let networkId: number;
+        if (!_.isUndefined(injectedWeb3)) {
+            try {
+                networkId = _.parseInt(await promisify(injectedWeb3.version.getNetwork)());
+            } catch (err) {
+                // Ignore error and proceed with networkId undefined
+            }
+        }
+
+        const provider = await this.getProviderAsync(injectedWeb3, networkId);
+        await this.updateProviderName(injectedWeb3);
+        const shouldPollUserAddress = true;
+        this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, networkId, shouldPollUserAddress);
+    }
+    private updateProviderName(injectedWeb3: Web3) {
+        const doesInjectedWeb3Exist = !_.isUndefined(injectedWeb3);
+        let providerName;
+        if (doesInjectedWeb3Exist) {
+            providerName = this.getNameGivenProvider(injectedWeb3.currentProvider);
+        } else {
+            providerName = constants.PUBLIC_PROVIDER_NAME;
+        }
+        this.dispatcher.updateInjectedProviderName(providerName);
+    }
+    private async getProviderAsync(injectedWeb3: Web3, networkId: number) {
+        const doesInjectedWeb3Exist = !_.isUndefined(injectedWeb3);
+        const isPublicNodeAvailable = networkId === constants.TESTNET_NETWORK_ID;
+
+        let provider;
+        if (doesInjectedWeb3Exist && isPublicNodeAvailable) {
+            // We catch all requests involving a users account and send it to the injectedWeb3
+            // instance. All other requests go to the public hosted node.
+            provider = new ProviderEngine();
+            provider.addProvider(new InjectedWeb3SubProvider(injectedWeb3));
+            provider.addProvider(new FilterSubprovider());
+            provider.addProvider(new RpcSubprovider({
+                rpcUrl: constants.HOSTED_TESTNET_URL,
+            }));
+            provider.start();
+        } else if (doesInjectedWeb3Exist) {
+            // Since no public node for this network, all requests go to injectedWeb3 instance
+            provider = injectedWeb3.currentProvider;
+        } else {
+            // If no injectedWeb3 instance, all requests go to our public hosted node
+            provider = new ProviderEngine();
+            provider.addProvider(new FilterSubprovider());
+            provider.addProvider(new RpcSubprovider({
+                rpcUrl: constants.HOSTED_TESTNET_URL,
+            }));
+            provider.start();
+        }
+
+        return provider;
+    }
+    private getNameGivenProvider(provider: Web3.Provider): string {
+        if (!_.isUndefined((provider as any).isMetaMask)) {
+            return constants.METAMASK_PROVIDER_NAME;
+        }
+
+        // HACK: We use the fact that Parity Signer's provider is an instance of their
+        // internal `Web3FrameProvider` class.
+        const isParitySigner = _.startsWith(provider.constructor.toString(), 'function Web3FrameProvider');
+        if (isParitySigner) {
+            return constants.PARITY_SIGNER_PROVIDER_NAME;
+        }
+
+        return constants.GENERIC_PROVIDER_NAME;
     }
     private async instantiateContractsAsync() {
         utils.assert(!_.isUndefined(this.networkId),
