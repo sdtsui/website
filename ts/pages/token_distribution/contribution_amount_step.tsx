@@ -9,6 +9,8 @@ import {EthAmountInput} from 'ts/components/inputs/eth_amount_input';
 import {InputLabel} from 'ts/components/ui/input_label';
 import {RequiredLabel} from 'ts/components/ui/required_label';
 
+const CUSTOM_GRAY = '#635F5E';
+
 export interface ContributionAmountStepProps {
     civicUserId: string;
     dispatcher: Dispatcher;
@@ -34,11 +36,11 @@ export class ContributionAmountStep extends React.Component<ContributionAmountSt
     public render() {
         const contributionAmountLabel = <RequiredLabel label="How much do you want to contribute"/>;
         return (
-            <div className="mx-auto left-align sm-px2" style={{maxWidth: 414}}>
-                <div className="lg-h2 md-h2 sm-h3 my2 pt3">
+            <div className="mx-auto left-align sm-px2" style={{maxWidth: 414, color: CUSTOM_GRAY}}>
+                <div className="my2 pt3 left-align" style={{fontSize: 28}}>
                     Select contribution amount
                 </div>
-                <div style={{maxWidth: 400}}>
+                <div className="pt3" style={{maxWidth: 400}}>
                     <InputLabel text={contributionAmountLabel}/>
                     <EthAmountInput
                         amount={this.state.contributionAmountInBaseUnits}
@@ -48,13 +50,15 @@ export class ContributionAmountStep extends React.Component<ContributionAmountSt
                         onChange={this.onContributionAmountChanged.bind(this)}
                     />
                 </div>
-                <Recaptcha
-                    sitekey={constants.RECAPTCHA_SITE_KEY}
-                    render="explicit"
-                    ref={this.setRecaptchaInstance.bind(this)}
-                    onloadCallback={_.noop}
-                    verifyCallback={this.verifyCaptchaCallback.bind(this)}
-                />
+                <div>
+                    <Recaptcha
+                        sitekey={constants.RECAPTCHA_SITE_KEY}
+                        render="explicit"
+                        ref={this.setRecaptchaInstance.bind(this)}
+                        onloadCallback={_.noop}
+                        verifyCallback={this.verifyCaptchaCallback.bind(this)}
+                    />
+                </div>
                 <div className="pt3 mt1 pb4">
                     <RaisedButton
                         label="Submit"

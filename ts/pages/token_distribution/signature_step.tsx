@@ -18,6 +18,8 @@ import {LedgerConfigDialog} from 'ts/components/ledger_config_dialog';
 import {U2fNotSupportedDialog} from 'ts/components/u2f_not_supported_dialog';
 import {Loading} from 'ts/components/ui/loading';
 
+const CUSTOM_GRAY = '#635F5E';
+
 export interface SignatureStepProps {
     blockchain: Blockchain;
     blockchainIsLoaded: boolean;
@@ -61,23 +63,23 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                           this.props.injectedProviderName :
                           'Injected Web3';
         return (
-            <div className="mx-auto left-align sm-px2" style={{maxWidth: 414}}>
+            <div className="mx-auto left-align sm-px2" style={{maxWidth: 489}}>
                 {!this.props.blockchainIsLoaded ?
                     <div className="pt2">
                         <Loading />
                     </div> :
-                    <div>
-                        <div className="lg-h2 md-h2 sm-h3 my2 pt3 center">
+                    <div style={{color: CUSTOM_GRAY}}>
+                        <div className="my2 pt3 left-align" style={{fontSize: 28}}>
                             Proof of Ownership
                         </div>
-                        <div className="pb2">
-                            In order to register a contribution address, you must prove that you own it. You
-                            prove ownership by signing a message with the address's corresponding private key.
-                            This proof also ensures that you do not try to register an exchange-hosted address.
-                            You can either use an address connected via an injected Web3 instance (Metamask,
-                            Parity Signer, Mist) or use a Ledger hardware wallet.
+                        <div className="pt2" style={{lineHeight: 1.5}}>
+                            In order to register a contribution address, you must prove ownership by
+                            signing a message with the corresponding private key.
                         </div>
-                        <div className="pt2">
+                        <div className="pt2 pb2">
+                            Notice: You cannot use an exchange address (i.e Coinbase, Kraken)
+                        </div>
+                        <div className="pt2 pb3 mx-auto" style={{maxWidth: 435}}>
                             <LabeledSwitcher
                                 labelLeft={labelLeft}
                                 labelRight="Ledger Nano S"
@@ -85,19 +87,51 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                                 onLeftLabelClick={this.onInjectedWeb3Click.bind(this)}
                                 onRightLabelClick={this.onLedgerClickAsync.bind(this)}
                             />
-                        </div>
-                        <div className="pt3" style={{maxWidth: 400}}>
-                            {this.renderUserAddress()}
-                        </div>
-                        <div className="pt3 pb4 center">
-                            <LifeCycleRaisedButton
-                                isPrimary={true}
-                                labelReady="Sign Proof of Ownership"
-                                labelLoading="Signing proof..."
-                                labelComplete="Proof signed!"
-                                onClickAsyncFn={this.onSignProofAsync.bind(this)}
-                                isDisabled={_.isEmpty(this.props.userAddress)}
-                            />
+                            <div
+                                className="clearfix"
+                                style={{fontSize: 14, color: '#635F5E', paddingTop: 11}}
+                            >
+                                <div className="col col-6 center">
+                                    <div>
+                                        address connected via a Web3 instance
+                                    </div>
+                                    <div>
+                                        (i.e{' '}
+                                        <a
+                                            className="underline"
+                                            style={{color: '#635F5E'}}
+                                            href={constants.METAMASK_CHROME_STORE_URL}
+                                            target="_blank"
+                                        >
+                                            Metamask
+                                        </a>{' '}or{' '}
+                                        <a
+                                            className="underline"
+                                            style={{color: '#635F5E'}}
+                                            href={constants.PARITY_CHROME_STORE_URL}
+                                            target="_blank"
+                                        >
+                                            Parity Signer
+                                        </a>)
+                                    </div>
+                                </div>
+                                <div className="col col-6 center">
+                                    Ledger hardware wallet
+                                </div>
+                            </div>
+                            <div className="pt4">
+                                {this.renderUserAddress()}
+                            </div>
+                            <div className="pt3 pb4 center">
+                                <LifeCycleRaisedButton
+                                    isPrimary={true}
+                                    labelReady="Sign Proof of Ownership"
+                                    labelLoading="Signing proof..."
+                                    labelComplete="Proof signed!"
+                                    onClickAsyncFn={this.onSignProofAsync.bind(this)}
+                                    isDisabled={_.isEmpty(this.props.userAddress)}
+                                />
+                            </div>
                         </div>
                     </div>
                 }

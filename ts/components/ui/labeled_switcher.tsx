@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import {colors} from 'material-ui/styles';
 
+const CUSTOM_BLUE = '#63A6F1';
+
 export enum Labels {
     LEFT,
     RIGHT,
@@ -31,7 +33,6 @@ export class LabeledSwitcher extends React.Component<LabeledSwitcherProps, Label
         return (
             <div
                 className="rounded clearfix"
-                style={{border: `1px solid ${colors.grey300}`}}
             >
                 {this.renderLabel(this.props.labelLeft, Labels.LEFT, isLeftLabelSelected)}
                 {this.renderLabel(this.props.labelRight, Labels.RIGHT, !isLeftLabelSelected)}
@@ -39,11 +40,17 @@ export class LabeledSwitcher extends React.Component<LabeledSwitcherProps, Label
         );
     }
     private renderLabel(title: string, label: Labels, isSelected: boolean) {
+        const borderStyle = `2px solid ${isSelected ? '#4F8BCF' : '#DADADA'}`;
         const style = {
             cursor: 'pointer',
-            backgroundColor: isSelected ? colors.cyan500 : colors.grey200,
-            color: isSelected ? 'white' : 'inherit',
-            boxShadow: isSelected ? `inset 0px 0px 3px ${colors.grey500}` : 'none',
+            backgroundColor: isSelected ? CUSTOM_BLUE : colors.grey200,
+            color: isSelected ? 'white' : '#A5A5A5',
+            boxShadow: isSelected ? `inset 0px 0px 4px #4083CE` : 'inset 0px 0px 4px #F7F6F6',
+            borderTop: borderStyle,
+            borderBottom: borderStyle,
+            [label === Labels.LEFT ? 'borderLeft' : 'borderRight']: borderStyle,
+            paddingTop: 12,
+            paddingBottom: 12,
         };
         const isLeft = label === Labels.LEFT;
         return (

@@ -197,16 +197,22 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
     }
     private renderThankYouStep() {
         return (
-            <div className="mx-auto" style={{maxWidth: 440}}>
-                <div className="h2 my2 pt3">
+            <div className="mx-auto" style={{maxWidth: 440, color: CUSTOM_GRAY}}>
+                <div className="my2 pt3" style={{fontSize: 28}}>
                     Registration successful!
                 </div>
                 <div className="sm-px2 pb3" style={{color: CUSTOM_GRAY}}>
-                    <div className="pt2">
+                    <div className="py2">
                         Thank you for taking the time to register for the 0x token sale. The contribution
                         period will begin on the <span className="bold">15th of August</span>.
                     </div>
-                    <div className="pt4 mx-auto" style={{maxWidth: 440}}>
+                    <div className="mx-auto pt3">
+                        <img
+                            src="/images/zrx_token.png"
+                            style={{width: 150}}
+                        />
+                    </div>
+                    <div className="pt3 mx-auto" style={{maxWidth: 440}}>
                         <div className="left-align pb2">
                             Get a reminder email when the contribution period opens
                         </div>
@@ -284,6 +290,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                             *0x is using{' '}
                             <a
                                 href="https://www.civic.com/"
+                                target="_blank"
                                 style={{color: '#A5A5A5'}}
                                 className="underline"
                             >
