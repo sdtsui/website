@@ -104,7 +104,7 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
             const result = await fetch(
                 endpoint,
                 {
-                    method: 'post',
+                    method: 'get',
                     headers: {
                         'Content-Type': 'application/json',
                     },
