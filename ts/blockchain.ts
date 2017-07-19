@@ -102,7 +102,8 @@ export class Blockchain {
         this.ledgerSubProvider.setPathIndex(pathIndex);
     }
     public async providerTypeUpdatedFireAndForgetAsync(providerType: ProviderType) {
-        let provider: any;
+        // Should actually be Web3.Provider|ProviderEngine union type but it causes issues
+        // later on in the logic.
         switch (providerType) {
             case ProviderType.LEDGER: {
                 const isU2FSupported = await utils.isU2FSupportedAsync();
@@ -115,7 +116,7 @@ export class Blockchain {
 
                 this.dispatcher.updateUserAddress(''); // Clear old userAddress
 
-                provider = new ProviderEngine();
+                const provider = new ProviderEngine();
                 this.ledgerSubProvider = ledgerWalletSubproviderFactory();
                 provider.addProvider(this.ledgerSubProvider);
                 provider.addProvider(new FilterSubprovider());
@@ -133,7 +134,7 @@ export class Blockchain {
                 if (_.isUndefined(this.cachedProvider)) {
                     return; // Going from injected to injected, so we noop
                 }
-                provider = this.cachedProvider;
+                const provider = this.cachedProvider;
                 const shouldPollUserAddress = true;
                 this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, this.networkId, shouldPollUserAddress);
                 delete this.ledgerSubProvider;
