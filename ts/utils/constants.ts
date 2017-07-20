@@ -17,6 +17,7 @@ export const constants = {
     FIREFOX_U2F_ADDON: 'https://addons.mozilla.org/en-US/firefox/addon/u2f-support-add-on/',
     HOSTED_TESTNET_URL: 'https://kovan.0xproject.com',
     GITHUB_0X_JS_URL: 'https://github.com/0xProject/0x.js',
+    LINKEDIN_0X_URL: 'https://www.linkedin.com/company/0x',
     LEDGER_PROVIDER_NAME: 'Ledger',
     METAMASK_PROVIDER_NAME: 'Metamask',
     PUBLIC_PROVIDER_NAME: '0x Public',

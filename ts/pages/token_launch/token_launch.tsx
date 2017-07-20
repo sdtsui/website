@@ -69,7 +69,7 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                 <div className="pt3">
                     <div className="mx-auto max-width-4 center pt2 mt2" style={{color: '#5D5D5D'}}>
                         <div className="mx-auto center">
-                            <div className="mt4" style={{fontSize: 38}}>
+                            <div className="mt4" style={{fontSize: 42, color: '#292929'}}>
                                 <span className="robotoMono">0</span>x Token Launch
                             </div>
                         </div>

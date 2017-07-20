@@ -4,6 +4,7 @@ import {Styles} from 'ts/types';
 import {
   Link,
 } from 'react-router-dom';
+import {constants} from 'ts/utils/constants';
 
 export interface FooterProps {}
 
@@ -50,7 +51,7 @@ export class Footer extends React.Component<FooterProps, FooterState> {
                                 </a>
                             </div>
                             <div className="col col-3 pt1">
-                                <a href="https://www.linkedin.com/company/0xProject" target="_blank">
+                                <a href={constants.LINKEDIN_0X_URL} target="_blank">
                                     <i className="zmdi zmdi-linkedin-box" style={{...styles.icon}} />
                                 </a>
                             </div>

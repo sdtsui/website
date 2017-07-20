@@ -305,7 +305,7 @@ export class GenerateOrderForm extends React.Component<GenerateOrderFormProps, a
             }
         } catch (err) {
             const errMsg = '' + err;
-            if (_.includes(errMsg, 'User denied message')) {
+            if (utils.didUserDenyWeb3Request(errMsg)) {
                 globalErrMsg = 'User denied sign request';
             } else {
                 globalErrMsg = 'An unexpected error occured. Please try refreshing the page';
