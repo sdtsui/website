@@ -17,6 +17,7 @@ import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 import {LedgerConfigDialog} from 'ts/components/ledger_config_dialog';
 import {U2fNotSupportedDialog} from 'ts/components/u2f_not_supported_dialog';
 import {Loading} from 'ts/components/ui/loading';
+import {MsgSigningExplanation} from 'ts/pages/token_distribution/msg_signing_explanation';
 
 const CUSTOM_GRAY = '#635F5E';
 
@@ -62,6 +63,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
         const labelLeft = this.props.injectedProviderName !== constants.PUBLIC_PROVIDER_NAME ?
                           this.props.injectedProviderName :
                           'Injected Web3';
+        const civicuserIdHashHex = this.getCivicUserIdHashHex(this.props.civicUserId);
         return (
             <div className="mx-auto left-align sm-px2" style={{maxWidth: 489}}>
                 {!this.props.blockchainIsLoaded ?
@@ -74,8 +76,17 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                         </div>
                         <div className="pt2" style={{lineHeight: 1.5}}>
                             In order to register a contribution address, you must prove ownership by
-                            signing a message with the corresponding private key.
+                            signing a {' '}
+                            <MsgSigningExplanation
+                                blockchain={this.props.blockchain}
+                                civicUserId={this.props.civicUserId}
+                                civicUserIdHashHex={civicuserIdHashHex}
+                            >
+                                message
+                            </MsgSigningExplanation>
+                            {' '} with the corresponding private key.
                         </div>
+
                         <div className="pt2 pb2">
                             Notice: You cannot use an exchange address (i.e Coinbase, Kraken)
                         </div>
@@ -226,9 +237,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
     private async onSignProofAsync() {
         let signatureData;
         try {
-            // ethUtil.sha3 is a misnomer. It's actually Keccak256.
-            const civicUserIdHashBuff = ethUtil.sha3(this.props.civicUserId);
-            const civicUserIdHashHex = ethUtil.bufferToHex(civicUserIdHashBuff);
+            const civicUserIdHashHex = this.getCivicUserIdHashHex(this.props.civicUserId);
             signatureData = await this.props.blockchain.sendSignRequestAsync(civicUserIdHashHex);
         } catch (err) {
             const errMsg = `${err}`;
@@ -265,6 +274,12 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
         } else {
             this.props.onSubmittedOwnershipProof();
         }
+    }
+    private getCivicUserIdHashHex(civicUserId: string): string {
+        // ethUtil.sha3 is a misnomer. It's actually Keccak256.
+        const civicUserIdHashBuff = ethUtil.sha3(civicUserId);
+        const civicUserIdHashHex = ethUtil.bufferToHex(civicUserIdHashBuff);
+        return civicUserIdHashHex;
     }
     private onToggleU2FDialog() {
         this.setState({

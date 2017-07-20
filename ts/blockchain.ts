@@ -233,19 +233,21 @@ export class Blockchain {
         const lowercaseAddress = address.toLowerCase();
         return this.web3Wrapper.isAddress(lowercaseAddress);
     }
-    public async sendSignRequestAsync(orderHashHex: string): Promise<SignatureData> {
-        let msgHashHex;
+    public getPersonalMessageHashHex(dataHashHex: string): string {
         const isParityNode = _.includes(this.nodeVersion, 'Parity');
         const isTestRpc = _.includes(this.nodeVersion, 'TestRPC');
         if (isParityNode || isTestRpc) {
             // Parity and TestRpc nodes add the personalMessage prefix itself
-            msgHashHex = orderHashHex;
+            return dataHashHex;
         } else {
-            const orderHashBuff = ethUtil.toBuffer(orderHashHex);
-            const msgHashBuff = ethUtil.hashPersonalMessage(orderHashBuff);
-            msgHashHex = ethUtil.bufferToHex(msgHashBuff);
+            const dataHashBuff = ethUtil.toBuffer(dataHashHex);
+            const msgHashBuff = ethUtil.hashPersonalMessage(dataHashBuff);
+            const msgHashHex = ethUtil.bufferToHex(msgHashBuff);
+            return msgHashHex;
         }
-
+    }
+    public async sendSignRequestAsync(dataHashHex: string): Promise<SignatureData> {
+        const msgHashHex = this.getPersonalMessageHashHex(dataHashHex);
         const makerAddress = this.userAddress;
         // If makerAddress is undefined, this means they have a web3 instance injected into their browser
         // but no account addresses associated with it.
@@ -259,18 +261,18 @@ export class Blockchain {
         // return the signature params in different orders. In order to support all client implementations,
         // we parse the signature in both ways, and evaluate if either one is a valid signature.
         const validVParamValues = [27, 28];
-        const signatureDataVRS = this.parseSignatureHexAsVRS(orderHashHex, signature);
+        const signatureDataVRS = this.parseSignatureHexAsVRS(dataHashHex, signature);
         if (_.includes(validVParamValues, signatureDataVRS.v)) {
-            const isValidVRSSignature = ZeroEx.isValidSignature(orderHashHex, signatureDataVRS, makerAddress);
+            const isValidVRSSignature = ZeroEx.isValidSignature(dataHashHex, signatureDataVRS, makerAddress);
             if (isValidVRSSignature) {
                 this.dispatcher.updateSignatureData(signatureDataVRS);
                 return signatureDataVRS;
             }
         }
 
-        const signatureDataRSV = this.parseSignatureHexAsRSV(orderHashHex, signature);
+        const signatureDataRSV = this.parseSignatureHexAsRSV(dataHashHex, signature);
         if (_.includes(validVParamValues, signatureDataRSV.v)) {
-            const isValidRSVSignature = ZeroEx.isValidSignature(orderHashHex, signatureDataRSV, makerAddress);
+            const isValidRSVSignature = ZeroEx.isValidSignature(dataHashHex, signatureDataRSV, makerAddress);
             if (isValidRSVSignature) {
                 this.dispatcher.updateSignatureData(signatureDataRSV);
                 return signatureDataRSV;
