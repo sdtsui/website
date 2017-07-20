@@ -29,13 +29,15 @@ export class TermsAndConditions extends React.Component<TermsAndConditionsProps,
         return (
             <div
                 className="mx-auto"
-                style={{width: 500, color: CUSTOM_GRAY}}
+                style={{maxWidth: 500, color: CUSTOM_GRAY}}
             >
-                <div className="h2 pt3 left-align">Terms & conditions</div>
+                <div className="h2 pt3 lg-left-align md-left-align sm-center">
+                    Terms & conditions
+                </div>
                 <div className="my3">
                     <div
                         id="termsAndConditons"
-                        className="left-align overflow-scroll"
+                        className="left-align overflow-scroll sm-px3"
                         style={{height: 300}}
                     >
                         <ReactMarkdown
@@ -43,13 +45,13 @@ export class TermsAndConditions extends React.Component<TermsAndConditionsProps,
                         />
                     </div>
                     <div className="clearfix left-align pb3 pt3">
-                        <div className="col col-7 left-align pt1">
+                        <div className="col lg-col-7 md-col-7 col-12 left-align pt1 sm-pl3 sm-pb3">
                             <Checkbox
                                 label="I agree to the terms & conditions"
                                 onCheck={this.onAcceptTermsCheckboxChecked.bind(this)}
                             />
                         </div>
-                        <div className="col col-5 right-align">
+                        <div className="col lg-col-5 md-col-5 col-12 lg-right-align md-right-align sm-center">
                             <RaisedButton
                                 label="Continue"
                                 primary={true}
