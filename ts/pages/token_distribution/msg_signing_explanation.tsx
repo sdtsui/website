@@ -60,19 +60,19 @@ export class MsgSigningExplanation extends React.Component<MsgSigningExplanation
         return (
             <div className="pt2" style={{color: 'black'}}>
                 <div className="my1 pt1 left-align" style={{fontSize: 20}}>
-                    This is the message you're signing:
+                    This is the message you're signing: <code>message</code>
                 </div>
                 <div className="center inline-block px1" style={signMessageDetailsStyles}>
                     {this.props.civicUserId}
                 </div>
                 <div className="my1 pt1 left-align" style={{fontSize: 20}}>
-                This is the hash of the message:
+                    This is the hash of the message: <code>keccak256(message)</code>
                 </div>
                 <div className="center inline-block px1" style={signMessageDetailsStyles}>
                     {this.props.civicUserIdHashHex}
                 </div>
                 <div className="my1 pt1 left-align" style={{fontSize: 20}}>
-                <a className="underline" href={ETH_SIGN_DOCS_LINK} target="_blanc">Ethereum specific</a> message hash:
+                    <a className="underline" href={ETH_SIGN_DOCS_LINK} target="_blanc">Ethereum specific</a> message hash:
                 </div>
                 <div className="center inline-block px1" style={signMessageDetailsStyles}>
                     {personalMessageHashHex}
