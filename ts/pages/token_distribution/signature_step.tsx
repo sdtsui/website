@@ -232,7 +232,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
             signatureData = await this.props.blockchain.sendSignRequestAsync(civicUserIdHashHex);
         } catch (err) {
             const errMsg = `${err}`;
-            if (_.includes(errMsg, 'User denied message')) {
+            if (utils.didUserDenyWeb3Request(errMsg)) {
                 this.props.dispatcher.showFlashMessage('You denied the sign request.');
             } else {
                 this.props.dispatcher.showFlashMessage('An unexpected error occured. Please try refreshing the page.');
