@@ -158,10 +158,8 @@ export const utils = {
     didUserDenyWeb3Request(errMsg: string) {
         const metamaskDenialErrMsg = 'User denied message';
         const paritySignerDenialErrMsg = 'Request has been rejected';
-        if (_.includes(errMsg, metamaskDenialErrMsg) ||
-            _.includes(errMsg, paritySignerDenialErrMsg)) {
-            return true;
-        }
-        return false;
+        const isUserDeniedErrMsg = _.includes(errMsg, metamaskDenialErrMsg) ||
+                                   _.includes(errMsg, paritySignerDenialErrMsg);
+        return isUserDeniedErrMsg;
     },
 };
