@@ -17,7 +17,6 @@ interface LifeCycleRaisedButtonProps {
     isHidden?: boolean;
     isDisabled?: boolean;
     isPrimary?: boolean;
-    isDisabled?: boolean;
     labelReady: string;
     labelLoading: string;
     labelComplete: string;
