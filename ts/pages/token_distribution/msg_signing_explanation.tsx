@@ -38,7 +38,7 @@ export class MsgSigningExplanation extends React.Component<MsgSigningExplanation
                 {this.props.children}
             </div>
             <Dialog
-              title="Massage signing explanation"
+              title="Message signing explanation"
               actions={actions}
               modal={false}
               open={this.state.isOpened}
