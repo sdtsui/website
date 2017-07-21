@@ -4,6 +4,7 @@ import {colors} from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
 import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
 import {Blockchain} from 'ts/blockchain';
+import {ipUtils} from 'ts/utils/ip_utils';
 import {constants} from 'ts/utils/constants';
 import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
@@ -47,6 +48,8 @@ interface RegistrationFlowState {
     prevNodeVersion: string;
     prevUserAddress: string;
     prevProviderType: ProviderType;
+    isLoadingRegistrationFlow: boolean;
+    isNYIP: boolean;
 }
 
 export class RegistrationFlow extends React.Component<RegistrationFlowProps, RegistrationFlowState> {
@@ -65,9 +68,12 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             prevNodeVersion: this.props.nodeVersion,
             prevUserAddress: this.props.userAddress,
             prevProviderType: this.props.providerType,
+            isLoadingRegistrationFlow: true,
+            isNYIP: false,
         };
     }
     public componentWillMount() {
+        this.setIsNYIPFireAndForgetAsync();
         this.blockchain = new Blockchain(this.props.dispatcher);
     }
     public componentDidMount() {
@@ -150,32 +156,9 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                             </Step>
                         </Stepper>
                     </div>
-                    {this.state.stepIndex === RegistrationFlowSteps.VERIFY_IDENTITY &&
-                        this.renderVerifyIdentityStep()
-                    }
-                    {this.state.stepIndex === RegistrationFlowSteps.SIGNATURE_PROOF &&
-                        <div>
-                            <SignatureStep
-                                blockchain={this.blockchain}
-                                blockchainIsLoaded={this.props.blockchainIsLoaded}
-                                civicUserId={this.state.civicUserId}
-                                dispatcher={this.props.dispatcher}
-                                injectedProviderName={this.props.injectedProviderName}
-                                userAddress={this.props.userAddress}
-                                onSubmittedOwnershipProof={this.onSubmittedOwnershipProof.bind(this)}
-                                providerType={this.props.providerType}
-                            />
-                        </div>
-                    }
-                    {this.state.stepIndex === RegistrationFlowSteps.CONTRIBUTION_AMOUNT &&
-                        <ContributionAmountStep
-                            civicUserId={this.state.civicUserId}
-                            dispatcher={this.props.dispatcher}
-                            onSubmittedContributionInfo={this.onSubmittedContributionInfo.bind(this)}
-                        />
-                    }
-                    {this.state.stepIndex === RegistrationFlowSteps.REGISTRATION_COMPLETE &&
-                        this.renderThankYouStep()
+                    {this.state.isLoadingRegistrationFlow ?
+                        <SimpleLoading message="Loading registration flow" /> :
+                        this.renderMainContent()
                     }
                 </div>
                 <BlockchainErrDialog
@@ -192,6 +175,61 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                     bodyStyle={{backgroundColor: colors.cyanA700}}
                 />
                 <Footer />
+            </div>
+        );
+    }
+    private renderMainContent() {
+        return (
+            <div>
+                {this.state.isNYIP &&
+                    this.renderNYForbiddenMessage()
+                }
+                {!this.state.isNYIP && this.state.stepIndex === RegistrationFlowSteps.VERIFY_IDENTITY &&
+                    this.renderVerifyIdentityStep()
+                }
+                {!this.state.isNYIP && this.state.stepIndex === RegistrationFlowSteps.SIGNATURE_PROOF &&
+                    <div>
+                        <SignatureStep
+                            blockchain={this.blockchain}
+                            blockchainIsLoaded={this.props.blockchainIsLoaded}
+                            civicUserId={this.state.civicUserId}
+                            dispatcher={this.props.dispatcher}
+                            injectedProviderName={this.props.injectedProviderName}
+                            userAddress={this.props.userAddress}
+                            onSubmittedOwnershipProof={this.onSubmittedOwnershipProof.bind(this)}
+                            providerType={this.props.providerType}
+                        />
+                    </div>
+                }
+                {!this.state.isNYIP && this.state.stepIndex === RegistrationFlowSteps.CONTRIBUTION_AMOUNT &&
+                    <ContributionAmountStep
+                        civicUserId={this.state.civicUserId}
+                        dispatcher={this.props.dispatcher}
+                        onSubmittedContributionInfo={this.onSubmittedContributionInfo.bind(this)}
+                    />
+                }
+                {!this.state.isNYIP && this.state.stepIndex === RegistrationFlowSteps.REGISTRATION_COMPLETE &&
+                    this.renderThankYouStep()
+                }
+            </div>
+        );
+    }
+    private renderNYForbiddenMessage() {
+        return (
+            <div className="sm-px3">
+                <Paper
+                    className="mt3 p3 mx-auto left-align"
+                    style={{maxWidth: 400}}
+                >
+                    <div className="h3 thin">
+                        <i className="zmdi zmdi-alert-triangle mr1" />
+                        New York IP detected
+                    </div>
+                    <div className="pt2">
+                        We are sorry but registration by New York residents goes against our terms and
+                        conditions.
+                    </div>
+                </Paper>
             </div>
         );
     }
@@ -344,5 +382,13 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                 isVerifyingIdentity: false,
             });
         }
+    }
+    private async setIsNYIPFireAndForgetAsync() {
+        const isNYIP = await ipUtils.isNewYorkIPAsync();
+        this.setState({
+            isNYIP,
+            isLoadingRegistrationFlow: false,
+        });
+
     }
 }
