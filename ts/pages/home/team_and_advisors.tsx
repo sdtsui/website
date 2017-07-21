@@ -72,16 +72,6 @@ const teamRow2: ProfileInfo[] = [
         medium: '',
     },
 ];
-const teamRow3: ProfileInfo[] = [
-    {
-        name: 'We\'re hiring',
-        title: 'Designer/UI/UX/Blockchain Engineer',
-        description: `We are looking for talented, self-starters who are passionate about decentralization
-                      to join the team! Apply at jobs@0xproject.com`,
-        image: '/images/team/anyone.png',
-        linkedIn: 'https://www.linkedin.com/company-beta/17942619/',
-    },
-];
 
 const advisors: ProfileInfo[] = [
     {
@@ -153,9 +143,6 @@ export function TeamAndAdvisors(props: TeamAndAdvisorsProps) {
                         </div>
                         <div className="clearfix pt3 mx-auto" style={{maxWidth: 1022}}>
                             {renderProfiles(teamRow2)}
-                        </div>
-                        <div className="clearfix pt3 mx-auto" style={{maxWidth: 1022}}>
-                            {renderProfiles(teamRow3)}
                         </div>
                     </div>
                 </ScrollElement>
