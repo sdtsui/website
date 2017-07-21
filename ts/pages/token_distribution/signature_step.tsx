@@ -271,11 +271,11 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
             isU2FDialogOpen: !this.state.isU2FDialogOpen,
         });
     }
-    private async onInjectedWeb3Click() {
+    private async onInjectedWeb3Click(): Promise<boolean> {
         this.props.dispatcher.updateProviderType(ProviderType.INJECTED);
         return true;
     }
-    private async onLedgerClickAsync() {
+    private async onLedgerClickAsync(): Promise<boolean> {
         const isU2FSupported = await utils.isU2FSupportedAsync();
         if (!isU2FSupported) {
             this.setState({

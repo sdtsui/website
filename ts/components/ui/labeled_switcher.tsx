@@ -8,8 +8,8 @@ interface LabeledSwitcherProps {
     labelLeft: string;
     labelRight: string;
     isLeftInitiallySelected: boolean;
-    onLeftLabelClickAsync: () => void;
-    onRightLabelClickAsync: () => void;
+    onLeftLabelClickAsync: () => Promise<boolean>;
+    onRightLabelClickAsync: () => Promise<boolean>;
 }
 
 interface LabeledSwitcherState {
@@ -57,7 +57,7 @@ export class LabeledSwitcher extends React.Component<LabeledSwitcherProps, Label
             </div>
         );
     }
-    private async onLabelClickAsync(isLeft: boolean) {
+    private async onLabelClickAsync(isLeft: boolean): Promise<void> {
         this.setState({
             isLeftSelected: isLeft,
         });
