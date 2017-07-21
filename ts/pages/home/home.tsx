@@ -187,21 +187,20 @@ export class Home extends React.Component<HomeProps, HomeState> {
                             style={{maxWidth: 750, ...styles.paragraph}}
                         >
                             <p>
-                                The Ethereum blockchain has become host to a{' '}
+                                The Ethereum blockchain has become host to a variety of{' '}
                                 <a href="https://etherscan.io/tokens" target="_blank">
                                     variety of digital assets
                                 </a>, with{' '}
                                 <a href="https://www.icoalert.com/" target="_blank">
                                     more being created every month
-                                </a>. Soon, thousands of assets will be tokenized and moved onto this{' '}
-                                open financial network including traditional securities, currencies and{' '}
-                                scarce digital goods.{' '}
+                                </a>. Soon, thousands of assets will be tokenized and moved onto this
+                                open financial network.
                             </p>
                             <p>
-                                As the token space continues to develop, the need{' '}
-                                to exchange these assets will be compounded. 0x protocol will act as a{' '}
-                                critical piece of infrastructure for the token economy, allowing Ethereum{' '}
-                                smart contracts to programmatically and seamlessly exchange Ethereum-based assets.{' '}
+                                As the token space continues to develop, the need to exchange these{' '}
+                                assets will be compounded. 0x protocol will act as a critical piece of{' '}
+                                infrastructure for the token economy, allowing Ethereum smart contracts{' '}
+                                to programmatically and seamlessly exchange Ethereum-based assets.
                             </p>
                         </div>
                         <div className="lg-py4 md-py4 sm-py2" />
