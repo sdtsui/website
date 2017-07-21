@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import {colors} from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
-import CircularProgress from 'material-ui/CircularProgress';
 import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
 import {Blockchain} from 'ts/blockchain';
 import {constants} from 'ts/utils/constants';
@@ -15,6 +14,7 @@ import {CivicSip, BlockchainErrs, ProviderType} from 'ts/types';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {FlashMessage} from 'ts/components/ui/flash_message';
 import {NewsletterInput} from 'ts/pages/home/newsletter_input';
+import {SimpleLoading} from 'ts/components/ui/simple_loading';
 import {BlockchainErrDialog} from 'ts/components/blockchain_err_dialog';
 
 const CUSTOM_GRAY = '#635F5E';
@@ -229,17 +229,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         return (
             <div>
                 {this.state.isVerifyingIdentity ?
-                    <div className="mx-auto pt3" style={{maxWidth: 400, height: 409}}>
-                        <div
-                            className="relative"
-                            style={{top: '50%', transform: 'translateY(-50%)', height: 95}}
-                        >
-                            <CircularProgress />
-                            <div className="pt3 pb3">
-                                Verifying your Civic Identity...
-                            </div>
-                        </div>
-                    </div> :
+                    <SimpleLoading message="verifying your Civic Identity" /> :
                     <div className="pt3" style={{color: CUSTOM_GRAY}}>
                         <div className="clearfix mx-auto">
                             <div className="col col-4 pt4 sm-hide xs-hide">
