@@ -59,7 +59,7 @@ export class MsgSigningExplanation extends React.Component<MsgSigningExplanation
         return (
             <div className="pt2" style={{color: 'black'}}>
                 <div className="my1 pt1 left-align" style={{fontSize: 20}}>
-                    This is the message you're signing: <code>message</code>
+                    This is the message you're signing:
                 </div>
                 <div className="center inline-block px1" style={signMessageDetailsStyles}>
                     {this.props.msg}
