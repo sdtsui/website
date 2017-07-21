@@ -8,8 +8,7 @@ const ETH_SIGN_DOCS_LINK = 'https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_s
 
 export interface MsgSigningExplanationProps {
     blockchain: Blockchain;
-    civicUserId: string;
-    civicUserIdHashHex: string;
+    msg: string;
 }
 
 interface MsgSigningExplanationState {
@@ -50,7 +49,7 @@ export class MsgSigningExplanation extends React.Component<MsgSigningExplanation
         );
     }
     private renderExplanation() {
-        const personalMessageHashHex = this.props.blockchain.getPersonalMessageHashHex(this.props.civicUserIdHashHex);
+        const personalMessageHashHex = this.props.blockchain.getPersonalMessageHashHex(this.props.msg);
         const signMessageDetailsStyles = {
             backgroundColor: 'whitesmoke',
             fontSize: 14,
@@ -63,16 +62,12 @@ export class MsgSigningExplanation extends React.Component<MsgSigningExplanation
                     This is the message you're signing: <code>message</code>
                 </div>
                 <div className="center inline-block px1" style={signMessageDetailsStyles}>
-                    {this.props.civicUserId}
+                    {this.props.msg}
                 </div>
                 <div className="my1 pt1 left-align" style={{fontSize: 20}}>
-                    This is the hash of the message: <code>keccak256(message)</code>
-                </div>
-                <div className="center inline-block px1" style={signMessageDetailsStyles}>
-                    {this.props.civicUserIdHashHex}
-                </div>
-                <div className="my1 pt1 left-align" style={{fontSize: 20}}>
-                    <a className="underline" href={ETH_SIGN_DOCS_LINK} target="_blanc">Ethereum specific</a> message hash:
+                    <a className="underline" href={ETH_SIGN_DOCS_LINK} target="_blanc">
+                        Ethereum specific
+                    </a> message hash:
                 </div>
                 <div className="center inline-block px1" style={signMessageDetailsStyles}>
                     {personalMessageHashHex}

@@ -63,7 +63,6 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
         const labelLeft = this.props.injectedProviderName !== constants.PUBLIC_PROVIDER_NAME ?
                           this.props.injectedProviderName :
                           'Injected Web3';
-        const civicuserIdHashHex = this.getCivicUserIdHashHex(this.props.civicUserId);
         return (
             <div className="mx-auto left-align sm-px2" style={{maxWidth: 489}}>
                 {!this.props.blockchainIsLoaded ?
@@ -79,8 +78,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                             signing a {' '}
                             <MsgSigningExplanation
                                 blockchain={this.props.blockchain}
-                                civicUserId={this.props.civicUserId}
-                                civicUserIdHashHex={civicuserIdHashHex}
+                                msg={'0x' + this.props.civicUserId}
                             >
                                 message
                             </MsgSigningExplanation>
@@ -237,8 +235,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
     private async onSignProofAsync() {
         let signatureData;
         try {
-            const civicUserIdHashHex = this.getCivicUserIdHashHex(this.props.civicUserId);
-            signatureData = await this.props.blockchain.sendSignRequestAsync(civicUserIdHashHex);
+            signatureData = await this.props.blockchain.sendSignRequestAsync('0x' + this.props.civicUserId);
         } catch (err) {
             const errMsg = `${err}`;
             if (utils.didUserDenyWeb3Request(errMsg)) {
@@ -274,12 +271,6 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
         } else {
             this.props.onSubmittedOwnershipProof();
         }
-    }
-    private getCivicUserIdHashHex(civicUserId: string): string {
-        // ethUtil.sha3 is a misnomer. It's actually Keccak256.
-        const civicUserIdHashBuff = ethUtil.sha3(civicUserId);
-        const civicUserIdHashHex = ethUtil.bufferToHex(civicUserIdHashBuff);
-        return civicUserIdHashHex;
     }
     private onToggleU2FDialog() {
         this.setState({
