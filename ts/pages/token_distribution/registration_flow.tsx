@@ -186,40 +186,42 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
     private renderMainContent() {
         return (
             <div>
-                {this.state.isNYIP &&
-                    this.renderNYForbiddenMessage()
-                }
-                {!this.state.isNYIP && this.state.stepIndex === RegistrationFlowSteps.ACCEPT_TERMS_AND_CONDITIONS &&
-                    <TermsAndConditions
-                        onContinueClick={this.onAcceptTermsAndConditions.bind(this)}
-                    />
-                }
-                {!this.state.isNYIP && this.state.stepIndex === RegistrationFlowSteps.VERIFY_IDENTITY &&
-                    this.renderVerifyIdentityStep()
-                }
-                {!this.state.isNYIP && this.state.stepIndex === RegistrationFlowSteps.SIGNATURE_PROOF &&
+                {this.state.isNYIP ?
+                    this.renderNYForbiddenMessage() :
                     <div>
-                        <SignatureStep
-                            blockchain={this.blockchain}
-                            blockchainIsLoaded={this.props.blockchainIsLoaded}
-                            civicUserId={this.state.civicUserId}
-                            dispatcher={this.props.dispatcher}
-                            injectedProviderName={this.props.injectedProviderName}
-                            userAddress={this.props.userAddress}
-                            onSubmittedOwnershipProof={this.onSubmittedOwnershipProof.bind(this)}
-                            providerType={this.props.providerType}
-                        />
+                        {this.state.stepIndex === RegistrationFlowSteps.ACCEPT_TERMS_AND_CONDITIONS &&
+                            <TermsAndConditions
+                                onContinueClick={this.onAcceptTermsAndConditions.bind(this)}
+                            />
+                        }
+                        {this.state.stepIndex === RegistrationFlowSteps.VERIFY_IDENTITY &&
+                            this.renderVerifyIdentityStep()
+                        }
+                        {this.state.stepIndex === RegistrationFlowSteps.SIGNATURE_PROOF &&
+                            <div>
+                                <SignatureStep
+                                    blockchain={this.blockchain}
+                                    blockchainIsLoaded={this.props.blockchainIsLoaded}
+                                    civicUserId={this.state.civicUserId}
+                                    dispatcher={this.props.dispatcher}
+                                    injectedProviderName={this.props.injectedProviderName}
+                                    userAddress={this.props.userAddress}
+                                    onSubmittedOwnershipProof={this.onSubmittedOwnershipProof.bind(this)}
+                                    providerType={this.props.providerType}
+                                />
+                            </div>
+                        }
+                        {this.state.stepIndex === RegistrationFlowSteps.CONTRIBUTION_AMOUNT &&
+                            <ContributionAmountStep
+                                civicUserId={this.state.civicUserId}
+                                dispatcher={this.props.dispatcher}
+                                onSubmittedContributionInfo={this.onSubmittedContributionInfo.bind(this)}
+                            />
+                        }
+                        {this.state.stepIndex === RegistrationFlowSteps.REGISTRATION_COMPLETE &&
+                            this.renderThankYouStep()
+                        }
                     </div>
-                }
-                {!this.state.isNYIP && this.state.stepIndex === RegistrationFlowSteps.CONTRIBUTION_AMOUNT &&
-                    <ContributionAmountStep
-                        civicUserId={this.state.civicUserId}
-                        dispatcher={this.props.dispatcher}
-                        onSubmittedContributionInfo={this.onSubmittedContributionInfo.bind(this)}
-                    />
-                }
-                {!this.state.isNYIP && this.state.stepIndex === RegistrationFlowSteps.REGISTRATION_COMPLETE &&
-                    this.renderThankYouStep()
                 }
             </div>
         );
