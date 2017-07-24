@@ -10,6 +10,7 @@ import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
 import {ContributionAmountStep} from 'ts/pages/token_distribution/contribution_amount_step';
 import {SignatureStep} from 'ts/pages/token_distribution/signature_step';
+import {TermsAndConditions} from 'ts/pages/token_distribution/terms_and_conditions';
 import {RegisterButton} from 'ts/pages/token_distribution/register_button';
 import {CivicSip, BlockchainErrs, ProviderType} from 'ts/types';
 import {Dispatcher} from 'ts/redux/dispatcher';
@@ -19,6 +20,7 @@ import {BlockchainErrDialog} from 'ts/components/blockchain_err_dialog';
 
 const CUSTOM_GRAY = '#635F5E';
 enum RegistrationFlowSteps {
+    ACCEPT_TERMS_AND_CONDITIONS,
     VERIFY_IDENTITY,
     SIGNATURE_PROOF,
     CONTRIBUTION_AMOUNT,
@@ -58,7 +60,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             appId: constants.CIVIC_APP_ID,
         });
         this.state = {
-            stepIndex: RegistrationFlowSteps.VERIFY_IDENTITY,
+            stepIndex: RegistrationFlowSteps.ACCEPT_TERMS_AND_CONDITIONS,
             civicUserId: undefined,
             isVerifyingIdentity: false,
             prevNetworkId: this.props.networkId,
@@ -137,19 +139,27 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                     <div className="sm-hide xs-hide">
                         <Stepper activeStep={this.state.stepIndex}>
                             <Step>
-                                <StepLabel>Verify your identity with Civic</StepLabel>
+                                <StepLabel>Terms & conditions</StepLabel>
                             </Step>
                             <Step>
-                                <StepLabel>Signature proof</StepLabel>
+                                <StepLabel>Identity verification</StepLabel>
                             </Step>
                             <Step>
-                                <StepLabel>Choose contribution amount</StepLabel>
+                                <StepLabel>Ownership proof</StepLabel>
+                            </Step>
+                            <Step>
+                                <StepLabel>Contribution amount</StepLabel>
                             </Step>
                             <Step>
                                 <StepLabel>Complete</StepLabel>
                             </Step>
                         </Stepper>
                     </div>
+                    {this.state.stepIndex === RegistrationFlowSteps.ACCEPT_TERMS_AND_CONDITIONS &&
+                        <TermsAndConditions
+                            onContinueClick={this.onAcceptTermsAndConditions.bind(this)}
+                        />
+                    }
                     {this.state.stepIndex === RegistrationFlowSteps.VERIFY_IDENTITY &&
                         this.renderVerifyIdentityStep()
                     }
@@ -312,6 +322,11 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
     private onSubmittedOwnershipProof() {
         this.setState({
             stepIndex: RegistrationFlowSteps.CONTRIBUTION_AMOUNT,
+        });
+    }
+    private onAcceptTermsAndConditions() {
+        this.setState({
+            stepIndex: RegistrationFlowSteps.VERIFY_IDENTITY,
         });
     }
     private onRegisterClick() {

@@ -79,8 +79,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                             signing a {' '}
                             <MsgSigningExplanation
                                 blockchain={this.props.blockchain}
-                                civicUserId={this.props.civicUserId}
-                                civicUserIdHashHex={civicuserIdHashHex}
+                                msg={'0x' + this.props.civicUserId}
                             >
                                 message
                             </MsgSigningExplanation>
@@ -237,8 +236,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
     private async onSignProofAsync() {
         let signatureData;
         try {
-            const civicUserIdHashHex = this.getCivicUserIdHashHex(this.props.civicUserId);
-            signatureData = await this.props.blockchain.sendSignRequestAsync(civicUserIdHashHex);
+            signatureData = await this.props.blockchain.sendSignRequestAsync('0x' + this.props.civicUserId);
         } catch (err) {
             const errMsg = `${err}`;
             if (utils.didUserDenyWeb3Request(errMsg)) {
