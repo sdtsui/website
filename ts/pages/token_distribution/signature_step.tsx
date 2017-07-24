@@ -10,7 +10,7 @@ import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
 import {InputLabel} from 'ts/components/ui/input_label';
 import {RequiredLabel} from 'ts/components/ui/required_label';
-import {LabeledSwitcher, Labels} from 'ts/components/ui/labeled_switcher';
+import {LabeledSwitcher} from 'ts/components/ui/labeled_switcher';
 import {Styles, ProviderType} from 'ts/types';
 import {Identicon} from 'ts/components/ui/identicon';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
@@ -83,9 +83,9 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                             <LabeledSwitcher
                                 labelLeft={labelLeft}
                                 labelRight="Ledger Nano S"
-                                initialSelectedLabel={isLedgerProvider ? Labels.RIGHT : Labels.LEFT}
-                                onLeftLabelClick={this.onInjectedWeb3Click.bind(this)}
-                                onRightLabelClick={this.onLedgerClickAsync.bind(this)}
+                                isLeftInitiallySelected={!isLedgerProvider}
+                                onLeftLabelClickAsync={this.onInjectedWeb3Click.bind(this)}
+                                onRightLabelClickAsync={this.onLedgerClickAsync.bind(this)}
                             />
                             <div
                                 className="clearfix"
@@ -271,21 +271,23 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
             isU2FDialogOpen: !this.state.isU2FDialogOpen,
         });
     }
-    private async onInjectedWeb3Click() {
+    private async onInjectedWeb3Click(): Promise<boolean> {
         this.props.dispatcher.updateProviderType(ProviderType.INJECTED);
+        return true;
     }
-    private async onLedgerClickAsync() {
+    private async onLedgerClickAsync(): Promise<boolean> {
         const isU2FSupported = await utils.isU2FSupportedAsync();
         if (!isU2FSupported) {
             this.setState({
                 isU2FDialogOpen: true,
             });
-            return;
+            return false;
         }
 
         this.props.dispatcher.updateProviderType(ProviderType.LEDGER);
         this.setState({
             isLedgerDialogOpen: true,
         });
+        return true;
     }
 }
