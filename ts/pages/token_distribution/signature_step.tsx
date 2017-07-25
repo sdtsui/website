@@ -250,7 +250,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
     private async onSignProofAsync() {
         let signatureData;
         try {
-            signatureData = await this.props.blockchain.sendSignRequestAsync('0x' + this.props.civicUserId);
+            signatureData = await this.props.blockchain.sendSignRequestAsync(`0x${this.props.civicUserId}`);
         } catch (err) {
             const errMsg = `${err}`;
             if (utils.didUserDenyWeb3Request(errMsg)) {
@@ -286,12 +286,6 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
         } else {
             this.props.onSubmittedOwnershipProof();
         }
-    }
-    private getCivicUserIdHashHex(civicUserId: string): string {
-        // ethUtil.sha3 is a misnomer. It's actually Keccak256.
-        const civicUserIdHashBuff = ethUtil.sha3(civicUserId);
-        const civicUserIdHashHex = ethUtil.bufferToHex(civicUserIdHashBuff);
-        return civicUserIdHashHex;
     }
     private onToggleU2FDialog() {
         this.setState({
