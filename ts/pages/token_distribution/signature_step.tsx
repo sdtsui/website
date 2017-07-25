@@ -78,7 +78,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                             In order to register a contribution address, you must prove ownership by
                             signing a {' '}
                             <MsgSigningExplanation
-                                blockchain={this.props.blockchain}
+                                getPersonalMessageHashHex={this.props.blockchain.getPersonalMessageHashHex}
                                 msg={'0x' + this.props.civicUserId}
                             >
                                 message

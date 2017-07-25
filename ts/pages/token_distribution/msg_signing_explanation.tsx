@@ -7,7 +7,7 @@ import {Blockchain} from 'ts/blockchain';
 const ETH_SIGN_DOCS_LINK = 'https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign';
 
 export interface MsgSigningExplanationProps {
-    blockchain: Blockchain;
+    getPersonalMessageHashHex: (msg: string) => string;
     msg: string;
 }
 
@@ -49,7 +49,7 @@ export class MsgSigningExplanation extends React.Component<MsgSigningExplanation
         );
     }
     private renderExplanation() {
-        const personalMessageHashHex = this.props.blockchain.getPersonalMessageHashHex(this.props.msg);
+        const personalMessageHashHex = this.props.getPersonalMessageHashHex(this.props.msg);
         const signMessageDetailsStyles = {
             backgroundColor: 'whitesmoke',
             fontSize: 14,
