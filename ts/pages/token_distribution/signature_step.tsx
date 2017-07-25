@@ -89,7 +89,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                                     getPersonalMessageHashHex={this.props.blockchain.getPersonalMessageHashHex}
                                     isOpen={this.state.isMsgSigningExplanationDialogOpen}
                                     handleClose={this.toggleMsgSigningDialog.bind(this, false)}
-                                    msg={'0x' + this.props.civicUserId}
+                                    msg={`0x${this.props.civicUserId}`}
                                 />
                             </div>
                             {' '} with the corresponding private key.
