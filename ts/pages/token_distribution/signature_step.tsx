@@ -17,7 +17,7 @@ import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 import {LedgerConfigDialog} from 'ts/components/ledger_config_dialog';
 import {U2fNotSupportedDialog} from 'ts/components/u2f_not_supported_dialog';
 import {Loading} from 'ts/components/ui/loading';
-import {MsgSigningExplanation} from 'ts/pages/token_distribution/msg_signing_explanation';
+import {MsgSigningExplanationDialog} from 'ts/pages/token_distribution/msg_signing_explanation_dialog';
 
 const CUSTOM_GRAY = '#635F5E';
 
@@ -36,6 +36,7 @@ interface SignatureStepState {
     didSignatureProofSucceed: boolean;
     isLedgerDialogOpen: boolean;
     isU2FDialogOpen: boolean;
+    isMsgSigningExplanationDialogOpen: boolean;
 }
 
 const styles: Styles = {
@@ -56,6 +57,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
             didSignatureProofSucceed: false,
             isLedgerDialogOpen: false,
             isU2FDialogOpen: false,
+            isMsgSigningExplanationDialogOpen: false,
         };
     }
     public render() {
@@ -77,12 +79,20 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                         <div className="pt2" style={{lineHeight: 1.5}}>
                             In order to register a contribution address, you must prove ownership by
                             signing a {' '}
-                            <MsgSigningExplanation
-                                getPersonalMessageHashHex={this.props.blockchain.getPersonalMessageHashHex}
-                                msg={'0x' + this.props.civicUserId}
-                            >
-                                message
-                            </MsgSigningExplanation>
+                            <div className="inline-block">
+                                <div
+                                    className="underline inline-block"
+                                    onClick={this.onMsgSigningExplanationDialogOpen.bind(this)}
+                                >
+                                    message
+                                </div>
+                                <MsgSigningExplanationDialog
+                                    getPersonalMessageHashHex={this.props.blockchain.getPersonalMessageHashHex}
+                                    isOpen={this.state.isMsgSigningExplanationDialogOpen}
+                                    handleClose={this.onMsgSigningExplanationDialogClose.bind(this)}
+                                    msg={'0x' + this.props.civicUserId}
+                                />
+                            </div>
                             {' '} with the corresponding private key.
                         </div>
 
@@ -157,6 +167,16 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                 />
             </div>
         );
+    }
+    private onMsgSigningExplanationDialogOpen(): void {
+        this.setState({
+            isMsgSigningExplanationDialogOpen: true,
+        });
+    }
+    private onMsgSigningExplanationDialogClose(): void {
+        this.setState({
+            isMsgSigningExplanationDialogOpen: false,
+        });
     }
     private renderUserAddress() {
         const userAddress = this.props.userAddress;

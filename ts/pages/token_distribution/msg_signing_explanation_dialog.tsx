@@ -6,46 +6,36 @@ import {Blockchain} from 'ts/blockchain';
 
 const ETH_SIGN_DOCS_LINK = 'https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign';
 
-export interface MsgSigningExplanationProps {
+export interface MsgSigningExplanationDialogProps {
     getPersonalMessageHashHex: (msg: string) => string;
+    isOpen: boolean;
+    handleClose: () => void;
     msg: string;
 }
 
-interface MsgSigningExplanationState {
-    isOpen: boolean;
-}
+interface MsgSigningExplanationDialogState {}
 
-export class MsgSigningExplanation extends React.Component<MsgSigningExplanationProps, MsgSigningExplanationState> {
-    constructor(props: MsgSigningExplanationProps) {
-        super(props);
-        this.state = {
-            isOpen: false,
-        };
-    }
+export class MsgSigningExplanationDialog
+    extends React.Component<MsgSigningExplanationDialogProps, MsgSigningExplanationDialogState> {
     public render() {
         const actions = [
             <FlatButton
                 label="OK"
                 primary={true}
-                onTouchTap={this.handleClose.bind(this)}
+                onTouchTap={this.props.handleClose.bind(this)}
             />,
         ];
 
         return (
-          <div className="inline-block">
-            <div className="underline inline-block" onClick={this.handleOpen.bind(this)}>
-                {this.props.children}
-            </div>
             <Dialog
-              title="Message signing explanation"
-              actions={actions}
-              modal={false}
-              open={this.state.isOpen}
-              onRequestClose={this.handleClose.bind(this)}
+                title="Message signing explanation"
+                actions={actions}
+                modal={false}
+                open={this.props.isOpen}
+                onRequestClose={this.props.handleClose.bind(this)}
             >
               {this.renderExplanation()}
             </Dialog>
-          </div>
         );
     }
     private renderExplanation() {
@@ -74,15 +64,5 @@ export class MsgSigningExplanation extends React.Component<MsgSigningExplanation
                 </div>
             </div>
         );
-    }
-    private handleOpen(): void {
-        this.setState({
-            isOpen: true,
-        });
-    }
-    private handleClose(): void {
-        this.setState({
-            isOpen: false,
-        });
     }
 }
