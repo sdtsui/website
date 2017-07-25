@@ -65,7 +65,6 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
         const labelLeft = this.props.injectedProviderName !== constants.PUBLIC_PROVIDER_NAME ?
                           this.props.injectedProviderName :
                           'Injected Web3';
-        const civicuserIdHashHex = this.getCivicUserIdHashHex(this.props.civicUserId);
         return (
             <div className="mx-auto left-align sm-px2" style={{maxWidth: 489}}>
                 {!this.props.blockchainIsLoaded ?
