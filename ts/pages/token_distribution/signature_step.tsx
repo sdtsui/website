@@ -82,14 +82,14 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                             <div className="inline-block">
                                 <div
                                     className="underline inline-block"
-                                    onClick={this.onMsgSigningExplanationDialogOpen.bind(this)}
+                                    onClick={this.toggleMsgSigningDialog.bind(this, true)}
                                 >
                                     message
                                 </div>
                                 <MsgSigningExplanationDialog
                                     getPersonalMessageHashHex={this.props.blockchain.getPersonalMessageHashHex}
                                     isOpen={this.state.isMsgSigningExplanationDialogOpen}
-                                    handleClose={this.onMsgSigningExplanationDialogClose.bind(this)}
+                                    handleClose={this.toggleMsgSigningDialog.bind(this, false)}
                                     msg={'0x' + this.props.civicUserId}
                                 />
                             </div>
@@ -168,14 +168,9 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
             </div>
         );
     }
-    private onMsgSigningExplanationDialogOpen(): void {
+    private toggleMsgSigningDialog(isOpen: boolean): void {
         this.setState({
-            isMsgSigningExplanationDialogOpen: true,
-        });
-    }
-    private onMsgSigningExplanationDialogClose(): void {
-        this.setState({
-            isMsgSigningExplanationDialogOpen: false,
+            isMsgSigningExplanationDialogOpen: isOpen,
         });
     }
     private renderUserAddress() {
