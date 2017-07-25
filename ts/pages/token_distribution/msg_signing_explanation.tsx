@@ -12,14 +12,14 @@ export interface MsgSigningExplanationProps {
 }
 
 interface MsgSigningExplanationState {
-    isOpened: boolean;
+    isOpen: boolean;
 }
 
 export class MsgSigningExplanation extends React.Component<MsgSigningExplanationProps, MsgSigningExplanationState> {
     constructor(props: MsgSigningExplanationProps) {
         super(props);
         this.state = {
-            isOpened: false,
+            isOpen: false,
         };
     }
     public render() {
@@ -40,7 +40,7 @@ export class MsgSigningExplanation extends React.Component<MsgSigningExplanation
               title="Message signing explanation"
               actions={actions}
               modal={false}
-              open={this.state.isOpened}
+              open={this.state.isOpen}
               onRequestClose={this.handleClose.bind(this)}
             >
               {this.renderExplanation()}
@@ -77,12 +77,12 @@ export class MsgSigningExplanation extends React.Component<MsgSigningExplanation
     }
     private handleOpen(): void {
         this.setState({
-            isOpened: true,
+            isOpen: true,
         });
     }
     private handleClose(): void {
         this.setState({
-            isOpened: false,
+            isOpen: false,
         });
     }
 }
