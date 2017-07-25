@@ -55,7 +55,7 @@ export class MsgSigningExplanationDialog
                     {this.props.msg}
                 </div>
                 <div className="my1 pt1 left-align" style={{fontSize: 20}}>
-                    <a className="underline" href={ETH_SIGN_DOCS_LINK} target="_blanc">
+                    <a className="underline" href={ETH_SIGN_DOCS_LINK} target="_blank">
                         Ethereum specific
                     </a> message hash:
                 </div>
