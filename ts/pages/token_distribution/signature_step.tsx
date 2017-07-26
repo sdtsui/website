@@ -77,22 +77,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                         </div>
                         <div className="pt2" style={{lineHeight: 1.5}}>
                             In order to register a contribution address, you must prove ownership by
-                            signing a {' '}
-                            <div className="inline-block">
-                                <div
-                                    className="underline inline-block"
-                                    onClick={this.toggleMsgSigningDialog.bind(this, true)}
-                                >
-                                    message
-                                </div>
-                                <MsgSigningExplanationDialog
-                                    getPersonalMessageHashHex={this.props.blockchain.getPersonalMessageHashHex}
-                                    isOpen={this.state.isMsgSigningExplanationDialogOpen}
-                                    handleClose={this.toggleMsgSigningDialog.bind(this, false)}
-                                    msg={`0x${this.props.civicUserId}`}
-                                />
-                            </div>
-                            {' '} with the corresponding private key.
+                            signing a message with the corresponding private key.
                         </div>
 
                         <div className="pt2 pb2">
@@ -150,6 +135,19 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                                     onClickAsyncFn={this.onSignProofAsync.bind(this)}
                                     isDisabled={_.isEmpty(this.props.userAddress)}
                                 />
+                                <div
+                                    className="pt2"
+                                    style={{color: 'lightgray', fontSize: 13}}
+                                >
+                                    You can follow{' '}
+                                    <span
+                                        className="underline"
+                                        style={{cursor: 'pointer'}}
+                                        onClick={this.toggleMsgSigningDialog.bind(this, true)}
+                                    >
+                                        these steps
+                                    </span> to verify the message you are about to sign.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -163,6 +161,12 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                 <U2fNotSupportedDialog
                     isOpen={this.state.isU2FDialogOpen}
                     onToggleDialog={this.onToggleU2FDialog.bind(this)}
+                />
+                <MsgSigningExplanationDialog
+                    getPersonalMessageHashHex={this.props.blockchain.getPersonalMessageHashHex}
+                    isOpen={this.state.isMsgSigningExplanationDialogOpen}
+                    handleClose={this.toggleMsgSigningDialog.bind(this, false)}
+                    message={`0x${this.props.civicUserId}`}
                 />
             </div>
         );
