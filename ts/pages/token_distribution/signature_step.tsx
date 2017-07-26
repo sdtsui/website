@@ -17,6 +17,7 @@ import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 import {LedgerConfigDialog} from 'ts/components/ledger_config_dialog';
 import {U2fNotSupportedDialog} from 'ts/components/u2f_not_supported_dialog';
 import {Loading} from 'ts/components/ui/loading';
+import {MsgSigningExplanationDialog} from 'ts/pages/token_distribution/msg_signing_explanation_dialog';
 
 const CUSTOM_GRAY = '#635F5E';
 
@@ -35,6 +36,7 @@ interface SignatureStepState {
     didSignatureProofSucceed: boolean;
     isLedgerDialogOpen: boolean;
     isU2FDialogOpen: boolean;
+    isMsgSigningExplanationDialogOpen: boolean;
 }
 
 const styles: Styles = {
@@ -55,6 +57,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
             didSignatureProofSucceed: false,
             isLedgerDialogOpen: false,
             isU2FDialogOpen: false,
+            isMsgSigningExplanationDialogOpen: false,
         };
     }
     public render() {
@@ -76,6 +79,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                             In order to register a contribution address, you must prove ownership by
                             signing a message with the corresponding private key.
                         </div>
+
                         <div className="pt2 pb2">
                             Notice: You cannot use an exchange address (i.e Coinbase, Kraken)
                         </div>
@@ -131,6 +135,19 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                                     onClickAsyncFn={this.onSignProofAsync.bind(this)}
                                     isDisabled={_.isEmpty(this.props.userAddress)}
                                 />
+                                <div
+                                    className="pt2"
+                                    style={{color: 'lightgray', fontSize: 13}}
+                                >
+                                    You can follow{' '}
+                                    <span
+                                        className="underline"
+                                        style={{cursor: 'pointer'}}
+                                        onClick={this.toggleMsgSigningDialog.bind(this, true)}
+                                    >
+                                        these steps
+                                    </span> to verify the message you are about to sign.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -145,8 +162,19 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                     isOpen={this.state.isU2FDialogOpen}
                     onToggleDialog={this.onToggleU2FDialog.bind(this)}
                 />
+                <MsgSigningExplanationDialog
+                    getPersonalMessageHashHex={this.props.blockchain.getPersonalMessageHashHex}
+                    isOpen={this.state.isMsgSigningExplanationDialogOpen}
+                    handleClose={this.toggleMsgSigningDialog.bind(this, false)}
+                    message={`0x${this.props.civicUserId}`}
+                />
             </div>
         );
+    }
+    private toggleMsgSigningDialog(isOpen: boolean): void {
+        this.setState({
+            isMsgSigningExplanationDialogOpen: isOpen,
+        });
     }
     private renderUserAddress() {
         const userAddress = this.props.userAddress;
@@ -226,10 +254,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
     private async onSignProofAsync() {
         let signatureData;
         try {
-            // ethUtil.sha3 is a misnomer. It's actually Keccak256.
-            const civicUserIdHashBuff = ethUtil.sha3(this.props.civicUserId);
-            const civicUserIdHashHex = ethUtil.bufferToHex(civicUserIdHashBuff);
-            signatureData = await this.props.blockchain.sendSignRequestAsync(civicUserIdHashHex);
+            signatureData = await this.props.blockchain.sendSignRequestAsync(`0x${this.props.civicUserId}`);
         } catch (err) {
             const errMsg = `${err}`;
             if (utils.didUserDenyWeb3Request(errMsg)) {
