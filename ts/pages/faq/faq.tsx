@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import * as DocumentTitle from 'react-document-title';
 import RaisedButton from 'material-ui/RaisedButton';
 import {colors} from 'material-ui/styles';
 import {Styles, FAQSection, FAQQuestion} from 'ts/types';
@@ -318,10 +319,10 @@ const sections: FAQSection[] = [
                         </div>
                         <div className="py1">
                             <div className="bold pb1">
-                                Early Investors & Advisors (10%)
+                                Early Backers & Advisors (10%)
                             </div>
                             <div>
-                                Our investors and advisors have provided capital, resources and guidance
+                                Our backers and advisors have provided capital, resources and guidance
                                 that have allowed us to fill out our team, setup a robust legal entity
                                 and build a fully functional product before launching a token. As a result,
                                 we have a proven track record and can offer a token that holds genuine utility.
@@ -445,6 +446,7 @@ export class FAQ extends React.Component<FAQProps, FAQState> {
     public render() {
         return (
             <div>
+                <DocumentTitle title="0x FAQ"/>
                 <TopBar
                     blockchainIsLoaded={false}
                     location={this.props.location}

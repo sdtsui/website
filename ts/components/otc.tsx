@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import * as DocumentTitle from 'react-document-title';
 import {Switch, Route} from 'react-router-dom';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {State} from 'ts/redux/reducer';
@@ -144,6 +145,7 @@ export class OTC extends React.Component<OTCAllProps, OTCAllState> {
         };
         return (
             <div style={otcStyle}>
+                <DocumentTitle title="OTC DApp"/>
                 <TopBar
                     userAddress={this.props.userAddress}
                     blockchainIsLoaded={this.props.blockchainIsLoaded}

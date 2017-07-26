@@ -20,7 +20,7 @@ import {TeamAndAdvisors} from 'ts/pages/home/team_and_advisors';
 import {Partnerships} from 'ts/pages/home/partnerships';
 import ReactTooltip = require('react-tooltip');
 
-const investorsRow1: Partner[] = [
+const backersRow1: Partner[] = [
     {
         name: 'Polychain Capital',
         logo: '/images/logos/polychain_capital.png',
@@ -38,7 +38,7 @@ const investorsRow1: Partner[] = [
     },
 ];
 
-const investorsRow2: Partner[] = [
+const backersRow2: Partner[] = [
     {
         name: 'Jen Advisors',
         logo: '/images/logos/jen_advisors.png',
@@ -187,21 +187,20 @@ export class Home extends React.Component<HomeProps, HomeState> {
                             style={{maxWidth: 750, ...styles.paragraph}}
                         >
                             <p>
-                                The Ethereum blockchain has become host to a{' '}
+                                The Ethereum blockchain has become host to a variety of{' '}
                                 <a href="https://etherscan.io/tokens" target="_blank">
                                     variety of digital assets
                                 </a>, with{' '}
                                 <a href="https://www.icoalert.com/" target="_blank">
                                     more being created every month
-                                </a>. Soon, thousands of assets will be tokenized and moved onto this{' '}
-                                open financial network including traditional securities, currencies and{' '}
-                                scarce digital goods.{' '}
+                                </a>. Soon, thousands of assets will be tokenized and moved onto this
+                                open financial network.
                             </p>
                             <p>
-                                As the token space continues to develop, the need{' '}
-                                to exchange these assets will be compounded. 0x protocol will act as a{' '}
-                                critical piece of infrastructure for the token economy, allowing Ethereum{' '}
-                                smart contracts to programmatically and seamlessly exchange Ethereum-based assets.{' '}
+                                As the token space continues to develop, the need to exchange these{' '}
+                                assets will be compounded. 0x protocol will act as a critical piece of{' '}
+                                infrastructure for the token economy, allowing Ethereum smart contracts{' '}
+                                to programmatically and seamlessly exchange Ethereum-based assets.
                             </p>
                         </div>
                         <div className="lg-py4 md-py4 sm-py2" />
@@ -220,7 +219,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
                 <div style={{backgroundColor: 'white'}}>
                     <div className="mx-auto max-width-4 pb4">
                         <h1
-                            id="investors"
+                            id="backers"
                             className="pt4 sm-center md-pl3 lg-pl0 thin"
                             style={{...styles.subheader}}
                         >
@@ -228,11 +227,11 @@ export class Home extends React.Component<HomeProps, HomeState> {
                         </h1>
                         <div className="pt4 mx-auto md-pl3 lg-pl0">
                             <div className="clearfix center">
-                                {this.renderPartners(investorsRow1)}
+                                {this.renderPartners(backersRow1)}
                             </div>
                             <div className="mx-auto">
                                 <div className="clearfix pt2 center">
-                                    {this.renderPartners(investorsRow2)}
+                                    {this.renderPartners(backersRow2)}
                                 </div>
                             </div>
                         </div>

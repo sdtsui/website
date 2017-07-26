@@ -10,8 +10,8 @@ const teamRow1: ProfileInfo[] = [
     {
         name: 'Will Warren',
         title: 'Co-founder & CEO',
-        description: `Smart contract R&D. Previously applied physics research and simulations at Los
-                      Alamos National Laboratory. Mechanical engineering at UC San Diego. PhD dropout.`,
+        description: `Smart contract R&D. Previously applied physics research at Los Alamos National
+                      Laboratory. Mechanical engineering at UC San Diego. PhD dropout.`,
         image: '/images/team/will.jpg',
         linkedIn: 'https://www.linkedin.com/in/will-warren-92aab62b/',
         github: 'https://github.com/willwarren89',
@@ -20,8 +20,8 @@ const teamRow1: ProfileInfo[] = [
     {
         name: 'Amir Bandeali',
         title: 'Co-founder & CTO',
-        description: `Full-stack web application & smart contract dev. Former fixed income trader at
-                      DRW and online poker professional. Finance at University of Illinois, Urbana-Champaign.`,
+        description: `Smart contract R&D. Former fixed income trader at DRW.
+                      Finance at University of Illinois, Urbana-Champaign.`,
         image: '/images/team/amir.jpeg',
         linkedIn: 'https://www.linkedin.com/in/abandeali1/',
         github: 'https://github.com/abandeali1',
@@ -30,7 +30,7 @@ const teamRow1: ProfileInfo[] = [
     {
         name: 'Fabio Berger',
         title: 'Senior Engineer',
-        description: `Blockchain engineer with extensive full-stack and devOps experience. Previously
+        description: `Blockchain engineer with extensive full-stack and DevOps experience. Previously
                       software engineer at Airtable and founder of WealthLift. Computer science at Duke.`,
         image: '/images/team/fabio.jpg',
         linkedIn: 'https://www.linkedin.com/in/fabio-berger-03ab261a/',
@@ -54,7 +54,7 @@ const teamRow2: ProfileInfo[] = [
     {
         name: 'Alex Xu',
         title: 'Director of Operations',
-        description: `End-to-end business operations. Previously digital marketing consultant at
+        description: `End-to-end business operations & strategy. Previously digital marketing consultant at
                       Google and vendor management at Amazon. Economics at UC San Diego.`,
         image: '/images/team/alex.jpg',
         linkedIn: 'https://www.linkedin.com/in/alex-xu/',
@@ -62,12 +62,12 @@ const teamRow2: ProfileInfo[] = [
         medium: '',
     },
     {
-        name: 'We\'re hiring',
-        title: 'Designer/UI/UX/Blockchain Engineer',
-        description: `We are looking for talented, self-starters who are passionate about decentralization
-                      to join the team! Apply at jobs@0xproject.com`,
-        image: '/images/team/anyone.png',
-        linkedIn: 'https://www.linkedin.com/company-beta/17942619/',
+        name: 'Ben Burns',
+        title: 'Designer',
+        description: `Product, motion, and graphic designer. Previously designer at Airtable and Apple.
+                      Digital Design at University of Cincinnati.`,
+        image: '/images/team/ben.jpg',
+        linkedIn: 'https://www.linkedin.com/in/ben-burns-30170478/',
         github: '',
         medium: '',
     },
@@ -94,7 +94,7 @@ const advisors: ProfileInfo[] = [
     {
         name: 'Joey Krug',
         title: 'Advisor',
-        description: `Founder of Augur. Computer Science at Pomona College dropout.
+        description: `Co-CIO at Pantera Capital. Founder of Augur.
                       Thiel Fellowship 20 Under 20 Fellow.`,
         image: '/images/advisors/joey.jpg',
         linkedIn: 'https://www.linkedin.com/in/joeykrug/',
