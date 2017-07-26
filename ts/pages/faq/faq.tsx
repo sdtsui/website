@@ -319,10 +319,10 @@ const sections: FAQSection[] = [
                         </div>
                         <div className="py1">
                             <div className="bold pb1">
-                                Early Investors & Advisors (10%)
+                                Early Backers & Advisors (10%)
                             </div>
                             <div>
-                                Our investors and advisors have provided capital, resources and guidance
+                                Our backers and advisors have provided capital, resources and guidance
                                 that have allowed us to fill out our team, setup a robust legal entity
                                 and build a fully functional product before launching a token. As a result,
                                 we have a proven track record and can offer a token that holds genuine utility.

@@ -20,7 +20,7 @@ import {TeamAndAdvisors} from 'ts/pages/home/team_and_advisors';
 import {Partnerships} from 'ts/pages/home/partnerships';
 import ReactTooltip = require('react-tooltip');
 
-const investorsRow1: Partner[] = [
+const backersRow1: Partner[] = [
     {
         name: 'Polychain Capital',
         logo: '/images/logos/polychain_capital.png',
@@ -38,7 +38,7 @@ const investorsRow1: Partner[] = [
     },
 ];
 
-const investorsRow2: Partner[] = [
+const backersRow2: Partner[] = [
     {
         name: 'Jen Advisors',
         logo: '/images/logos/jen_advisors.png',
@@ -219,7 +219,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
                 <div style={{backgroundColor: 'white'}}>
                     <div className="mx-auto max-width-4 pb4">
                         <h1
-                            id="investors"
+                            id="backers"
                             className="pt4 sm-center md-pl3 lg-pl0 thin"
                             style={{...styles.subheader}}
                         >
@@ -227,11 +227,11 @@ export class Home extends React.Component<HomeProps, HomeState> {
                         </h1>
                         <div className="pt4 mx-auto md-pl3 lg-pl0">
                             <div className="clearfix center">
-                                {this.renderPartners(investorsRow1)}
+                                {this.renderPartners(backersRow1)}
                             </div>
                             <div className="mx-auto">
                                 <div className="clearfix pt2 center">
-                                    {this.renderPartners(investorsRow2)}
+                                    {this.renderPartners(backersRow2)}
                                 </div>
                             </div>
                         </div>

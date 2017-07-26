@@ -28,7 +28,7 @@ const distributionEntities = [
     },
     {
         percentage: '10%',
-        recipient: 'Early investors & advisors',
+        recipient: 'Early backers & advisors',
         color: '#00953f',
     },
 ];
