@@ -468,7 +468,6 @@ export class Blockchain {
             tokenAddress,
             name,
             symbol,
-            url,
             decimals,
         ] = tokenData[1];
         // HACK: For now we have a hard-coded list of iconUrls for the dummyTokens
