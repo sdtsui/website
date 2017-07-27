@@ -7,7 +7,7 @@ const SHOW_DURATION_MS = 4000;
 
 interface FlashMessageProps {
     dispatcher: Dispatcher;
-    flashMessage?: string;
+    flashMessage?: string|React.ReactNode;
     showDurationMs?: number;
     bodyStyle?: React.CSSProperties;
 }

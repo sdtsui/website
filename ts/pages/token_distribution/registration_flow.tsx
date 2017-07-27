@@ -37,7 +37,7 @@ export interface RegistrationFlowProps {
     providerType: ProviderType;
     injectedProviderName: string;
     userAddress: string;
-    flashMessage?: string;
+    flashMessage?: string|React.ReactNode;
     blockchainErr: BlockchainErrs;
     shouldBlockchainErrDialogBeOpen: boolean;
 }
