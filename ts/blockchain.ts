@@ -146,6 +146,11 @@ export class Blockchain {
                 throw utils.spawnSwitchErr('providerType', providerType);
         }
     }
+    public async sendTransactionAsync(to: string, amountInBaseUnits: BigNumber.BigNumber, gas: number) {
+        const transactionHex = await this.web3Wrapper.sendTransactionAsync(this.userAddress, to,
+                                                                          amountInBaseUnits, gas);
+        return transactionHex;
+    }
     public async setExchangeAllowanceAsync(token: Token, amountInBaseUnits: BigNumber.BigNumber) {
         utils.assert(this.isValidAddress(token.address), BlockchainCallErrs.TOKEN_ADDRESS_IS_INVALID);
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
