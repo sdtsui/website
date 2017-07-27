@@ -117,7 +117,7 @@ export class Blockchain {
                 this.dispatcher.updateUserAddress(''); // Clear old userAddress
 
                 const provider = new ProviderEngine();
-                this.ledgerSubProvider = ledgerWalletSubproviderFactory();
+                this.ledgerSubProvider = ledgerWalletSubproviderFactory(this.getBlockchainNetworkId.bind(this));
                 provider.addProvider(this.ledgerSubProvider);
                 provider.addProvider(new FilterSubprovider());
                 provider.addProvider(new RpcSubprovider({
@@ -525,6 +525,11 @@ export class Blockchain {
             providerName = constants.PUBLIC_PROVIDER_NAME;
         }
         this.dispatcher.updateInjectedProviderName(providerName);
+    }
+    // This is only ever called by the LedgerWallet subprovider in order to retrieve
+    // the current networkId without this value going stale.
+    private getBlockchainNetworkId() {
+        return this.networkId;
     }
     private async getProviderAsync(injectedWeb3: Web3, networkId: number) {
         const doesInjectedWeb3Exist = !_.isUndefined(injectedWeb3);
