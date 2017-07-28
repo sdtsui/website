@@ -97,7 +97,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                             >
                                 <div className="col col-6 center">
                                     <div>
-                                        address connected via a Web3 instance
+                                        address connected via Web3
                                     </div>
                                     <div>
                                         (i.e{' '}

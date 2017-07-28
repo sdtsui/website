@@ -63,7 +63,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             appId: constants.CIVIC_APP_ID,
         });
         this.state = {
-            stepIndex: RegistrationFlowSteps.ACCEPT_TERMS_AND_CONDITIONS,
+            stepIndex: RegistrationFlowSteps.REGISTRATION_COMPLETE,
             civicUserId: undefined,
             isVerifyingIdentity: false,
             prevNetworkId: this.props.networkId,
@@ -177,7 +177,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                     dispatcher={this.props.dispatcher}
                     flashMessage={this.props.flashMessage}
                     showDurationMs={10000}
-                    bodyStyle={{backgroundColor: colors.cyanA700}}
+                    bodyStyle={{backgroundColor: constants.CUSTOM_BLUE}}
                 />
                 <Footer />
             </div>

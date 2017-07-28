@@ -31,12 +31,14 @@ import {Web3Wrapper} from 'ts/web3_wrapper';
 import {errorReporter} from 'ts/utils/error_reporter';
 import {tradeHistoryStorage} from 'ts/local_storage/trade_history_storage';
 import {customTokenStorage} from 'ts/local_storage/custom_token_storage';
-import * as ProxyArtifacts from '../contracts/Proxy.json';
+import * as ProxyTokenTransferArtifacts from '../contracts/TokenTransferProxy.json';
 import * as ExchangeArtifacts from '../contracts/Exchange.json';
 import * as TokenRegistryArtifacts from '../contracts/TokenRegistry.json';
 import * as TokenArtifacts from '../contracts/Token.json';
 import * as MintableArtifacts from '../contracts/Mintable.json';
 import * as EtherTokenArtifacts from '../contracts/EtherToken.json';
+import * as TokenSaleArtifacts from '../contracts/TokenSale.json';
+import * as ZRXTokenArtifacts from '../contracts/ZRXToken.json';
 
 const ALLOWANCE_TO_ZERO_GAS_AMOUNT = 45730;
 
@@ -45,6 +47,8 @@ export class Blockchain {
     public nodeVersion: string;
     private dispatcher: Dispatcher;
     private web3Wrapper: Web3Wrapper;
+    private zrxToken: ContractInstance;
+    private tokenSale: ContractInstance;
     private exchange: ContractInstance;
     private exchangeLogFillEvents: any[];
     private proxy: ContractInstance;
@@ -146,9 +150,48 @@ export class Blockchain {
                 throw utils.spawnSwitchErr('providerType', providerType);
         }
     }
+    public getTokenSaleAddress(): string {
+      utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not be instantiated yet');
+
+      return this.tokenSale.address;
+    }
+    public async getTokenSaleOrderHashAsync(): Promise<string> {
+      utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not be instantiated yet');
+
+      const orderHash = await this.tokenSale.getOrderHash.call();
+      return orderHash;
+    }
+    public async getTokenSaleExchangeRateAsync(): Promise<BigNumber.BigNumber> {
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not be instantiated yet');
+
+        const makerTokenAmount = await this.tokenSale.getOrderMakerTokenAmount.call();
+        const takerTokenAmount = await this.tokenSale.getOrderTakerTokenAmount.call();
+        const zrxToEthExchangeRate = makerTokenAmount.div(takerTokenAmount);
+        return zrxToEthExchangeRate;
+    }
+    public async tokenSaleFillOrderWithEthAsync(amountInBaseUnits: BigNumber.BigNumber) {
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not be instantiated yet');
+
+        // const gas = await this.tokenSale.fillOrderWithEth.estimateGas({
+        //     value: amountInBaseUnits,
+        // });
+        // console.log('gas', gas);
+        const isRegistered = await this.tokenSale.registered.call(this.userAddress);
+        if (!isRegistered) {
+            throw new Error('ADDRESS_NOT_REGISTERED');
+        }
+
+        const response = await this.tokenSale.fillOrderWithEth({
+            value: amountInBaseUnits,
+            gas: constants.TOKEN_SALE_GAS_AMOUNT,
+            from: this.userAddress,
+        });
+        console.log('response', response);
+        return response;
+    }
     public async sendTransactionAsync(to: string, amountInBaseUnits: BigNumber.BigNumber, gas: number) {
         const transactionHex = await this.web3Wrapper.sendTransactionAsync(this.userAddress, to,
-                                                                          amountInBaseUnits, gas);
+                                                                           amountInBaseUnits, gas);
         return transactionHex;
     }
     public async setExchangeAllowanceAsync(token: Token, amountInBaseUnits: BigNumber.BigNumber) {
@@ -586,13 +629,21 @@ export class Blockchain {
         this.dispatcher.updateBlockchainIsLoaded(false);
         try {
             const contractsPromises = _.map(
-                [ExchangeArtifacts, TokenRegistryArtifacts, ProxyArtifacts],
+                [
+                  ExchangeArtifacts,
+                  TokenRegistryArtifacts,
+                  ProxyTokenTransferArtifacts,
+                  TokenSaleArtifacts,
+                  ZRXTokenArtifacts,
+                ],
                 (artifacts: any) => this.instantiateContractIfExistsAsync(artifacts),
             );
             const contracts = await Promise.all(contractsPromises);
             this.exchange = contracts[0];
             this.tokenRegistry = contracts[1];
             this.proxy = contracts[2];
+            this.tokenSale = contracts[3];
+            this.zrxToken = contracts[4];
         } catch (err) {
             const errMsg = err + '';
             if (_.includes(errMsg, BlockchainCallErrs.CONTRACT_DOES_NOT_EXIST)) {

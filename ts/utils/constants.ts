@@ -9,6 +9,7 @@ export const constants = {
     BITLY_ACCESS_TOKEN: 'ffc4c1a31e5143848fb7c523b39f91b9b213d208',
     BITLY_ENDPOINT: 'https://api-ssl.bitly.com',
     CIVIC_APP_ID: 'H1dfQuJEb',
+    CUSTOM_BLUE: '#60a4f4',
     DEFAULT_TOKEN_ICON_URL: '/images/token_icons/default.png',
     DEFAULT_DERIVATION_PATH: `44'/60'/0'`,
     ETHER_FAUCET_ENDPOINT: 'https://faucet.0xproject.com/rain',
@@ -101,4 +102,7 @@ export const constants = {
         'ApprovalContractEventArgs',
         'TokenContractEventArgs',
     ],
+    // Crowdsale constants
+    TOKEN_SALE_GAS_AMOUNT: 150000,
+    TOTAL_ZRX_SUPPLY: 500000000,
 };

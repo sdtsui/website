@@ -7,23 +7,19 @@ import {Styles} from 'ts/types';
 
 const MIN_ADDRESS_WIDTH = 70;
 
-const styles: Styles = {
-    address: {
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-    },
-};
-
 interface PartyProps {
     label: string;
     address: string;
     identiconDiameter: number;
+    identiconStyle?: React.CSSProperties;
 }
 
 interface PartyState {}
 
 export class Party extends React.Component<PartyProps, PartyState> {
+    public static defaultProps: Partial<PartyProps> = {
+        identiconStyle: {},
+    };
     public render() {
         const label = this.props.label;
         const address = this.props.address;
@@ -31,16 +27,17 @@ export class Party extends React.Component<PartyProps, PartyState> {
         const identiconDiameter = this.props.identiconDiameter;
         const addressWidth = identiconDiameter > MIN_ADDRESS_WIDTH ?
                              identiconDiameter : MIN_ADDRESS_WIDTH;
+        const addressEnds = `${address.substring(0, 6)}...${address.substr(-4)}`;
         return (
             <div style={{overflow: 'hidden'}}>
                 <div className="pb1 center">{label}</div>
                 <Identicon
                     address={this.props.address}
                     diameter={identiconDiameter}
+                    style={this.props.identiconStyle}
                 />
                 <div
                     className="mx-auto center pt1"
-                    style={{...styles.address, width: addressWidth}}
                 >
                     {!_.isEmpty(address) &&
                         <div className="pr1 inline">
@@ -49,10 +46,11 @@ export class Party extends React.Component<PartyProps, PartyState> {
                     }
                     <div
                         className="inline"
+                        style={{fontSize: 13}}
                         data-tip={true}
                         data-for={tooltipId}
                     >
-                        {!_.isEmpty(address) ? address : 'Anybody'}
+                        {!_.isEmpty(address) ? addressEnds : 'Anybody'}
                     </div>
                 </div>
                 {!_.isEmpty(address) && <ReactTooltip id={tooltipId}>{address}</ReactTooltip>}

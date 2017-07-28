@@ -75,8 +75,8 @@ export class Web3Wrapper {
         return timestamp;
     }
     public async sendTransactionAsync(from: string, to: string,
-                                     amountInBaseUnits: BigNumber.BigNumber,
-                                     gas: number): Promise<string> {
+                                      amountInBaseUnits: BigNumber.BigNumber,
+                                      gas: number): Promise<string> {
         const transactionHex = await promisify(this.web3.eth.sendTransaction)({
             from,
             to,

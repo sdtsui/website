@@ -24,7 +24,7 @@ export class EthAmountInput extends React.Component<EthAmountInputProps, EthAmou
             ZeroEx.toUnitAmount(this.props.amount, constants.ETH_DECIMAL_PLACES) :
             undefined;
         return (
-            <div className="flex overflow-hidden" style={{height: 84}}>
+            <div className="flex overflow-hidden" style={{height: 63}}>
                 <BalanceBoundedInput
                     label={this.props.label}
                     balance={this.props.balance}
