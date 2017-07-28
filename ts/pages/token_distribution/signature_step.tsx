@@ -7,6 +7,7 @@ import {Blockchain} from 'ts/blockchain';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {errorReporter} from 'ts/utils/error_reporter';
 import {utils} from 'ts/utils/utils';
+import {configs} from 'ts/utils/configs';
 import {constants} from 'ts/utils/constants';
 import {InputLabel} from 'ts/components/ui/input_label';
 import {RequiredLabel} from 'ts/components/ui/required_label';
@@ -273,7 +274,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
             civicUserId: this.props.civicUserId,
             signatureData,
         });
-        const response = await fetch(`${constants.BACKEND_BASE_URL}/signature_proof`, {
+        const response = await fetch(`${configs.BACKEND_BASE_URL}/signature_proof`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

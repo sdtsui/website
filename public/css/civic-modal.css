@@ -117,7 +117,6 @@ button, input[type="button"], input[type="reset"], input[type="submit"],
 /* line 53, ../sass/civic-styles/base/_typography.scss */
 a {
   color: #3ab03e;
-  text-decoration: none;
   transition: color 0.25s ease;
 }
 /* line 204, ../sass/modals/_informant.scss */

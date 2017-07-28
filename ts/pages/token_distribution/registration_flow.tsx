@@ -5,7 +5,7 @@ import Paper from 'material-ui/Paper';
 import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
 import {Blockchain} from 'ts/blockchain';
 import {ipUtils} from 'ts/utils/ip_utils';
-import {constants} from 'ts/utils/constants';
+import {configs} from 'ts/utils/configs';
 import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
 import {ContributionAmountStep} from 'ts/pages/token_distribution/contribution_amount_step';
@@ -60,7 +60,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
     constructor(props: RegistrationFlowProps) {
         super(props);
         this.civicSip = new (global as any).civic.sip({
-            appId: constants.CIVIC_APP_ID,
+            appId: configs.CIVIC_APP_ID,
         });
         this.state = {
             stepIndex: RegistrationFlowSteps.ACCEPT_TERMS_AND_CONDITIONS,
@@ -372,7 +372,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         const body = JSON.stringify({
             jwtToken,
         });
-        const response = await fetch(`${constants.BACKEND_BASE_URL}/civic_auth`, {
+        const response = await fetch(`${configs.BACKEND_BASE_URL}/civic_auth`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
