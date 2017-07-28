@@ -30,6 +30,7 @@
     "ethereumjs-abi": "^0.6.4",
     "ethereumjs-util": "^5.1.1",
     "find-versions": "^2.0.0",
+    "is-mobile": "^0.2.2",
     "jsonschema": "^1.1.1",
     "ledgerco": "0xProject/ledger-node-js-api",
     "less": "^2.7.2",

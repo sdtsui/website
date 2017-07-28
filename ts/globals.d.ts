@@ -123,3 +123,9 @@ declare function blockies(config: BlockiesConfig): BlockiesIcon;
 declare module 'blockies' {
     export = blockies;
 }
+
+// is-mobile declarations
+declare function isMobile(): boolean;
+declare module 'is-mobile' {
+    export = isMobile;
+}
