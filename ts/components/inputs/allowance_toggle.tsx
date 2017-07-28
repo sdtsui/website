@@ -9,7 +9,7 @@ import {Token, BalanceErrs} from 'ts/types';
 import {utils} from 'ts/utils/utils';
 import {errorReporter} from 'ts/utils/error_reporter';
 
-const DEFAULT_ALLOWANCE_AMOUNT_IN_UNITS = 1000000;
+const DEFAULT_ALLOWANCE_AMOUNT_IN_UNITS = 1000000000;
 
 interface AllowanceToggleProps {
     blockchain: Blockchain;
