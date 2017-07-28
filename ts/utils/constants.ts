@@ -11,7 +11,6 @@ export const constants = {
     CIVIC_APP_ID: 'H1dfQuJEb',
     DEFAULT_TOKEN_ICON_URL: '/images/token_icons/default.png',
     DEFAULT_DERIVATION_PATH: `44'/60'/0'`,
-    ETHER_SCAN_ENDPOINT: 'https://kovan.etherscan.io',
     ETHER_FAUCET_ENDPOINT: 'https://faucet.0xproject.com/rain',
     FEE_RECIPIENT_ADDRESS: '0x0000000000000000000000000000000000000000',
     FIREFOX_U2F_ADDON: 'https://addons.mozilla.org/en-US/firefox/addon/u2f-support-add-on/',
