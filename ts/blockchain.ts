@@ -151,18 +151,18 @@ export class Blockchain {
         }
     }
     public getTokenSaleAddress(): string {
-      utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not be instantiated yet');
+      utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
 
       return this.tokenSale.address;
     }
     public async getTokenSaleOrderHashAsync(): Promise<string> {
-      utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not be instantiated yet');
+      utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
 
       const orderHash = await this.tokenSale.getOrderHash.call();
       return orderHash;
     }
     public async getTokenSaleExchangeRateAsync(): Promise<BigNumber.BigNumber> {
-        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not be instantiated yet');
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
 
         const makerTokenAmount = await this.tokenSale.getOrderMakerTokenAmount.call();
         const takerTokenAmount = await this.tokenSale.getOrderTakerTokenAmount.call();
@@ -170,12 +170,12 @@ export class Blockchain {
         return zrxToEthExchangeRate;
     }
     public async tokenSaleFillOrderWithEthAsync(amountInBaseUnits: BigNumber.BigNumber) {
-        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not be instantiated yet');
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
 
-        // const gas = await this.tokenSale.fillOrderWithEth.estimateGas({
-        //     value: amountInBaseUnits,
-        // });
-        // console.log('gas', gas);
+        const gas = await this.tokenSale.fillOrderWithEth.estimateGas({
+            value: amountInBaseUnits,
+        });
+        console.log('gas', gas);
         const isRegistered = await this.tokenSale.registered.call(this.userAddress);
         if (!isRegistered) {
             throw new Error('ADDRESS_NOT_REGISTERED');
@@ -183,7 +183,7 @@ export class Blockchain {
 
         const response = await this.tokenSale.fillOrderWithEth({
             value: amountInBaseUnits,
-            gas: constants.TOKEN_SALE_GAS_AMOUNT,
+            gas,
             from: this.userAddress,
         });
         console.log('response', response);
@@ -271,7 +271,8 @@ export class Blockchain {
     }
     public async getFillAmountAsync(orderHash: string): Promise<BigNumber.BigNumber> {
         utils.assert(ZeroEx.isValidOrderHash(orderHash), 'Must be valid orderHash');
-        const fillAmount = await this.exchange.getUnavailableTakerTokenAmount.call(orderHash);
+        const fillAmountOldBigNumber = await this.exchange.getUnavailableTakerTokenAmount.call(orderHash);
+        const fillAmount = new BigNumber(fillAmountOldBigNumber);
         return fillAmount;
     }
     public getExchangeContractAddressIfExists() {

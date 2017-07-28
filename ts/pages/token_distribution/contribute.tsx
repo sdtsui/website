@@ -433,7 +433,8 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
     }
     private async updateTokenSaleInfoFireAndForgetAsync() {
         const orderHash = await this.blockchain.getTokenSaleOrderHashAsync();
-        const ethContributed = await this.blockchain.getFillAmountAsync(orderHash);
+        const ethContributedInWei = await this.blockchain.getFillAmountAsync(orderHash);
+        const ethContributed = ZeroEx.toUnitAmount(ethContributedInWei, 18);
         const zrxToEthExchangeRate = await this.blockchain.getTokenSaleExchangeRateAsync();
         const zrxSold = ethContributed.mul(zrxToEthExchangeRate);
 
