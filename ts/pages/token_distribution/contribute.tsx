@@ -22,29 +22,10 @@ import {Party} from 'ts/components/ui/party';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 import {SaleStats} from 'ts/pages/token_distribution/sale_stats';
 import {Loading} from 'ts/components/ui/loading';
-import {tradeHistoryStorage} from 'ts/local_storage/trade_history_storage';
-
-interface CapInfo {
-    cap: number;
-    startTimestampSec: number;
-}
-const capSchedule: CapInfo[] = [
-    {
-        cap: 12,
-        startTimestampSec: moment().add(3, 'day').valueOf(),
-    },
-    {
-        cap: 24,
-        startTimestampSec: moment().add(6, 'day').valueOf(),
-    },
-    {
-        cap: 1000000,
-        startTimestampSec: moment().add(10, 'day').valueOf(),
-    },
-];
 
 const CUSTOM_GRAY = '#464646';
 const CUSTOM_LIGHT_GRAY = '#BBBBBB';
+const ZRX_ETH_DECIMAL_PLACES = 18;
 
 export interface ContributeProps {
     location: Location;
@@ -55,6 +36,7 @@ export interface ContributeProps {
     providerType: ProviderType;
     injectedProviderName: string;
     userAddress: string;
+    userEtherBalance: BigNumber.BigNumber;
     flashMessage?: string|React.ReactNode;
     blockchainErr: BlockchainErrs;
     shouldBlockchainErrDialogBeOpen: boolean;
@@ -72,10 +54,14 @@ interface ContributeState {
     zrxSold: BigNumber.BigNumber;
     zrxToEthExchangeRate?: BigNumber.BigNumber;
     ethContributedAmount?: BigNumber.BigNumber;
+    baseEthCapPerAddress?: BigNumber.BigNumber;
+    startTimeInSec?: BigNumber.BigNumber;
+    totalZrxSupply: BigNumber.BigNumber;
 }
 
 export class Contribute extends React.Component<ContributeProps, ContributeState> {
     private blockchain: Blockchain;
+    private contributionIntervalId: number;
     constructor(props: ContributeProps) {
         super(props);
         this.state = {
@@ -87,10 +73,19 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             isLedgerDialogOpen: false,
             isU2FDialogOpen: false,
             zrxSold: new BigNumber(0),
+            totalZrxSupply: ZeroEx.toBaseUnitAmount(new BigNumber(500000000), 18),
         };
     }
     public componentWillMount() {
         this.blockchain = new Blockchain(this.props.dispatcher);
+    }
+    public componentDidMount() {
+        this.contributionIntervalId = window.setInterval(() => {
+            this.updateUserContributionAmount();
+        }, 3000);
+    }
+    public componentWillUnmount() {
+        clearInterval(this.contributionIntervalId);
     }
     public componentWillReceiveProps(nextProps: ContributeProps) {
         if (nextProps.networkId !== this.state.prevNetworkId) {
@@ -119,7 +114,6 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         }
         if (nextProps.blockchainIsLoaded && !this.state.prevBlockchainIsLoaded) {
             this.updateTokenSaleInfoFireAndForgetAsync();
-            this.updateUserContributedAmountFireAndForgetAsync();
         }
     }
     public render() {
@@ -170,17 +164,17 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         );
     }
     private renderContributionForm() {
-      const capIndex = this.findCurrentCapIndex();
-      const nextCapInfo = capSchedule[capIndex + 1];
+      const now = moment().unix();
+      const nextPeriodTimestamp = now + constants.CAP_PERIOD_IN_SEC;
+      const capPeriodEndIfExists = this.getCapPeriodEndTimestampIfExists();
       const labelLeft = this.props.injectedProviderName !== constants.PUBLIC_PROVIDER_NAME ?
                         this.props.injectedProviderName :
                         'Injected Web3';
       const isLedgerProvider = this.props.providerType === ProviderType.LEDGER;
       let ZRXAmountToReceive = 0;
       if (!_.isUndefined(this.state.contributionAmountInBaseUnits)) {
-          const contributionETHAmountInUnits = ZeroEx.toUnitAmount(this.state.contributionAmountInBaseUnits, 18);
-          const zrxEquivalentAmount = contributionETHAmountInUnits.mul(this.state.zrxToEthExchangeRate);
-          ZRXAmountToReceive = Math.round(zrxEquivalentAmount.toNumber() * 100000) / 100000;
+          const zrxEquivalentAmount = this.state.contributionAmountInBaseUnits.mul(this.state.zrxToEthExchangeRate);
+          ZRXAmountToReceive = this.formatCurrencyAmount(zrxEquivalentAmount);
       }
       const tokenSaleAddress = this.blockchain.getTokenSaleAddress();
       const etherscanTokenSaleContractUrl = utils.getEtherScanLinkIfExists(tokenSaleAddress,
@@ -189,7 +183,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
       return (
         <div className="clearfix max-width-4 mx-auto" style={{paddingTop: 43, width: '64rem'}}>
             <div className="col col-9">
-                <div className="mx-auto" style={{width: 460}}>
+                <div className="mx-auto" style={{width: 530}}>
                     <div className="h2 pt3">Make a contribution</div>
                     <div className="clearfix pt3">
                         <div className="col col-1">
@@ -291,13 +285,14 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                         <div className="col col-11">
                             <div className="h3">Choose an amount:</div>
                             <div className="clearfix">
-                                <div className="col col-6" style={{maxWidth: 220}}>
+                                <div className="col col-6" style={{maxWidth: 235}}>
                                     <EthAmountInput
                                         amount={this.state.contributionAmountInBaseUnits}
-                                        balance={new BigNumber(Infinity)}
-                                        shouldCheckBalance={false}
+                                        balance={this.props.userEtherBalance}
+                                        shouldCheckBalance={true}
                                         shouldShowIncompleteErrs={false}
                                         onChange={this.onContributionAmountChanged.bind(this)}
+                                        shouldHideVisitBalancesLink={true}
                                     />
                                 </div>
                                 {ZRXAmountToReceive !== 0 &&
@@ -310,7 +305,25 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                 }
                             </div>
                             <div style={{fontSize: 13}}>
-                                {this.renderCapInfo(capIndex)}
+                                <div>
+                                    <div>
+                                        <span style={{color: CUSTOM_LIGHT_GRAY}}>
+                                            current contribution cap:
+                                        </span>{' '}
+                                        <span style={{color: CUSTOM_GRAY}}>
+                                            {this.renderEthCapPerAddress(now)} ETH/participant
+                                        </span>
+                                    </div>
+                                    <div className="pt1">
+                                        <span style={{color: CUSTOM_LIGHT_GRAY}}>
+                                            cap increases to{' '}
+                                            <span style={{color: CUSTOM_GRAY}}>
+                                                {this.renderEthCapPerAddress(nextPeriodTimestamp)} ETH
+                                            </span>{' '}
+                                            {this.renderTimeUntilCapIncrease(capPeriodEndIfExists)}
+                                        </span>
+                                    </div>
+                                </div>
                                 <div className="pt1">
                                     <span style={{color: CUSTOM_LIGHT_GRAY}}>
                                         contributed from your address so far:
@@ -318,7 +331,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                     <span style={{color: CUSTOM_GRAY}}>
                                         {_.isUndefined(this.state.ethContributedAmount) ?
                                             '...' :
-                                            this.state.ethContributedAmount.toString()
+                                            this.formatCurrencyAmount(this.state.ethContributedAmount)
                                         } ETH
                                     </span>
                                 </div>
@@ -355,46 +368,29 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             <div className="col col-3">
                 <div className="pt4">
                     <SaleStats
+                        totalZrxSupply={this.state.totalZrxSupply}
                         zrxSold={this.state.zrxSold}
-                        capTimeRemainingSec={_.isUndefined(nextCapInfo) ? 0 : nextCapInfo.startTimestampSec}
+                        capPeriodEnd={_.isUndefined(capPeriodEndIfExists) ? 0 : capPeriodEndIfExists}
                     />
                 </div>
             </div>
         </div>
       );
     }
-    private renderCapInfo(capIndex: number) {
-        const capInfo = capSchedule[capIndex];
-        const nextCapInfo = capSchedule[capIndex + 1];
-        return (
-            <div>
-                <div>
-                    <span style={{color: CUSTOM_LIGHT_GRAY}}>
-                        current contribution cap:
-                    </span>{' '}
-                    <span style={{color: CUSTOM_GRAY}}>
-                        {capInfo.cap} ETH/participant
-                    </span>
-                </div>
-                {this.renderNextCapInfo(nextCapInfo)}
-            </div>
-        );
-    }
-    private renderNextCapInfo(nextCapInfo: CapInfo) {
-        if (_.isUndefined(nextCapInfo)) {
-            return null;
+    private renderTimeUntilCapIncrease(capPeriodEndIfExists: number) {
+        if (_.isUndefined(capPeriodEndIfExists)) {
+            return '...';
         }
-        const nextCapMoment = moment(nextCapInfo.startTimestampSec);
-        return (
-            <div className="pt1">
-                <span style={{color: CUSTOM_LIGHT_GRAY}}>
-                    cap increases to{' '}
-                    <span style={{color: CUSTOM_GRAY}}>
-                        {nextCapInfo.cap} ETH {nextCapMoment.fromNow()}
-                    </span>
-                </span>
-            </div>
-        );
+        const capIncreaseFromNow = moment.unix(capPeriodEndIfExists).fromNow();
+        return capIncreaseFromNow;
+    }
+    private renderEthCapPerAddress(timestamp: number) {
+        if (_.isUndefined(this.state.baseEthCapPerAddress)) {
+            return '...';
+        }
+        const currentEthCapPerAddressInWei = this.getEthCapPerAddressAtTimestamp(timestamp);
+        const currentEthCapPerAddress = this.formatCurrencyAmount(currentEthCapPerAddressInWei);
+        return currentEthCapPerAddress;
     }
     private renderStepNumber(n: number) {
         const numberedCircleStyles = {
@@ -415,17 +411,30 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             </div>
         );
     }
-    private async updateUserContributedAmountFireAndForgetAsync() {
-        const orderHash = await this.blockchain.getTokenSaleOrderHashAsync();
-        const fillsByHash = tradeHistoryStorage.getUserFillsByHash(this.props.userAddress, this.props.networkId);
-        const fills = _.values(fillsByHash);
-        const tokenSaleFills = _.filter(fills, fill => {
-            const isTokenSaleFill = fill.orderHash === orderHash;
-            return isTokenSaleFill;
+    private renderTransactionSuccessfulMsg(transactionHex: string) {
+        const etherscanLink = utils.getEtherScanLinkIfExists(transactionHex, this.props.networkId,
+                                                             EtherscanLinkSuffixes.tx);
+        return (
+            <div>
+                Your transaction was successfully mined!{' '}
+                <a
+                    href={etherscanLink}
+                    target="_blank"
+                    className="underline"
+                    style={{color: 'white'}}
+                >
+                    View your transaction
+                </a>
+            </div>
+        );
+    }
+    private updateUserContributionAmount() {
+        const userContributions = _.filter(this.blockchain.contributions, contribution => {
+            return contribution.contributor === this.props.userAddress;
         });
         let ethContributedAmount = new BigNumber(0);
-        for (const fill of tokenSaleFills) {
-            ethContributedAmount = ethContributedAmount.add(fill.filledMakerTokenAmount);
+        for (const contribution of userContributions) {
+            ethContributedAmount = ethContributedAmount.add(contribution.ethAmountInWei);
         }
         this.setState({
             ethContributedAmount,
@@ -434,13 +443,19 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
     private async updateTokenSaleInfoFireAndForgetAsync() {
         const orderHash = await this.blockchain.getTokenSaleOrderHashAsync();
         const ethContributedInWei = await this.blockchain.getFillAmountAsync(orderHash);
-        const ethContributed = ZeroEx.toUnitAmount(ethContributedInWei, 18);
+        const ethContributed = ZeroEx.toUnitAmount(ethContributedInWei, ZRX_ETH_DECIMAL_PLACES);
         const zrxToEthExchangeRate = await this.blockchain.getTokenSaleExchangeRateAsync();
         const zrxSold = ethContributed.mul(zrxToEthExchangeRate);
+        const baseEthCapPerAddress = await this.blockchain.getTokenSaleBaseEthCapPerAddressAsync();
+        const startTimeInSec = await this.blockchain.getTokenSaleStartTimeInSecAsync();
+        const totalZrxSupply = await this.blockchain.getTokenSaleTotalSupplyAsync();
 
         this.setState({
             zrxSold,
             zrxToEthExchangeRate,
+            baseEthCapPerAddress,
+            startTimeInSec,
+            totalZrxSupply,
         });
     }
     private onContributionAmountChanged(isValid: boolean, contributionAmountInBaseUnits?: BigNumber.BigNumber) {
@@ -477,54 +492,69 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         });
         return true;
     }
+    private formatCurrencyAmount(amount: BigNumber.BigNumber) {
+        const unitAmount = ZeroEx.toUnitAmount(amount, ZRX_ETH_DECIMAL_PLACES);
+        const roundedUnitAmount = Math.round(unitAmount.toNumber() * 100000) / 100000;
+        return roundedUnitAmount;
+    }
     private async onPurchaseZRXClickAsync() {
+        const isAmountBelowCurrentCap = this.isAmountBelowCurrentCap();
+        if (!isAmountBelowCurrentCap) {
+            const desiredContributionAmount = this.formatCurrencyAmount(this.state.contributionAmountInBaseUnits);
+            const errMsg = `Cannot contribute ${desiredContributionAmount} ETH without exceeding the current cap`;
+            this.props.dispatcher.showFlashMessage(errMsg);
+            return;
+        }
+
         try {
             const tokenSaleAddress = this.blockchain.getTokenSaleAddress();
             const response = await this.blockchain.tokenSaleFillOrderWithEthAsync(
                 this.state.contributionAmountInBaseUnits,
             );
-            const transactionHex = 'blah';
+            console.log('response', response);
+            const transactionHex = 'blah'; // TODO
             const transactionSuccessMsg = this.renderTransactionSuccessfulMsg(transactionHex);
             this.props.dispatcher.showFlashMessage(transactionSuccessMsg);
             return true;
         } catch (err) {
-            utils.consoleLog(`Sending transaction failed: ${err}`);
-            this.props.dispatcher.showFlashMessage('Failed to complete transaction. Please try again.');
+            const errMsg = `${err}`;
+            if (utils.didUserDenyWeb3Request(errMsg)) {
+                this.props.dispatcher.showFlashMessage('You denied the transaction confirmation');
+            } else {
+                utils.consoleLog(`Sending transaction failed: ${err}`);
+                this.props.dispatcher.showFlashMessage(
+                    'Failed to complete transaction. Please try again.',
+                );
+            }
             return false;
         }
     }
-    private renderTransactionSuccessfulMsg(transactionHex: string) {
-        const etherscanLink = utils.getEtherScanLinkIfExists(transactionHex, this.props.networkId,
-                                                             EtherscanLinkSuffixes.tx);
-        return (
-            <div>
-                Your transaction was successfully mined!{' '}
-                <a
-                    href={etherscanLink}
-                    target="_blank"
-                    className="underline"
-                    style={{color: 'white'}}
-                >
-                    View your transaction
-                </a>
-            </div>
-        );
+    private isAmountBelowCurrentCap() {
+        const nowTimestamp = moment().unix();
+        const ethCapPerAddress = this.getEthCapPerAddressAtTimestamp(nowTimestamp);
+        const desiredContributionAmount = this.state.contributionAmountInBaseUnits.add(this.state.ethContributedAmount);
+        const isBelowCap = ethCapPerAddress.gte(desiredContributionAmount);
+        return isBelowCap;
     }
-    private findCurrentCapIndex(): number {
-        const currentMoment = moment();
-        for (let i = 0; i < capSchedule.length; i++) {
-            const capInfo = capSchedule[i];
-            const startMoment = moment(capInfo.startTimestampSec);
-            const isBeforeFirstCap = i === 0 && currentMoment.isBefore(startMoment);
-            const isLastCap = i === (capSchedule.length - 1);
-            if (isBeforeFirstCap || isLastCap) {
-                return i;
-            }
-            const nextCapInfo = capSchedule[i + 1];
-            const stopMoment =  moment(nextCapInfo.startTimestampSec);
-            if (currentMoment.isBefore(stopMoment) && startMoment.isBefore(currentMoment)) {
-                return i;
-            }
+    private getEthCapPerAddressAtTimestamp(timestamp: number) {
+        const period = this.getCapPeriod(timestamp);
+        const multiplier = (2 ** period) - 1;
+        const ethCapPerAddress = this.state.baseEthCapPerAddress.mul(multiplier);
+        return ethCapPerAddress;
+    }
+    private getCapPeriod(timestamp: number): number {
+        const timestampBigNumber = new BigNumber(timestamp);
+        const secondsSinceStart = timestampBigNumber.minus(this.state.startTimeInSec);
+        const period = secondsSinceStart.div(constants.CAP_PERIOD_IN_SEC).round(0, 1).add(1);
+        return period.toNumber();
+    }
+    private getCapPeriodEndTimestampIfExists(): number {
+        if (_.isUndefined(this.state.startTimeInSec)) {
+            return undefined;
         }
+        const now = moment().unix();
+        const period = this.getCapPeriod(now);
+        const capPeriodEndTimestamp = this.state.startTimeInSec.add(constants.CAP_PERIOD_IN_SEC * period);
+        return capPeriodEndTimestamp.toNumber();
     }
 }

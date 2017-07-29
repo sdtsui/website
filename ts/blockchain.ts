@@ -169,24 +169,41 @@ export class Blockchain {
         const zrxToEthExchangeRate = makerTokenAmount.div(takerTokenAmount);
         return zrxToEthExchangeRate;
     }
-    public async tokenSaleFillOrderWithEthAsync(amountInBaseUnits: BigNumber.BigNumber) {
+    public async getTokenSaleTotalSupplyAsync(): Promise<BigNumber.BigNumber> {
         utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
 
-        const gas = await this.tokenSale.fillOrderWithEth.estimateGas({
-            value: amountInBaseUnits,
-        });
-        console.log('gas', gas);
+        const makerTokenAmount = await this.tokenSale.getOrderMakerTokenAmount.call();
+        return new BigNumber(makerTokenAmount);
+    }
+    public async getTokenSaleBaseEthCapPerAddressAsync() {
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
+
+        const baseEthCapPerAddress = await this.tokenSale.baseEthCapPerAddress.call();
+        return new BigNumber(baseEthCapPerAddress);
+    }
+    public async getTokenSaleStartTimeInSecAsync() {
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
+
+        const startTimeInSec = await this.tokenSale.startTimeInSec.call();
+        return new BigNumber(startTimeInSec);
+    }
+    public async tokenSaleFillOrderWithEthAsync(amountInBaseUnits: BigNumber.BigNumber): Promise<any> {
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
+
         const isRegistered = await this.tokenSale.registered.call(this.userAddress);
         if (!isRegistered) {
             throw new Error('ADDRESS_NOT_REGISTERED');
         }
 
-        const response = await this.tokenSale.fillOrderWithEth({
+        const gas = await this.tokenSale.fillOrderWithEth.estimateGas({
             value: amountInBaseUnits,
-            gas,
             from: this.userAddress,
         });
-        console.log('response', response);
+        const response = await this.tokenSale.fillOrderWithEth({
+            value: amountInBaseUnits,
+            from: this.userAddress,
+            gas,
+        });
         return response;
     }
     public async sendTransactionAsync(to: string, amountInBaseUnits: BigNumber.BigNumber, gas: number) {

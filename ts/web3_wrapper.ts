@@ -41,6 +41,10 @@ export class Web3Wrapper {
         const nodeVersion = await promisify(this.web3.version.getNode)();
         return nodeVersion;
     }
+    public async getTransactionAsync(transactionHash: string) {
+        const transaction = await promisify(this.web3.eth.getTransaction)(transactionHash);
+        return transaction;
+    }
     public getProviderObj() {
         return this.web3.currentProvider;
     }

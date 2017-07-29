@@ -17,6 +17,7 @@ interface BalanceBoundedInputProps {
     shouldCheckBalance: boolean;
     validate?: (amount: BigNumber.BigNumber) => InputErrMsg;
     onVisitBalancesPageClick?: () => void;
+    shouldHideVisitBalancesLink?: boolean;
 }
 
 interface BalanceBoundedInputState {
@@ -28,6 +29,7 @@ export class BalanceBoundedInput extends
     React.Component<BalanceBoundedInputProps, BalanceBoundedInputState> {
     public static defaultProps: Partial<BalanceBoundedInputProps> = {
         shouldShowIncompleteErrs: false,
+        shouldHideVisitBalancesLink: false,
     };
     constructor(props: BalanceBoundedInputProps) {
         super(props);
@@ -124,6 +126,10 @@ export class BalanceBoundedInput extends
         return errMsg;
     }
     private renderIncreaseBalanceLink() {
+        if (this.props.shouldHideVisitBalancesLink) {
+            return null;
+        }
+
         const increaseBalanceText = 'Increase balance';
         const linkStyle = {
             cursor: 'pointer',

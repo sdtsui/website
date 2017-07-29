@@ -22,6 +22,7 @@ interface ConnectedState {
     providerType: ProviderType;
     injectedProviderName: string;
     userAddress: string;
+    userEtherBalance: BigNumber.BigNumber;
     blockchainErr: BlockchainErrs;
     shouldBlockchainErrDialogBeOpen: boolean;
 };
@@ -34,6 +35,7 @@ const mapStateToProps = (state: State): ConnectedState => ({
     providerType: state.providerType,
     injectedProviderName: state.injectedProviderName,
     userAddress: state.userAddress,
+    userEtherBalance: state.userEtherBalance,
     blockchainErr: state.blockchainErr,
     shouldBlockchainErrDialogBeOpen: state.shouldBlockchainErrDialogBeOpen,
 });

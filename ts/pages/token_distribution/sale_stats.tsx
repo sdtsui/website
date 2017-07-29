@@ -8,16 +8,18 @@ import {SaleCountdown} from 'ts/pages/token_distribution/sale_countdown';
 const CUSTOM_LIGHT_GRAY = '#BBBBBB';
 
 export interface SaleStatsProps {
+    totalZrxSupply: BigNumber.BigNumber;
     zrxSold: BigNumber.BigNumber;
-    capTimeRemainingSec: number;
+    capPeriodEnd: number;
 }
 
 interface SaleStatsState {}
 
 export class SaleStats extends React.Component<SaleStatsProps, SaleStatsState> {
     public render() {
-        const percentRaised = this.props.zrxSold.div(constants.TOTAL_ZRX_SUPPLY).mul(100);
+        const percentRaised = this.props.zrxSold.div(this.props.totalZrxSupply).mul(100);
         const roundedPercentRaised = percentRaised.round().toString();
+        const roundedZrxSold = Math.round(this.props.zrxSold.toNumber() * 100000) / 100000;
         return (
             <div
                 style={{color: CUSTOM_LIGHT_GRAY, maxWidth: 230}}
@@ -44,7 +46,7 @@ export class SaleStats extends React.Component<SaleStatsProps, SaleStatsState> {
                             className="center"
                             style={{color: constants.CUSTOM_BLUE, fontSize: 13, paddingTop: 10}}
                         >
-                            {this.props.zrxSold.toString()} ZRX ({roundedPercentRaised}%) sold
+                            {roundedZrxSold} ZRX ({roundedPercentRaised}%) sold
                         </div>
                         <div
                             className="pt3 center"
@@ -52,7 +54,7 @@ export class SaleStats extends React.Component<SaleStatsProps, SaleStatsState> {
                         >
                             <div>Time remaining</div>
                             <div>(if cap not reached)</div>
-                            <SaleCountdown capTimeRemainingSec={this.props.capTimeRemainingSec} />
+                            <SaleCountdown capPeriodEnd={this.props.capPeriodEnd} />
                         </div>
                     </div>
                 </div>

@@ -14,6 +14,7 @@ interface EthAmountInputProps {
     shouldShowIncompleteErrs: boolean;
     onVisitBalancesPageClick?: () => void;
     shouldCheckBalance: boolean;
+    shouldHideVisitBalancesLink?: boolean;
 }
 
 interface EthAmountInputState {}
@@ -33,6 +34,7 @@ export class EthAmountInput extends React.Component<EthAmountInputProps, EthAmou
                     shouldCheckBalance={this.props.shouldCheckBalance}
                     shouldShowIncompleteErrs={this.props.shouldShowIncompleteErrs}
                     onVisitBalancesPageClick={this.props.onVisitBalancesPageClick}
+                    shouldHideVisitBalancesLink={this.props.shouldHideVisitBalancesLink}
                 />
                 <div style={{paddingTop: _.isUndefined(this.props.label) ? 15 : 40}}>
                     ETH

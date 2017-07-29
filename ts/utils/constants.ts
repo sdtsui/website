@@ -103,6 +103,5 @@ export const constants = {
         'TokenContractEventArgs',
     ],
     // Crowdsale constants
-    TOKEN_SALE_GAS_AMOUNT: 150000,
-    TOTAL_ZRX_SUPPLY: 500000000,
+    CAP_PERIOD_IN_SEC: 86400, // 24hrs in seconds
 };

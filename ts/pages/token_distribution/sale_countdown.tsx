@@ -7,7 +7,7 @@ import {constants} from 'ts/utils/constants';
 const UPDATE_INTERVAL_MS = 1000;
 
 export interface SaleCountdownProps {
-    capTimeRemainingSec: number;
+    capPeriodEnd: number;
 }
 
 interface SaleCountdownState {}
@@ -23,30 +23,24 @@ export class SaleCountdown extends React.Component<SaleCountdownProps, SaleCount
         window.clearInterval(this.refreshTimeoutId);
     }
     public render() {
-        const remainingMoment = moment(this.props.capTimeRemainingSec);
-        const currentMoment = moment();
-        const days = remainingMoment.diff(currentMoment, 'days');
-        const remainingMomentHoursAndLess = remainingMoment.subtract(days, 'days');
-        const hours = remainingMomentHoursAndLess.diff(currentMoment, 'hours');
-        const remainingMomentMinutesOrLess = remainingMomentHoursAndLess.subtract(hours, 'hours');
-        const minutes = remainingMomentMinutesOrLess.diff(currentMoment, 'minutes');
-        const remainingMomentSecondsOrLess = remainingMomentMinutesOrLess.subtract(minutes, 'minutes');
-        const seconds = remainingMomentSecondsOrLess.diff(currentMoment, 'seconds');
+        const periodEndMoment = moment.unix(this.props.capPeriodEnd);
+        const now = moment();
+        const hours = periodEndMoment.diff(now, 'hours');
+        const periodEndMomentMinutesOrLess = periodEndMoment.subtract(hours, 'hours');
+        const minutes = periodEndMomentMinutesOrLess.diff(now, 'minutes');
+        const periodEndMomentSecondsOrLess = periodEndMomentMinutesOrLess.subtract(minutes, 'minutes');
+        const seconds = periodEndMomentSecondsOrLess.diff(now, 'seconds');
         return (
             <div className="clearfix pt2 pb1">
-                <div className="col col-3">
-                    <div>{days}</div>
-                    <div>DAY</div>
-                </div>
-                <div className="col col-3">
+                <div className="col col-4">
                     <div>{hours}</div>
                     <div>HR</div>
                 </div>
-                <div className="col col-3">
+                <div className="col col-4">
                     <div>{minutes}</div>
                     <div>MIN</div>
                 </div>
-                <div className="col col-3">
+                <div className="col col-4">
                     <div>{seconds}</div>
                     <div>SEC</div>
                 </div>
