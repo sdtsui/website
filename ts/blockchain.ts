@@ -175,17 +175,31 @@ export class Blockchain {
         const makerTokenAmount = await this.tokenSale.getOrderMakerTokenAmount.call();
         return new BigNumber(makerTokenAmount);
     }
-    public async getTokenSaleBaseEthCapPerAddressAsync() {
+    public async getTokenSaleBaseEthCapPerAddressAsync(): Promise<BigNumber.BigNumber> {
         utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
 
         const baseEthCapPerAddress = await this.tokenSale.baseEthCapPerAddress.call();
         return new BigNumber(baseEthCapPerAddress);
     }
-    public async getTokenSaleStartTimeInSecAsync() {
+    public async getTokenSaleStartTimeInSecAsync(): Promise<BigNumber.BigNumber> {
         utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
 
         const startTimeInSec = await this.tokenSale.startTimeInSec.call();
         return new BigNumber(startTimeInSec);
+    }
+    public async getTokenSaleContributionAmountAsync(): Promise<BigNumber.BigNumber> {
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
+        utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
+
+        const contributionAmount = await this.tokenSale.contributed.call(this.userAddress);
+        return new BigNumber(contributionAmount);
+    }
+    public async getTokenSaleIsUserAddressRegisteredAsync(): Promise<boolean> {
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
+        utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
+
+        const isRegistered = await this.tokenSale.registered.call(this.userAddress);
+        return isRegistered;
     }
     public async tokenSaleFillOrderWithEthAsync(amountInBaseUnits: BigNumber.BigNumber): Promise<any> {
         utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');

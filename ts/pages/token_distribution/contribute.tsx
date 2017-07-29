@@ -57,11 +57,11 @@ interface ContributeState {
     baseEthCapPerAddress?: BigNumber.BigNumber;
     startTimeInSec?: BigNumber.BigNumber;
     totalZrxSupply: BigNumber.BigNumber;
+    isAddressRegistered: boolean;
 }
 
 export class Contribute extends React.Component<ContributeProps, ContributeState> {
     private blockchain: Blockchain;
-    private contributionIntervalId: number;
     constructor(props: ContributeProps) {
         super(props);
         this.state = {
@@ -74,18 +74,11 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             isU2FDialogOpen: false,
             zrxSold: new BigNumber(0),
             totalZrxSupply: ZeroEx.toBaseUnitAmount(new BigNumber(500000000), 18),
+            isAddressRegistered: false,
         };
     }
     public componentWillMount() {
         this.blockchain = new Blockchain(this.props.dispatcher);
-    }
-    public componentDidMount() {
-        this.contributionIntervalId = window.setInterval(() => {
-            this.updateUserContributionAmount();
-        }, 3000);
-    }
-    public componentWillUnmount() {
-        clearInterval(this.contributionIntervalId);
     }
     public componentWillReceiveProps(nextProps: ContributeProps) {
         if (nextProps.networkId !== this.state.prevNetworkId) {
@@ -244,9 +237,25 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                             />
                             <div
                                 className="pt1 mx-auto center"
-                                style={{fontSize: 12, width: 108}}
+                                style={{fontSize: 12, width: 132}}
                             >
-                                ZRX will be instantly sent to this address
+                                {!_.isEmpty(this.props.userAddress) &&
+                                    <div className="pb1">
+                                        {this.state.isAddressRegistered ?
+                                            <div style={{color: 'rgb(0, 195, 62)'}}>
+                                                <span><i className="zmdi zmdi-check" /></span>{' '}
+                                                <span>Address registered</span>
+                                            </div> :
+                                            <div style={{color: colors.red500}}>
+                                                <span><i className="zmdi zmdi-alert-triangle" /></span>{' '}
+                                                <span>Unregistered address</span>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                <div>
+                                    ZRX will be instantly sent to this address
+                                </div>
                             </div>
                         </div>
                         <div className="col col-2">
@@ -428,18 +437,6 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             </div>
         );
     }
-    private updateUserContributionAmount() {
-        const userContributions = _.filter(this.blockchain.contributions, contribution => {
-            return contribution.contributor === this.props.userAddress;
-        });
-        let ethContributedAmount = new BigNumber(0);
-        for (const contribution of userContributions) {
-            ethContributedAmount = ethContributedAmount.add(contribution.ethAmountInWei);
-        }
-        this.setState({
-            ethContributedAmount,
-        });
-    }
     private async updateTokenSaleInfoFireAndForgetAsync() {
         const orderHash = await this.blockchain.getTokenSaleOrderHashAsync();
         const ethContributedInWei = await this.blockchain.getFillAmountAsync(orderHash);
@@ -449,6 +446,12 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         const baseEthCapPerAddress = await this.blockchain.getTokenSaleBaseEthCapPerAddressAsync();
         const startTimeInSec = await this.blockchain.getTokenSaleStartTimeInSecAsync();
         const totalZrxSupply = await this.blockchain.getTokenSaleTotalSupplyAsync();
+        let ethContributedAmount = new BigNumber(0);
+        let isAddressRegistered = false;
+        if (!_.isEmpty(this.props.userAddress)) {
+            ethContributedAmount = await this.blockchain.getTokenSaleContributionAmountAsync();
+            isAddressRegistered = await this.blockchain.getTokenSaleIsUserAddressRegisteredAsync();
+        }
 
         this.setState({
             zrxSold,
@@ -456,6 +459,8 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             baseEthCapPerAddress,
             startTimeInSec,
             totalZrxSupply,
+            ethContributedAmount,
+            isAddressRegistered,
         });
     }
     private onContributionAmountChanged(isValid: boolean, contributionAmountInBaseUnits?: BigNumber.BigNumber) {
