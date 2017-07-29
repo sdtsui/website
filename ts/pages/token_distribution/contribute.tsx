@@ -243,7 +243,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                     <div className="pb1">
                                         {this.state.isAddressRegistered ?
                                             <div style={{color: 'rgb(0, 195, 62)'}}>
-                                                <span><i className="zmdi zmdi-check" /></span>{' '}
+                                                <span><i className="zmdi zmdi-check-circle" /></span>{' '}
                                                 <span>Address registered</span>
                                             </div> :
                                             <div style={{color: colors.red500}}>
@@ -503,6 +503,12 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         return roundedUnitAmount;
     }
     private async onPurchaseZRXClickAsync() {
+        const contributionAmountInUnits = ZeroEx.toUnitAmount(this.state.contributionAmountInBaseUnits,
+                                                              ZRX_ETH_DECIMAL_PLACES);
+        if (this.props.userEtherBalance.lt(contributionAmountInUnits)) {
+            this.props.dispatcher.showFlashMessage('Insufficient Ether balance to complete this transaction');
+            return;
+        }
         const isAmountBelowCurrentCap = this.isAmountBelowCurrentCap();
         if (!isAmountBelowCurrentCap) {
             const desiredContributionAmount = this.formatCurrencyAmount(this.state.contributionAmountInBaseUnits);
@@ -525,6 +531,8 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             const errMsg = `${err}`;
             if (utils.didUserDenyWeb3Request(errMsg)) {
                 this.props.dispatcher.showFlashMessage('You denied the transaction confirmation');
+            } else if (_.includes(errMsg, 'ADDRESS_NOT_REGISTERED')) {
+                this.props.dispatcher.showFlashMessage('You cannot contribute from an unregistered address');
             } else {
                 utils.consoleLog(`Sending transaction failed: ${err}`);
                 this.props.dispatcher.showFlashMessage(
