@@ -38,7 +38,6 @@ import * as TokenArtifacts from '../contracts/Token.json';
 import * as MintableArtifacts from '../contracts/Mintable.json';
 import * as EtherTokenArtifacts from '../contracts/EtherToken.json';
 import * as TokenSaleArtifacts from '../contracts/TokenSale.json';
-import * as ZRXTokenArtifacts from '../contracts/ZRXToken.json';
 
 const ALLOWANCE_TO_ZERO_GAS_AMOUNT = 45730;
 
@@ -666,7 +665,6 @@ export class Blockchain {
                   TokenRegistryArtifacts,
                   ProxyTokenTransferArtifacts,
                   TokenSaleArtifacts,
-                  ZRXTokenArtifacts,
                 ],
                 (artifacts: any) => this.instantiateContractIfExistsAsync(artifacts),
             );
@@ -675,7 +673,6 @@ export class Blockchain {
             this.tokenRegistry = contracts[1];
             this.proxy = contracts[2];
             this.tokenSale = contracts[3];
-            this.zrxToken = contracts[4];
         } catch (err) {
             const errMsg = err + '';
             if (_.includes(errMsg, BlockchainCallErrs.CONTRACT_DOES_NOT_EXIST)) {
