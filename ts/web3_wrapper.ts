@@ -78,17 +78,6 @@ export class Web3Wrapper {
         const {timestamp} = await promisify(this.web3.eth.getBlock)(blockHash);
         return timestamp;
     }
-    public async sendTransactionAsync(from: string, to: string,
-                                      amountInBaseUnits: BigNumber.BigNumber,
-                                      gas: number): Promise<string> {
-        const transactionHex = await promisify(this.web3.eth.sendTransaction)({
-            from,
-            to,
-            value: amountInBaseUnits,
-            gas,
-        });
-        return transactionHex;
-    }
     public destroy() {
         this.stopEmittingNetworkConnectionAndUserBalanceStateAsync();
     }
