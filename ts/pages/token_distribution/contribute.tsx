@@ -571,7 +571,6 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         }
 
         try {
-            const tokenSaleAddress = this.blockchain.getTokenSaleAddress();
             const response = await this.blockchain.tokenSaleFillOrderWithEthAsync(
                 this.state.contributionAmountInBaseUnits,
             );
