@@ -4,6 +4,7 @@ import * as DocumentTitle from 'react-document-title';
 import * as BigNumber from 'bignumber.js';
 import * as moment from 'moment';
 import {colors} from 'material-ui/styles';
+import CircularProgress from 'material-ui/CircularProgress';
 import {ZeroEx} from '0x.js';
 import {utils} from 'ts/utils/utils';
 import {Blockchain} from 'ts/blockchain';
@@ -61,6 +62,7 @@ interface ContributeState {
     startTimeInSec?: BigNumber.BigNumber;
     totalZrxSupply: BigNumber.BigNumber;
     isAddressRegistered: boolean;
+    didLoadConstantTokenSaleInfo: boolean;
 }
 
 export class Contribute extends React.Component<ContributeProps, ContributeState> {
@@ -80,6 +82,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             zrxSold: new BigNumber(0),
             totalZrxSupply: ZeroEx.toBaseUnitAmount(new BigNumber(500000000), 18),
             isAddressRegistered: false,
+            didLoadConstantTokenSaleInfo: false,
         };
     }
     public componentDidMount() {
@@ -266,7 +269,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                 className="pt1 mx-auto center"
                                 style={{fontSize: 12, maxWidth: 132}}
                             >
-                                {!_.isEmpty(this.props.userAddress) &&
+                                {!_.isEmpty(this.props.userAddress) && this.state.didLoadConstantTokenSaleInfo &&
                                     <div className="pb1">
                                         {this.state.isAddressRegistered ?
                                             <div style={{color: 'rgb(0, 195, 62)'}}>
@@ -345,15 +348,15 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                 <div>
                                     <div>
                                         <span style={{color: CUSTOM_LIGHT_GRAY}}>
-                                            current contribution cap:
-                                        </span>{' '}
+                                            current contribution cap:{' '}
+                                        </span>
                                         <span style={{color: CUSTOM_GRAY}}>
                                             {this.renderEthCapPerAddress(now)} ETH/participant
                                         </span>
                                     </div>
                                     <div className="pt1">
                                         <span style={{color: CUSTOM_LIGHT_GRAY}}>
-                                            cap increases to{' '}
+                                            cap increases to:{' '}
                                             <span style={{color: CUSTOM_GRAY}}>
                                                 {this.renderEthCapPerAddress(nextPeriodTimestamp)} ETH
                                             </span>{' '}
@@ -363,11 +366,13 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                 </div>
                                 <div className="pt1">
                                     <span style={{color: CUSTOM_LIGHT_GRAY}}>
-                                        contributed from your address so far:
-                                    </span>{' '}
+                                        contributed from your address so far:{' '}
+                                    </span>
                                     <span style={{color: CUSTOM_GRAY}}>
                                         {_.isUndefined(this.state.ethContributedAmount) ?
-                                            '...' :
+                                            <span style={{paddingRight: 3, paddingLeft: 3}}>
+                                                <CircularProgress size={10} />
+                                            </span> :
                                             this.formatCurrencyAmount(this.state.ethContributedAmount)
                                         } ETH
                                     </span>
@@ -413,6 +418,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             <div className="col lg-col-3 md-col-3 col-12">
                 <div className="lg-pt4 md-pt4 sm-pt2">
                     <SaleStats
+                        isLoading={!this.state.didLoadConstantTokenSaleInfo}
                         totalZrxSupply={this.state.totalZrxSupply}
                         zrxSold={this.state.zrxSold}
                         capPeriodEnd={_.isUndefined(capPeriodEndIfExists) ? 0 : capPeriodEndIfExists}
@@ -423,14 +429,18 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
     }
     private renderTimeUntilCapIncrease(capPeriodEndIfExists: number) {
         if (_.isUndefined(capPeriodEndIfExists)) {
-            return '...';
+            return null;
         }
         const capIncreaseFromNow = moment.unix(capPeriodEndIfExists).fromNow();
         return capIncreaseFromNow;
     }
     private renderEthCapPerAddress(timestamp: number) {
         if (_.isUndefined(this.state.baseEthCapPerAddress)) {
-            return '...';
+            return (
+                <span style={{paddingRight: 3, paddingLeft: 3}}>
+                    <CircularProgress size={10} />
+                </span>
+            );
         }
         const currentEthCapPerAddressInWei = this.getEthCapPerAddressAtTimestamp(timestamp);
         const currentEthCapPerAddress = this.formatCurrencyAmount(currentEthCapPerAddressInWei);
@@ -483,6 +493,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             baseEthCapPerAddress,
             startTimeInSec,
             totalZrxSupply,
+            didLoadConstantTokenSaleInfo: true,
         });
     }
     private async updateVariableTokenSaleInfoFireAndForgetAsync() {
