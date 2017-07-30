@@ -3,7 +3,7 @@ import {Store as ReduxStore, Dispatch} from 'redux';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {State} from 'ts/redux/reducer';
 import {Contribute as ContributeComponent} from 'ts/pages/token_distribution/contribute';
-import {BlockchainErrs, ProviderType} from 'ts/types';
+import {BlockchainErrs, ProviderType, ScreenWidths} from 'ts/types';
 
 interface ConnectedDispatch {
     dispatcher: Dispatcher;
@@ -25,6 +25,7 @@ interface ConnectedState {
     userEtherBalance: BigNumber.BigNumber;
     blockchainErr: BlockchainErrs;
     shouldBlockchainErrDialogBeOpen: boolean;
+    screenWidth: ScreenWidths;
 };
 
 const mapStateToProps = (state: State): ConnectedState => ({
@@ -38,6 +39,7 @@ const mapStateToProps = (state: State): ConnectedState => ({
     userEtherBalance: state.userEtherBalance,
     blockchainErr: state.blockchainErr,
     shouldBlockchainErrDialogBeOpen: state.shouldBlockchainErrDialogBeOpen,
+    screenWidth: state.screenWidth,
 });
 
 export const Contribute: React.ComponentClass<ContributeComponentPassedProps> =

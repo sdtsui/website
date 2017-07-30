@@ -22,6 +22,7 @@ export class SaleStats extends React.Component<SaleStatsProps, SaleStatsState> {
         const roundedZrxSold = Math.round(this.props.zrxSold.toNumber() * 100000) / 100000;
         return (
             <div
+                className="sm-mx-auto"
                 style={{color: CUSTOM_LIGHT_GRAY, maxWidth: 230}}
             >
                 <div className="pb1 pl1">Crowdsale stats</div>

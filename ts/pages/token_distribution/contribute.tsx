@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import * as DocumentTitle from 'react-document-title';
 import * as BigNumber from 'bignumber.js';
 import * as moment from 'moment';
 import {colors} from 'material-ui/styles';
@@ -9,7 +10,7 @@ import {Blockchain} from 'ts/blockchain';
 import {constants} from 'ts/utils/constants';
 import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
-import {BlockchainErrs, ProviderType, EtherscanLinkSuffixes} from 'ts/types';
+import {BlockchainErrs, ProviderType, EtherscanLinkSuffixes, ScreenWidths} from 'ts/types';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {FlashMessage} from 'ts/components/ui/flash_message';
 import {BlockchainErrDialog} from 'ts/components/blockchain_err_dialog';
@@ -26,6 +27,7 @@ import {Loading} from 'ts/components/ui/loading';
 const CUSTOM_GRAY = '#464646';
 const CUSTOM_LIGHT_GRAY = '#BBBBBB';
 const ZRX_ETH_DECIMAL_PLACES = 18;
+const THROTTLE_TIMEOUT = 100;
 
 export interface ContributeProps {
     location: Location;
@@ -40,6 +42,7 @@ export interface ContributeProps {
     flashMessage?: string|React.ReactNode;
     blockchainErr: BlockchainErrs;
     shouldBlockchainErrDialogBeOpen: boolean;
+    screenWidth: ScreenWidths;
 }
 
 interface ContributeState {
@@ -62,8 +65,10 @@ interface ContributeState {
 
 export class Contribute extends React.Component<ContributeProps, ContributeState> {
     private blockchain: Blockchain;
+    private throttledScreenWidthUpdate: () => void;
     constructor(props: ContributeProps) {
         super(props);
+        this.throttledScreenWidthUpdate = _.throttle(this.updateScreenWidth.bind(this), THROTTLE_TIMEOUT);
         this.state = {
             prevNetworkId: this.props.networkId,
             prevNodeVersion: this.props.nodeVersion,
@@ -76,6 +81,13 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             totalZrxSupply: ZeroEx.toBaseUnitAmount(new BigNumber(500000000), 18),
             isAddressRegistered: false,
         };
+    }
+    public componentDidMount() {
+        window.addEventListener('resize', this.throttledScreenWidthUpdate);
+        window.scrollTo(0, 0);
+    }
+    public componentWillUnmount() {
+        window.removeEventListener('resize', this.throttledScreenWidthUpdate);
     }
     public componentWillMount() {
         this.blockchain = new Blockchain(this.props.dispatcher);
@@ -121,13 +133,16 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                 .updateShouldBlockchainErrDialogBeOpen.bind(this.props.dispatcher);
         return (
             <div style={contributeStyle}>
+                <DocumentTitle title="Contribute"/>
                 <TopBar
                     blockchainIsLoaded={false}
                     location={this.props.location}
                 />
                 {this.props.blockchainIsLoaded ?
                   this.renderContributionForm() :
-                  <Loading />
+                  <div className="pt4">
+                      <Loading />
+                 </div>
                 }
                 <Footer />
                 <BlockchainErrDialog
@@ -174,9 +189,12 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                                                            this.props.networkId,
                                                                            EtherscanLinkSuffixes.address);
       return (
-        <div className="clearfix max-width-4 mx-auto" style={{paddingTop: 43, width: '64rem'}}>
-            <div className="col col-9">
-                <div className="mx-auto" style={{width: 530}}>
+        <div className="clearfix max-width-4 mx-auto" style={{paddingTop: 43, width: '100%'}}>
+            {this.props.screenWidth === ScreenWidths.SM &&
+                this.renderSaleStats(capPeriodEndIfExists)
+            }
+            <div className="col lg-col-9 md-col-9 col-12">
+                <div className="mx-auto sm-px2" style={{maxWidth: 530}}>
                     <div className="h2 pt3">Make a contribution</div>
                     <div className="clearfix pt3">
                         <div className="col col-1">
@@ -238,7 +256,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                             />
                             <div
                                 className="pt1 mx-auto center"
-                                style={{fontSize: 12, width: 132}}
+                                style={{fontSize: 12, maxWidth: 132}}
                             >
                                 {!_.isEmpty(this.props.userAddress) &&
                                     <div className="pb1">
@@ -376,8 +394,16 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                     </div>
                 </div>
             </div>
-            <div className="col col-3">
-                <div className="pt4">
+            {this.props.screenWidth !== ScreenWidths.SM &&
+                this.renderSaleStats(capPeriodEndIfExists)
+            }
+        </div>
+      );
+    }
+    private renderSaleStats(capPeriodEndIfExists: number) {
+        return (
+            <div className="col lg-col-3 md-col-3 col-12">
+                <div className="lg-pt4 md-pt4 sm-pt2">
                     <SaleStats
                         totalZrxSupply={this.state.totalZrxSupply}
                         zrxSold={this.state.zrxSold}
@@ -385,8 +411,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                     />
                 </div>
             </div>
-        </div>
-      );
+        );
     }
     private renderTimeUntilCapIncrease(capPeriodEndIfExists: number) {
         if (_.isUndefined(capPeriodEndIfExists)) {
@@ -570,5 +595,9 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         const period = this.getCapPeriod(now);
         const capPeriodEndTimestamp = this.state.startTimeInSec.add(constants.CAP_PERIOD_IN_SEC * period);
         return capPeriodEndTimestamp.toNumber();
+    }
+    private updateScreenWidth() {
+        const newScreenWidth = utils.getScreenWidth();
+        this.props.dispatcher.updateScreenWidth(newScreenWidth);
     }
 }
