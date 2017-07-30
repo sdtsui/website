@@ -46,7 +46,6 @@ export class Blockchain {
     public nodeVersion: string;
     private dispatcher: Dispatcher;
     private web3Wrapper: Web3Wrapper;
-    private zrxToken: ContractInstance;
     private tokenSale: ContractInstance;
     private exchange: ContractInstance;
     private exchangeLogFillEvents: any[];
