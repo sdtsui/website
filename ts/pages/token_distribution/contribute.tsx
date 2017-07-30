@@ -11,7 +11,7 @@ import {Blockchain} from 'ts/blockchain';
 import {constants} from 'ts/utils/constants';
 import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
-import {BlockchainErrs, ProviderType, EtherscanLinkSuffixes, ScreenWidths} from 'ts/types';
+import {BlockchainErrs, ProviderType, EtherscanLinkSuffixes, ScreenWidths, TokenSaleErrs} from 'ts/types';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {FlashMessage} from 'ts/components/ui/flash_message';
 import {BlockchainErrDialog} from 'ts/components/blockchain_err_dialog';
@@ -583,7 +583,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             const errMsg = `${err}`;
             if (utils.didUserDenyWeb3Request(errMsg)) {
                 this.props.dispatcher.showFlashMessage('You denied the transaction confirmation');
-            } else if (_.includes(errMsg, 'ADDRESS_NOT_REGISTERED')) {
+            } else if (_.includes(errMsg, TokenSaleErrs.ADDRESS_NOT_REGISTERED)) {
                 this.props.dispatcher.showFlashMessage('You cannot contribute from an unregistered address');
             } else {
                 utils.consoleLog(`Sending transaction failed: ${err}`);

@@ -26,6 +26,7 @@ import {
     ContractInstance,
     ProviderType,
     LedgerWalletSubprovider,
+    TokenSaleErrs,
 } from 'ts/types';
 import {Web3Wrapper} from 'ts/web3_wrapper';
 import {errorReporter} from 'ts/utils/error_reporter';
@@ -204,7 +205,7 @@ export class Blockchain {
 
         const isRegistered = await this.tokenSale.registered.call(this.userAddress);
         if (!isRegistered) {
-            throw new Error('ADDRESS_NOT_REGISTERED');
+            throw new Error(TokenSaleErrs.ADDRESS_NOT_REGISTERED);
         }
 
         const gas = await this.tokenSale.fillOrderWithEth.estimateGas({

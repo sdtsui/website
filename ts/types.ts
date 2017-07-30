@@ -437,3 +437,8 @@ export interface TxParams {
     data?: string;
     chainId: number; // EIP 155 chainId - mainnet: 1, ropsten: 3
 }
+
+export const TokenSaleErrs = strEnum([
+  'ADDRESS_NOT_REGISTERED',
+]);
+export type TokenSaleErrs = keyof typeof TokenSaleErrs;
