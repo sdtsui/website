@@ -63,7 +63,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             appId: constants.CIVIC_APP_ID,
         });
         this.state = {
-            stepIndex: RegistrationFlowSteps.REGISTRATION_COMPLETE,
+            stepIndex: RegistrationFlowSteps.ACCEPT_TERMS_AND_CONDITIONS,
             civicUserId: undefined,
             isVerifyingIdentity: false,
             prevNetworkId: this.props.networkId,
