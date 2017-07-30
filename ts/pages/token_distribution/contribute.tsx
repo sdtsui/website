@@ -234,6 +234,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                 address={this.props.userAddress}
                                 identiconDiameter={30}
                                 identiconStyle={{marginTop: 10, marginBottom: 10}}
+                                noAddressLabel="No address found"
                             />
                             <div
                                 className="pt1 mx-auto center"
@@ -272,6 +273,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                 address={tokenSaleAddress}
                                 identiconDiameter={30}
                                 identiconStyle={{marginTop: 10, marginBottom: 10}}
+                                noAddressLabel="No address found"
                             />
                             <div
                                 className="pt1 mx-auto center underline"

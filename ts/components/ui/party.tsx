@@ -12,6 +12,7 @@ interface PartyProps {
     address: string;
     identiconDiameter: number;
     identiconStyle?: React.CSSProperties;
+    noAddressLabel?: string;
 }
 
 interface PartyState {}
@@ -19,6 +20,7 @@ interface PartyState {}
 export class Party extends React.Component<PartyProps, PartyState> {
     public static defaultProps: Partial<PartyProps> = {
         identiconStyle: {},
+        noAddressLabel: 'Anybody',
     };
     public render() {
         const label = this.props.label;
@@ -50,7 +52,7 @@ export class Party extends React.Component<PartyProps, PartyState> {
                         data-tip={true}
                         data-for={tooltipId}
                     >
-                        {!_.isEmpty(address) ? addressEnds : 'Anybody'}
+                        {!_.isEmpty(address) ? addressEnds : this.props.noAddressLabel}
                     </div>
                 </div>
                 {!_.isEmpty(address) && <ReactTooltip id={tooltipId}>{address}</ReactTooltip>}
