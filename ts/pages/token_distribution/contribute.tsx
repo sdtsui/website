@@ -117,8 +117,16 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                 prevProviderType: nextProps.providerType,
             });
         }
-        if (nextProps.blockchainIsLoaded && !this.state.prevBlockchainIsLoaded) {
-            this.updateTokenSaleInfoFireAndForgetAsync();
+        if (this.state.prevBlockchainIsLoaded !== nextProps.blockchainIsLoaded) {
+            if (nextProps.blockchainIsLoaded) {
+                this.updateConstantTokenSaleInfoFireAndForgetAsync();
+            }
+            this.setState({
+                prevBlockchainIsLoaded: nextProps.blockchainIsLoaded,
+            });
+        }
+        if (nextProps.blockchainIsLoaded) {
+            this.updateVariableTokenSaleInfoFireAndForgetAsync();
         }
     }
     public render() {
@@ -464,15 +472,26 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             </div>
         );
     }
-    private async updateTokenSaleInfoFireAndForgetAsync() {
+    private async updateConstantTokenSaleInfoFireAndForgetAsync() {
+        const zrxToEthExchangeRate = await this.blockchain.getTokenSaleExchangeRateAsync();
+        const baseEthCapPerAddress = await this.blockchain.getTokenSaleBaseEthCapPerAddressAsync();
+        const startTimeInSec = await this.blockchain.getTokenSaleStartTimeInSecAsync();
+        const totalZrxSupply = await this.blockchain.getTokenSaleTotalSupplyAsync();
+
+        this.setState({
+            zrxToEthExchangeRate,
+            baseEthCapPerAddress,
+            startTimeInSec,
+            totalZrxSupply,
+        });
+    }
+    private async updateVariableTokenSaleInfoFireAndForgetAsync() {
         const orderHash = await this.blockchain.getTokenSaleOrderHashAsync();
         const ethContributedInWei = await this.blockchain.getFillAmountAsync(orderHash);
         const ethContributed = ZeroEx.toUnitAmount(ethContributedInWei, ZRX_ETH_DECIMAL_PLACES);
         const zrxToEthExchangeRate = await this.blockchain.getTokenSaleExchangeRateAsync();
         const zrxSold = ethContributed.mul(zrxToEthExchangeRate);
-        const baseEthCapPerAddress = await this.blockchain.getTokenSaleBaseEthCapPerAddressAsync();
-        const startTimeInSec = await this.blockchain.getTokenSaleStartTimeInSecAsync();
-        const totalZrxSupply = await this.blockchain.getTokenSaleTotalSupplyAsync();
+
         let ethContributedAmount = new BigNumber(0);
         let isAddressRegistered = false;
         if (!_.isEmpty(this.props.userAddress)) {
@@ -482,10 +501,6 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
 
         this.setState({
             zrxSold,
-            zrxToEthExchangeRate,
-            baseEthCapPerAddress,
-            startTimeInSec,
-            totalZrxSupply,
             ethContributedAmount,
             isAddressRegistered,
         });
