@@ -7,9 +7,9 @@ export const constants = {
     BIGNUMBERJS_GITHUB_URL: 'http://mikemcl.github.io/bignumber.js',
     BITLY_ACCESS_TOKEN: 'ffc4c1a31e5143848fb7c523b39f91b9b213d208',
     BITLY_ENDPOINT: 'https://api-ssl.bitly.com',
+    CUSTOM_BLUE: '#60a4f4',
     DEFAULT_TOKEN_ICON_URL: '/images/token_icons/default.png',
     DEFAULT_DERIVATION_PATH: `44'/60'/0'`,
-    ETHER_SCAN_ENDPOINT: 'https://kovan.etherscan.io',
     ETHER_FAUCET_ENDPOINT: 'https://faucet.0xproject.com/rain',
     FEE_RECIPIENT_ADDRESS: '0x0000000000000000000000000000000000000000',
     FIREFOX_U2F_ADDON: 'https://addons.mozilla.org/en-US/firefox/addon/u2f-support-add-on/',
@@ -99,4 +99,6 @@ export const constants = {
         'ApprovalContractEventArgs',
         'TokenContractEventArgs',
     ],
+    // Crowdsale constants
+    CAP_PERIOD_IN_SEC: 86400, // 24hrs in seconds
 };

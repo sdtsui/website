@@ -37,7 +37,7 @@ export interface RegistrationFlowProps {
     providerType: ProviderType;
     injectedProviderName: string;
     userAddress: string;
-    flashMessage?: string;
+    flashMessage?: string|React.ReactNode;
     blockchainErr: BlockchainErrs;
     shouldBlockchainErrDialogBeOpen: boolean;
 }
@@ -177,7 +177,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                     dispatcher={this.props.dispatcher}
                     flashMessage={this.props.flashMessage}
                     showDurationMs={10000}
-                    bodyStyle={{backgroundColor: colors.cyanA700}}
+                    bodyStyle={{backgroundColor: constants.CUSTOM_BLUE}}
                 />
                 <Footer />
             </div>

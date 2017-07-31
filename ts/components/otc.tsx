@@ -53,7 +53,7 @@ export interface OTCAllProps {
     shouldBlockchainErrDialogBeOpen: boolean;
     userSuppliedOrderCache: Order;
     location: Location;
-    flashMessage?: string;
+    flashMessage?: string|React.ReactNode;
 }
 
 interface OTCAllState {

@@ -14,6 +14,6 @@ export const configs = {
     RECAPTCHA_SITE_KEY: '6LcXHicUAAAAAOmRl4ZpDf2MxLEiHolYp1vpdOII',
     CIVIC_APP_ID: 'H1dfQuJEb',
     symbolsOfMintableTokens: ['MKR', 'MLN', 'GNT', 'DGD', 'REP', 'ZRX'],
-    mostPopularTradingPairSymbols: ['WETH', 'GNT'],
+    mostPopularTradingPairSymbols: ['WETH', 'ZRX'],
     lastLocalStorageFillClearanceDate: '2017-07-07',
 };
