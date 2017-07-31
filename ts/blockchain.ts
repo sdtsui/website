@@ -26,17 +26,19 @@ import {
     ContractInstance,
     ProviderType,
     LedgerWalletSubprovider,
+    TokenSaleErrs,
 } from 'ts/types';
 import {Web3Wrapper} from 'ts/web3_wrapper';
 import {errorReporter} from 'ts/utils/error_reporter';
 import {tradeHistoryStorage} from 'ts/local_storage/trade_history_storage';
 import {customTokenStorage} from 'ts/local_storage/custom_token_storage';
-import * as ProxyArtifacts from '../contracts/Proxy.json';
+import * as TokenTransferProxyArtifacts from '../contracts/TokenTransferProxy.json';
 import * as ExchangeArtifacts from '../contracts/Exchange.json';
 import * as TokenRegistryArtifacts from '../contracts/TokenRegistry.json';
 import * as TokenArtifacts from '../contracts/Token.json';
 import * as MintableArtifacts from '../contracts/Mintable.json';
 import * as EtherTokenArtifacts from '../contracts/EtherToken.json';
+import * as TokenSaleArtifacts from '../contracts/TokenSale.json';
 
 const ALLOWANCE_TO_ZERO_GAS_AMOUNT = 45730;
 
@@ -45,9 +47,10 @@ export class Blockchain {
     public nodeVersion: string;
     private dispatcher: Dispatcher;
     private web3Wrapper: Web3Wrapper;
+    private tokenSale: ContractInstance;
     private exchange: ContractInstance;
     private exchangeLogFillEvents: any[];
-    private proxy: ContractInstance;
+    private tokenTransferProxy: ContractInstance;
     private tokenRegistry: ContractInstance;
     private userAddress: string;
     private cachedProvider: Web3.Provider;
@@ -117,7 +120,7 @@ export class Blockchain {
                 this.dispatcher.updateUserAddress(''); // Clear old userAddress
 
                 const provider = new ProviderEngine();
-                this.ledgerSubProvider = ledgerWalletSubproviderFactory();
+                this.ledgerSubProvider = ledgerWalletSubproviderFactory(this.getBlockchainNetworkId.bind(this));
                 provider.addProvider(this.ledgerSubProvider);
                 provider.addProvider(new FilterSubprovider());
                 provider.addProvider(new RpcSubprovider({
@@ -146,7 +149,77 @@ export class Blockchain {
                 throw utils.spawnSwitchErr('providerType', providerType);
         }
     }
-    public async setExchangeAllowanceAsync(token: Token, amountInBaseUnits: BigNumber.BigNumber) {
+    public getTokenSaleAddress(): string {
+      utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
+
+      return this.tokenSale.address;
+    }
+    public async getTokenSaleOrderHashAsync(): Promise<string> {
+      utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
+
+      const orderHash = await this.tokenSale.getOrderHash.call();
+      return orderHash;
+    }
+    public async getTokenSaleExchangeRateAsync(): Promise<BigNumber.BigNumber> {
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
+
+        const makerTokenAmount = await this.tokenSale.getOrderMakerTokenAmount.call();
+        const takerTokenAmount = await this.tokenSale.getOrderTakerTokenAmount.call();
+        const zrxToEthExchangeRate = makerTokenAmount.div(takerTokenAmount);
+        return zrxToEthExchangeRate;
+    }
+    public async getTokenSaleTotalSupplyAsync(): Promise<BigNumber.BigNumber> {
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
+
+        const makerTokenAmount = await this.tokenSale.getOrderMakerTokenAmount.call();
+        return new BigNumber(makerTokenAmount);
+    }
+    public async getTokenSaleBaseEthCapPerAddressAsync(): Promise<BigNumber.BigNumber> {
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
+
+        const baseEthCapPerAddress = await this.tokenSale.baseEthCapPerAddress.call();
+        return new BigNumber(baseEthCapPerAddress);
+    }
+    public async getTokenSaleStartTimeInSecAsync(): Promise<BigNumber.BigNumber> {
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
+
+        const startTimeInSec = await this.tokenSale.startTimeInSec.call();
+        return new BigNumber(startTimeInSec);
+    }
+    public async getTokenSaleContributionAmountAsync(): Promise<BigNumber.BigNumber> {
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
+        utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
+
+        const contributionAmount = await this.tokenSale.contributed.call(this.userAddress);
+        return new BigNumber(contributionAmount);
+    }
+    public async getTokenSaleIsUserAddressRegisteredAsync(): Promise<boolean> {
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
+        utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
+
+        const isRegistered = await this.tokenSale.registered.call(this.userAddress);
+        return isRegistered;
+    }
+    public async tokenSaleFillOrderWithEthAsync(amountInBaseUnits: BigNumber.BigNumber): Promise<string> {
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
+
+        const isRegistered = await this.tokenSale.registered.call(this.userAddress);
+        if (!isRegistered) {
+            throw new Error(TokenSaleErrs.ADDRESS_NOT_REGISTERED);
+        }
+
+        const gas = await this.tokenSale.fillOrderWithEth.estimateGas({
+            value: amountInBaseUnits,
+            from: this.userAddress,
+        });
+        const response = await this.tokenSale.fillOrderWithEth({
+            value: amountInBaseUnits,
+            from: this.userAddress,
+            gas,
+        });
+        return response.tx;
+    }
+    public async setProxyAllowanceAsync(token: Token, amountInBaseUnits: BigNumber.BigNumber): Promise<void> {
         utils.assert(this.isValidAddress(token.address), BlockchainCallErrs.TOKEN_ADDRESS_IS_INVALID);
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
@@ -155,7 +228,7 @@ export class Blockchain {
         // on testrpc. Probably related to https://github.com/ethereumjs/testrpc/issues/294
         // TODO: Debug issue in testrpc and submit a PR, then remove this hack
         const gas = this.networkId === constants.TESTRPC_NETWORK_ID ? ALLOWANCE_TO_ZERO_GAS_AMOUNT : undefined;
-        await tokenContract.approve(this.proxy.address, amountInBaseUnits, {
+        await tokenContract.approve(this.tokenTransferProxy.address, amountInBaseUnits, {
             from: this.userAddress,
             gas,
         });
@@ -223,7 +296,8 @@ export class Blockchain {
     }
     public async getFillAmountAsync(orderHash: string): Promise<BigNumber.BigNumber> {
         utils.assert(ZeroEx.isValidOrderHash(orderHash), 'Must be valid orderHash');
-        const fillAmount = await this.exchange.getUnavailableTakerTokenAmount.call(orderHash);
+        const fillAmountOldBigNumber = await this.exchange.getUnavailableTakerTokenAmount.call(orderHash);
+        const fillAmount = new BigNumber(fillAmountOldBigNumber);
         return fillAmount;
     }
     public getExchangeContractAddressIfExists() {
@@ -329,7 +403,7 @@ export class Blockchain {
         let allowance = new BigNumber(0);
         if (this.doesUserAddressExist()) {
             balance = await tokenContract.balanceOf.call(ownerAddress);
-            allowance = await tokenContract.allowance.call(ownerAddress, this.proxy.address);
+            allowance = await tokenContract.allowance.call(ownerAddress, this.tokenTransferProxy.address);
             // We rewrap BigNumbers from web3 into our BigNumber because the version that they're using is too old
             balance = new BigNumber(balance);
             allowance = new BigNumber(allowance);
@@ -463,7 +537,6 @@ export class Blockchain {
             tokenAddress,
             name,
             symbol,
-            url,
             decimals,
         ] = tokenData[1];
         // HACK: For now we have a hard-coded list of iconUrls for the dummyTokens
@@ -526,6 +599,11 @@ export class Blockchain {
         }
         this.dispatcher.updateInjectedProviderName(providerName);
     }
+    // This is only ever called by the LedgerWallet subprovider in order to retrieve
+    // the current networkId without this value going stale.
+    private getBlockchainNetworkId() {
+        return this.networkId;
+    }
     private async getProviderAsync(injectedWeb3: Web3, networkId: number) {
         const doesInjectedWeb3Exist = !_.isUndefined(injectedWeb3);
         const isPublicNodeAvailable = networkId === constants.TESTNET_NETWORK_ID;
@@ -577,13 +655,19 @@ export class Blockchain {
         this.dispatcher.updateBlockchainIsLoaded(false);
         try {
             const contractsPromises = _.map(
-                [ExchangeArtifacts, TokenRegistryArtifacts, ProxyArtifacts],
+                [
+                  ExchangeArtifacts,
+                  TokenRegistryArtifacts,
+                  TokenTransferProxyArtifacts,
+                  TokenSaleArtifacts,
+                ],
                 (artifacts: any) => this.instantiateContractIfExistsAsync(artifacts),
             );
             const contracts = await Promise.all(contractsPromises);
             this.exchange = contracts[0];
             this.tokenRegistry = contracts[1];
-            this.proxy = contracts[2];
+            this.tokenTransferProxy = contracts[2];
+            this.tokenSale = contracts[3];
         } catch (err) {
             const errMsg = err + '';
             if (_.includes(errMsg, BlockchainCallErrs.CONTRACT_DOES_NOT_EXIST)) {
