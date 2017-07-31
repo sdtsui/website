@@ -468,6 +468,9 @@ export class Blockchain {
     public updateWeb3WrapperPrevUserAddress(newUserAddress: string) {
         this.web3Wrapper.updatePrevUserAddress(newUserAddress);
     }
+    public isOnTestnet() {
+        return this.networkId === constants.TESTNET_NETWORK_ID;
+    }
     private doesUserAddressExist(): boolean {
         return this.userAddress !== '';
     }

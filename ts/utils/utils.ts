@@ -181,4 +181,16 @@ export const utils = {
                                    _.includes(errMsg, paritySignerDenialErrMsg);
         return isUserDeniedErrMsg;
     },
+    getCurrentEnvironment() {
+        switch (location.host) {
+            case constants.DEVELOPMENT_DOMAIN:
+                return 'development';
+            case constants.STAGING_DOMAIN:
+                return 'staging';
+            case constants.PRODUCTION_DOMAIN:
+                return 'production';
+            default:
+                return 'production';
+        }
+    },
 };
