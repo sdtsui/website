@@ -200,7 +200,7 @@ export class Blockchain {
         const isRegistered = await this.tokenSale.registered.call(this.userAddress);
         return isRegistered;
     }
-    public async tokenSaleFillOrderWithEthAsync(amountInBaseUnits: BigNumber.BigNumber): Promise<any> {
+    public async tokenSaleFillOrderWithEthAsync(amountInBaseUnits: BigNumber.BigNumber): Promise<string> {
         utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
 
         const isRegistered = await this.tokenSale.registered.call(this.userAddress);
@@ -217,7 +217,7 @@ export class Blockchain {
             from: this.userAddress,
             gas,
         });
-        return response;
+        return response.tx;
     }
     public async setExchangeAllowanceAsync(token: Token, amountInBaseUnits: BigNumber.BigNumber) {
         utils.assert(this.isValidAddress(token.address), BlockchainCallErrs.TOKEN_ADDRESS_IS_INVALID);

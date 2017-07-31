@@ -571,10 +571,9 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         }
 
         try {
-            const response = await this.blockchain.tokenSaleFillOrderWithEthAsync(
+            const transactionHex = await this.blockchain.tokenSaleFillOrderWithEthAsync(
                 this.state.contributionAmountInBaseUnits,
             );
-            const transactionHex = response.tx;
             const transactionSuccessMsg = this.renderTransactionSuccessfulMsg(transactionHex);
             this.props.dispatcher.showFlashMessage(transactionSuccessMsg);
             return true;
