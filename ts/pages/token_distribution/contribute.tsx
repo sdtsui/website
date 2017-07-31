@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as DocumentTitle from 'react-document-title';
 import * as BigNumber from 'bignumber.js';
 import * as moment from 'moment';
+import ReactTooltip = require('react-tooltip');
 import {colors} from 'material-ui/styles';
 import CircularProgress from 'material-ui/CircularProgress';
 import {ZeroEx} from '0x.js';
@@ -275,9 +276,18 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                                 <span><i className="zmdi zmdi-check-circle" /></span>{' '}
                                                 <span>Address registered</span>
                                             </div> :
-                                            <div style={{color: colors.red500}}>
+                                            <div
+                                                style={{color: colors.red500}}
+                                                data-tip={true}
+                                                data-for="notRegisteredTooltip"
+                                            >
                                                 <span><i className="zmdi zmdi-alert-triangle" /></span>{' '}
                                                 <span>Unregistered address</span>
+                                                <ReactTooltip id="notRegisteredTooltip">
+                                                    You can only contribute from an address that was<br />
+                                                    registered during the mandatory registration period<br />
+                                                    (Aug. 9th-12th).
+                                                </ReactTooltip>
                                             </div>
                                         }
                                     </div>
