@@ -29,7 +29,7 @@ export class Party extends React.Component<PartyProps, PartyState> {
         const identiconDiameter = this.props.identiconDiameter;
         const addressWidth = identiconDiameter > MIN_ADDRESS_WIDTH ?
                              identiconDiameter : MIN_ADDRESS_WIDTH;
-        const addressEnds = `${address.substring(0, 6)}...${address.substr(-4)}`;
+        const truncatedAddress = `${address.substring(0, 6)}...${address.substr(-4)}`; // 0x3d5a...b287
         return (
             <div style={{overflow: 'hidden'}}>
                 <div className="pb1 center">{label}</div>
@@ -52,7 +52,7 @@ export class Party extends React.Component<PartyProps, PartyState> {
                         data-tip={true}
                         data-for={tooltipId}
                     >
-                        {!_.isEmpty(address) ? addressEnds : this.props.noAddressLabel}
+                        {!_.isEmpty(address) ? truncatedAddress : this.props.noAddressLabel}
                     </div>
                 </div>
                 {!_.isEmpty(address) && <ReactTooltip id={tooltipId}>{address}</ReactTooltip>}
