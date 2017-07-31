@@ -81,6 +81,9 @@ const LazyZeroExJSDocumentation = createLazyComponent(
     'ZeroExJSDocumentation',
     () => System.import<any>(/* webpackChunkName: "docs" */'ts/containers/zero_ex_js_documentation'),
 );
+const LazyContribute = createLazyComponent('Contribute', () => System.import<any>(
+    /* webpackChunkName: "contribute" */'ts/containers/contribute',
+));
 
 const store: ReduxStore<State> = createStore(reducer);
 render(
@@ -95,7 +98,7 @@ render(
                             <Route path="/token" component={TokenLaunch as any} />
                             <Route path="/faq" component={FAQ as any} />
                             <Route path="/registration" component={RegistrationFlow as any} />
-                            <Route path="/contribute" component={Contribute as any} />
+                            <Route path="/contribute" component={LazyContribute} />
                             <Route path="/registration_check" component={RegistrationCheck as any} />
                             <Route path="/docs/0xjs/:version?" component={LazyZeroExJSDocumentation} />
                             <Route component={NotFound as any} />
