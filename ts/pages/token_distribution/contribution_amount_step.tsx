@@ -4,7 +4,7 @@ import * as BigNumber from 'bignumber.js';
 import * as Recaptcha from 'react-recaptcha';
 import RaisedButton from 'material-ui/RaisedButton';
 import {Dispatcher} from 'ts/redux/dispatcher';
-import {constants} from 'ts/utils/constants';
+import {configs} from 'ts/utils/configs';
 import {EthAmountInput} from 'ts/components/inputs/eth_amount_input';
 import {InputLabel} from 'ts/components/ui/input_label';
 import {RequiredLabel} from 'ts/components/ui/required_label';
@@ -52,7 +52,7 @@ export class ContributionAmountStep extends React.Component<ContributionAmountSt
                 </div>
                 <div>
                     <Recaptcha
-                        sitekey={constants.RECAPTCHA_SITE_KEY}
+                        sitekey={configs.RECAPTCHA_SITE_KEY}
                         render="explicit"
                         ref={this.setRecaptchaInstance.bind(this)}
                         onloadCallback={_.noop}
@@ -84,7 +84,7 @@ export class ContributionAmountStep extends React.Component<ContributionAmountSt
             civicUserId: this.props.civicUserId,
             recaptchaToken: this.state.recaptchaToken,
         });
-        const response = await fetch(`${constants.BACKEND_BASE_URL}/contribution_amount`, {
+        const response = await fetch(`${configs.BACKEND_BASE_URL}/contribution_amount`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
