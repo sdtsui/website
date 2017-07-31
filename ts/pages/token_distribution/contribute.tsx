@@ -599,6 +599,8 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                 this.props.dispatcher.showFlashMessage('You denied the transaction confirmation');
             } else if (_.includes(errMsg, TokenSaleErrs.ADDRESS_NOT_REGISTERED)) {
                 this.props.dispatcher.showFlashMessage('You cannot contribute from an unregistered address');
+            } else if (_.includes(errMsg, 'TOO_OLD_LEDGER_FIRMWARE')) {
+                this.props.dispatcher.showFlashMessage('Your Ledger firmware is too old. Please update it.');
             } else {
                 utils.consoleLog(`Sending transaction failed: ${err}`);
                 this.props.dispatcher.showFlashMessage(

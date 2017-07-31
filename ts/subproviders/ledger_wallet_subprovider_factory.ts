@@ -99,6 +99,14 @@ export class LedgerWallet {
             tx.r = new Buffer(result.r, 'hex');
             tx.s = new Buffer(result.s, 'hex');
 
+            // EIP155: v should be chain_id * 2 + {35, 36}
+            const signedChainId = Math.floor((tx.v[0] - 35) / 2);
+            if (signedChainId !== chainId) {
+                const err = new Error('TOO_OLD_LEDGER_FIRMWARE');
+                callback(err, null);
+                return;
+            }
+
             const signedTxHex = `0x${tx.serialize().toString('hex')}`;
             await this.closeLedgerConnectionAsync();
             callback(null, signedTxHex);
