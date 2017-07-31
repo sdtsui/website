@@ -32,7 +32,7 @@ import {Web3Wrapper} from 'ts/web3_wrapper';
 import {errorReporter} from 'ts/utils/error_reporter';
 import {tradeHistoryStorage} from 'ts/local_storage/trade_history_storage';
 import {customTokenStorage} from 'ts/local_storage/custom_token_storage';
-import * as ProxyTokenTransferArtifacts from '../contracts/TokenTransferProxy.json';
+import * as TokenTransferProxyArtifacts from '../contracts/TokenTransferProxy.json';
 import * as ExchangeArtifacts from '../contracts/Exchange.json';
 import * as TokenRegistryArtifacts from '../contracts/TokenRegistry.json';
 import * as TokenArtifacts from '../contracts/Token.json';
@@ -50,7 +50,7 @@ export class Blockchain {
     private tokenSale: ContractInstance;
     private exchange: ContractInstance;
     private exchangeLogFillEvents: any[];
-    private proxy: ContractInstance;
+    private tokenTransferProxy: ContractInstance;
     private tokenRegistry: ContractInstance;
     private userAddress: string;
     private cachedProvider: Web3.Provider;
@@ -228,7 +228,7 @@ export class Blockchain {
         // on testrpc. Probably related to https://github.com/ethereumjs/testrpc/issues/294
         // TODO: Debug issue in testrpc and submit a PR, then remove this hack
         const gas = this.networkId === constants.TESTRPC_NETWORK_ID ? ALLOWANCE_TO_ZERO_GAS_AMOUNT : undefined;
-        await tokenContract.approve(this.proxy.address, amountInBaseUnits, {
+        await tokenContract.approve(this.tokenTransferProxy.address, amountInBaseUnits, {
             from: this.userAddress,
             gas,
         });
@@ -403,7 +403,7 @@ export class Blockchain {
         let allowance = new BigNumber(0);
         if (this.doesUserAddressExist()) {
             balance = await tokenContract.balanceOf.call(ownerAddress);
-            allowance = await tokenContract.allowance.call(ownerAddress, this.proxy.address);
+            allowance = await tokenContract.allowance.call(ownerAddress, this.tokenTransferProxy.address);
             // We rewrap BigNumbers from web3 into our BigNumber because the version that they're using is too old
             balance = new BigNumber(balance);
             allowance = new BigNumber(allowance);
@@ -658,7 +658,7 @@ export class Blockchain {
                 [
                   ExchangeArtifacts,
                   TokenRegistryArtifacts,
-                  ProxyTokenTransferArtifacts,
+                  TokenTransferProxyArtifacts,
                   TokenSaleArtifacts,
                 ],
                 (artifacts: any) => this.instantiateContractIfExistsAsync(artifacts),
@@ -666,7 +666,7 @@ export class Blockchain {
             const contracts = await Promise.all(contractsPromises);
             this.exchange = contracts[0];
             this.tokenRegistry = contracts[1];
-            this.proxy = contracts[2];
+            this.tokenTransferProxy = contracts[2];
             this.tokenSale = contracts[3];
         } catch (err) {
             const errMsg = err + '';
