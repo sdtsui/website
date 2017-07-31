@@ -16,7 +16,6 @@ import {Dispatcher} from 'ts/redux/dispatcher';
 import {FlashMessage} from 'ts/components/ui/flash_message';
 import {BlockchainErrDialog} from 'ts/components/blockchain_err_dialog';
 import {EthAmountInput} from 'ts/components/inputs/eth_amount_input';
-import {InputLabel} from 'ts/components/ui/input_label';
 import {LedgerConfigDialog} from 'ts/components/ledger_config_dialog';
 import {U2fNotSupportedDialog} from 'ts/components/u2f_not_supported_dialog';
 import {LabeledSwitcher} from 'ts/components/ui/labeled_switcher';
@@ -483,10 +482,17 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         );
     }
     private async updateConstantTokenSaleInfoFireAndForgetAsync() {
-        const zrxToEthExchangeRate = await this.blockchain.getTokenSaleExchangeRateAsync();
-        const baseEthCapPerAddress = await this.blockchain.getTokenSaleBaseEthCapPerAddressAsync();
-        const startTimeInSec = await this.blockchain.getTokenSaleStartTimeInSecAsync();
-        const totalZrxSupply = await this.blockchain.getTokenSaleTotalSupplyAsync();
+        const [
+            zrxToEthExchangeRate,
+            baseEthCapPerAddress,
+            startTimeInSec,
+            totalZrxSupply,
+        ] = await Promise.all([
+            await this.blockchain.getTokenSaleExchangeRateAsync(),
+            await this.blockchain.getTokenSaleBaseEthCapPerAddressAsync(),
+            await this.blockchain.getTokenSaleStartTimeInSecAsync(),
+            await this.blockchain.getTokenSaleTotalSupplyAsync(),
+        ]);
 
         this.setState({
             zrxToEthExchangeRate,
@@ -550,24 +556,24 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         });
         return true;
     }
-    private formatCurrencyAmount(amount: BigNumber.BigNumber) {
+    private formatCurrencyAmount(amount: BigNumber.BigNumber): number {
         const unitAmount = ZeroEx.toUnitAmount(amount, ZRX_ETH_DECIMAL_PLACES);
         const roundedUnitAmount = Math.round(unitAmount.toNumber() * 100000) / 100000;
         return roundedUnitAmount;
     }
-    private async onPurchaseZRXClickAsync() {
+    private async onPurchaseZRXClickAsync(): Promise<boolean> {
         const contributionAmountInUnits = ZeroEx.toUnitAmount(this.state.contributionAmountInBaseUnits,
                                                               ZRX_ETH_DECIMAL_PLACES);
         if (this.props.userEtherBalance.lt(contributionAmountInUnits)) {
             this.props.dispatcher.showFlashMessage('Insufficient Ether balance to complete this transaction');
-            return;
+            return false;
         }
         const isAmountBelowCurrentCap = this.isAmountBelowCurrentCap();
         if (!isAmountBelowCurrentCap) {
             const desiredContributionAmount = this.formatCurrencyAmount(this.state.contributionAmountInBaseUnits);
             const errMsg = `Cannot contribute ${desiredContributionAmount} ETH without exceeding the current cap`;
             this.props.dispatcher.showFlashMessage(errMsg);
-            return;
+            return false;
         }
 
         try {
@@ -592,14 +598,14 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             return false;
         }
     }
-    private isAmountBelowCurrentCap() {
+    private isAmountBelowCurrentCap(): boolean {
         const nowTimestamp = moment().unix();
         const ethCapPerAddress = this.getEthCapPerAddressAtTimestamp(nowTimestamp);
         const desiredContributionAmount = this.state.contributionAmountInBaseUnits.add(this.state.ethContributedAmount);
         const isBelowCap = ethCapPerAddress.gte(desiredContributionAmount);
         return isBelowCap;
     }
-    private getEthCapPerAddressAtTimestamp(timestamp: number) {
+    private getEthCapPerAddressAtTimestamp(timestamp: number): BigNumber.BigNumber {
         const period = this.getCapPeriod(timestamp);
         const multiplier = (2 ** period) - 1;
         const ethCapPerAddress = this.state.baseEthCapPerAddress.mul(multiplier);

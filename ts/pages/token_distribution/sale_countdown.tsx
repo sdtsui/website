@@ -1,8 +1,5 @@
-import * as _ from 'lodash';
 import * as React from 'react';
 import * as moment from 'moment';
-import LinearProgress from 'material-ui/LinearProgress';
-import {constants} from 'ts/utils/constants';
 
 const UPDATE_INTERVAL_MS = 1000;
 
