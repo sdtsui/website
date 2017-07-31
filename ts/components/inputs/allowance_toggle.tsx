@@ -75,7 +75,7 @@ export class AllowanceToggle extends React.Component<AllowanceToggleProps, Allow
         try {
             const allowanceInUnits = new BigNumber(newAllowanceAmountInUnits);
             const amountInBaseUnits = ZeroEx.toBaseUnitAmount(allowanceInUnits, this.props.token.decimals);
-            await this.props.blockchain.setExchangeAllowanceAsync(this.props.token, amountInBaseUnits);
+            await this.props.blockchain.setProxyAllowanceAsync(this.props.token, amountInBaseUnits);
         } catch (err) {
             this.setState({
                 isSpinnerVisible: false,

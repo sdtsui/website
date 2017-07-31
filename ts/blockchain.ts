@@ -219,7 +219,7 @@ export class Blockchain {
         });
         return response.tx;
     }
-    public async setExchangeAllowanceAsync(token: Token, amountInBaseUnits: BigNumber.BigNumber) {
+    public async setProxyAllowanceAsync(token: Token, amountInBaseUnits: BigNumber.BigNumber): Promise<void> {
         utils.assert(this.isValidAddress(token.address), BlockchainCallErrs.TOKEN_ADDRESS_IS_INVALID);
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
