@@ -6,6 +6,7 @@ import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
 import {Blockchain} from 'ts/blockchain';
 import {ipUtils} from 'ts/utils/ip_utils';
 import {configs} from 'ts/utils/configs';
+import {constants} from 'ts/utils/constants';
 import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
 import {ContributionAmountStep} from 'ts/pages/token_distribution/contribution_amount_step';
