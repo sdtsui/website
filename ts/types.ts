@@ -415,6 +415,7 @@ export interface LedgerEthConnection {
     getAddress_async: (derivationPath: string, askForDeviceConfirmation: boolean,
                        shouldGetChainCode: boolean) => Promise<LedgerGetAddressResult>;
     signPersonalMessage_async: (derivationPath: string, messageHex: string) => Promise<LedgerSignResult>;
+    signTransaction_async: (derivationPath: string, txHex: string) => Promise<LedgerSignResult>;
     comm: LedgerCommunication;
 }
 export interface SignPersonalMessageParams {
@@ -426,3 +427,18 @@ export interface LedgerWalletSubprovider {
     setPath: (path: string) => void;
     setPathIndex: (pathIndex: number) => void;
 }
+
+export interface TxParams {
+    nonce: string;
+    gasPrice?: number;
+    gasLimit: string;
+    to: string;
+    value?: string;
+    data?: string;
+    chainId: number; // EIP 155 chainId - mainnet: 1, ropsten: 3
+}
+
+export const TokenSaleErrs = strEnum([
+  'ADDRESS_NOT_REGISTERED',
+]);
+export type TokenSaleErrs = keyof typeof TokenSaleErrs;

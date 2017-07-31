@@ -2,13 +2,13 @@ import {connect} from 'react-redux';
 import {Store as ReduxStore, Dispatch} from 'redux';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {State} from 'ts/redux/reducer';
-import {RegistrationFlow as RegistrationFlowComponent} from 'ts/pages/token_distribution/registration_flow';
-import {BlockchainErrs, ProviderType} from 'ts/types';
+import {Contribute as ContributeComponent} from 'ts/pages/token_distribution/contribute';
+import {BlockchainErrs, ProviderType, ScreenWidths} from 'ts/types';
 
 interface ConnectedDispatch {
     dispatcher: Dispatcher;
 }
-interface RegistrationFlowComponentPassedProps {};
+interface ContributeComponentPassedProps {};
 
 const mapDispatchToProps = (dispatch: Dispatch<State>): ConnectedDispatch => ({
     dispatcher: new Dispatcher(dispatch),
@@ -22,8 +22,10 @@ interface ConnectedState {
     providerType: ProviderType;
     injectedProviderName: string;
     userAddress: string;
+    userEtherBalance: BigNumber.BigNumber;
     blockchainErr: BlockchainErrs;
     shouldBlockchainErrDialogBeOpen: boolean;
+    screenWidth: ScreenWidths;
 };
 
 const mapStateToProps = (state: State): ConnectedState => ({
@@ -34,9 +36,11 @@ const mapStateToProps = (state: State): ConnectedState => ({
     providerType: state.providerType,
     injectedProviderName: state.injectedProviderName,
     userAddress: state.userAddress,
+    userEtherBalance: state.userEtherBalance,
     blockchainErr: state.blockchainErr,
     shouldBlockchainErrDialogBeOpen: state.shouldBlockchainErrDialogBeOpen,
+    screenWidth: state.screenWidth,
 });
 
-export const RegistrationFlow: React.ComponentClass<RegistrationFlowComponentPassedProps> =
-  connect(mapStateToProps, mapDispatchToProps)(RegistrationFlowComponent);
+export const Contribute: React.ComponentClass<ContributeComponentPassedProps> =
+  connect(mapStateToProps, mapDispatchToProps)(ContributeComponent);

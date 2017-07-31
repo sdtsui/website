@@ -48,7 +48,7 @@ export interface State {
     availableZeroExJSVersions: string[];
 
     // Shared
-    flashMessage: string;
+    flashMessage: string|React.ReactNode;
     providerType: ProviderType;
     injectedProviderName: string;
 };

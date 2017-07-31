@@ -58,7 +58,7 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
         const dialogActions = [
             <FlatButton
                 label="Cancel"
-                onTouchTap={this.props.toggleDialogFn.bind(this.props.toggleDialogFn, false)}
+                onTouchTap={this.onClose.bind(this)}
             />,
         ];
         const dialogTitle = this.state.stepIndex === LedgerSteps.CONNECT ?
@@ -70,7 +70,7 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
                 titleStyle={{fontWeight: 100}}
                 actions={dialogActions}
                 open={this.props.isOpen}
-                onRequestClose={this.props.toggleDialogFn.bind(this.props.toggleDialogFn, false)}
+                onRequestClose={this.onClose.bind(this)}
                 autoScrollBodyContent={true}
                 bodyStyle={{paddingBottom: 0}}
             >
@@ -192,6 +192,13 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
             );
         });
         return rows;
+    }
+    private onClose() {
+        this.setState({
+            didConnectFail: false,
+        });
+        const isOpen = false;
+        this.props.toggleDialogFn(isOpen);
     }
     private onAddressSelected(selectedRowIndexes: number[]) {
         const selectedRowIndex = selectedRowIndexes[0];

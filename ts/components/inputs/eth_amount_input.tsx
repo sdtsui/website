@@ -14,6 +14,7 @@ interface EthAmountInputProps {
     shouldShowIncompleteErrs: boolean;
     onVisitBalancesPageClick?: () => void;
     shouldCheckBalance: boolean;
+    shouldHideVisitBalancesLink?: boolean;
 }
 
 interface EthAmountInputState {}
@@ -24,7 +25,7 @@ export class EthAmountInput extends React.Component<EthAmountInputProps, EthAmou
             ZeroEx.toUnitAmount(this.props.amount, constants.ETH_DECIMAL_PLACES) :
             undefined;
         return (
-            <div className="flex overflow-hidden" style={{height: 84}}>
+            <div className="flex overflow-hidden" style={{height: 63}}>
                 <BalanceBoundedInput
                     label={this.props.label}
                     balance={this.props.balance}
@@ -33,6 +34,7 @@ export class EthAmountInput extends React.Component<EthAmountInputProps, EthAmou
                     shouldCheckBalance={this.props.shouldCheckBalance}
                     shouldShowIncompleteErrs={this.props.shouldShowIncompleteErrs}
                     onVisitBalancesPageClick={this.props.onVisitBalancesPageClick}
+                    shouldHideVisitBalancesLink={this.props.shouldHideVisitBalancesLink}
                 />
                 <div style={{paddingTop: _.isUndefined(this.props.label) ? 15 : 40}}>
                     ETH

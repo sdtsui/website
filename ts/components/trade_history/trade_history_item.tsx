@@ -65,7 +65,7 @@ export class TradeHistoryItem extends React.Component<TradeHistoryItemProps, Tra
                         className="col col-12 lg-col-6 md-col-6 lg-pl3 md-pl3"
                         style={{fontSize: 12, fontWeight: 100}}
                     >
-                        <div className="flex sm-mx-auto xs-mx-auto" style={{paddingTop: 4, width: 168}}>
+                        <div className="flex sm-mx-auto xs-mx-auto" style={{paddingTop: 4, width: 224}}>
                             <Party
                                 label="Maker"
                                 address={fill.maker}
