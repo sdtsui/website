@@ -5,9 +5,14 @@ const NEW_YORK_CITY_NAME = 'New York';
 
 export const ipUtils = {
     async isNewYorkIPAsync() {
-        const cityIfAvailable = await this.fetchIPAPICityIfAvailableAsync();
-        if (_.isUndefined(cityIfAvailable)) {
+        let cityIfAvailable;
+        try {
+            cityIfAvailable = await this.fetchIPAPICityIfAvailableAsync();
+        } catch (err) {
             return false; // We default to them not being from NY if the IP lookup fails
+        }
+        if (_.isUndefined(cityIfAvailable)) {
+            return false;
         }
         return cityIfAvailable === NEW_YORK_CITY_NAME;
     },
