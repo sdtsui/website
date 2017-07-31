@@ -498,10 +498,10 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             startTimeInSec,
             totalZrxSupply,
         ] = await Promise.all([
-            await this.blockchain.getTokenSaleExchangeRateAsync(),
-            await this.blockchain.getTokenSaleBaseEthCapPerAddressAsync(),
-            await this.blockchain.getTokenSaleStartTimeInSecAsync(),
-            await this.blockchain.getTokenSaleTotalSupplyAsync(),
+            this.blockchain.getTokenSaleExchangeRateAsync(),
+            this.blockchain.getTokenSaleBaseEthCapPerAddressAsync(),
+            this.blockchain.getTokenSaleStartTimeInSecAsync(),
+            this.blockchain.getTokenSaleTotalSupplyAsync(),
         ]);
 
         this.setState({
