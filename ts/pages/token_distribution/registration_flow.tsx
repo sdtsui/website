@@ -1,12 +1,12 @@
 import * as _ from 'lodash';
 import * as React from 'react';
-import isMobile = require('is-mobile');
 import {colors} from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
 import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
 import {Blockchain} from 'ts/blockchain';
 import {ipUtils} from 'ts/utils/ip_utils';
 import {constants} from 'ts/utils/constants';
+import {utils} from 'ts/utils/utils';
 import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
 import {ContributionAmountStep} from 'ts/pages/token_distribution/contribution_amount_step';
@@ -53,7 +53,6 @@ interface RegistrationFlowState {
     prevProviderType: ProviderType;
     isLoadingRegistrationFlow: boolean;
     isNYIP: boolean;
-    isMobile: boolean;
 }
 
 export class RegistrationFlow extends React.Component<RegistrationFlowProps, RegistrationFlowState> {
@@ -74,7 +73,6 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             prevProviderType: this.props.providerType,
             isLoadingRegistrationFlow: true,
             isNYIP: false,
-            isMobile: isMobile(),
         };
     }
     public componentWillMount() {
@@ -279,7 +277,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         );
     }
     private renderVerifyIdentityStep() {
-        if (this.state.isMobile) {
+        if (utils.isUserOnMobile()) {
             return (
                 <div>
                     Mobile devices are not supported.
