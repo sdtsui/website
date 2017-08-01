@@ -204,7 +204,9 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
         const selectedRowIndex = selectedRowIndexes[0];
         this.props.blockchain.updateLedgerDerivationIndex(selectedRowIndex);
         const selectedAddress = this.state.userAddresses[selectedRowIndex];
+        const selectAddressBalance = this.state.addressBalances[selectedRowIndex];
         this.props.dispatcher.updateUserAddress(selectedAddress);
+        this.props.dispatcher.updateUserEtherBalance(selectAddressBalance);
         this.setState({
             stepIndex: LedgerSteps.CONNECT,
         });

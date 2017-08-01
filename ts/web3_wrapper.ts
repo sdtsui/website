@@ -87,7 +87,7 @@ export class Web3Wrapper {
         }
 
         let prevNodeVersion: string;
-        let prevUserEtherBalanceInWei = new BigNumber(0);
+        let prevUserEtherBalanceInEth = new BigNumber(0);
         let prevUserAddress: string;
         this.dispatcher.updateNetworkId(this.prevNetworkId);
         this.watchNetworkAndBalanceIntervalId = window.setInterval(async () => {
@@ -116,8 +116,8 @@ export class Web3Wrapper {
                 // Check for user ether balance changes
                 if (userAddressIfExists !== '') {
                     const balance = await this.getBalanceInEthAsync(userAddressIfExists);
-                    if (!balance.eq(prevUserEtherBalanceInWei)) {
-                        prevUserEtherBalanceInWei = balance;
+                    if (!balance.eq(prevUserEtherBalanceInEth)) {
+                        prevUserEtherBalanceInEth = balance;
                         this.dispatcher.updateUserEtherBalance(balance);
                     }
                 }
