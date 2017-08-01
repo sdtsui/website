@@ -12,6 +12,8 @@ export class Web3Wrapper {
     private prevNetworkId: number;
     private shouldPollUserAddress: boolean;
     private watchNetworkAndBalanceIntervalId: number;
+    private prevUserEtherBalanceInEth: BigNumber.BigNumber;
+    private prevUserAddress: string;
     constructor(dispatcher: Dispatcher, provider: Web3.Provider, networkId: number,
                 shouldPollUserAddress: boolean) {
         this.dispatcher = dispatcher;
@@ -77,6 +79,10 @@ export class Web3Wrapper {
     public destroy() {
         this.stopEmittingNetworkConnectionAndUserBalanceStateAsync();
     }
+    // This should only be called from the LedgerConfigDialog
+    public updatePrevUserAddress(userAddress: string) {
+        this.prevUserAddress = userAddress;
+    }
     private async getNetworkAsync() {
         const networkId = await promisify(this.web3.version.getNetwork)();
         return networkId;
@@ -87,8 +93,7 @@ export class Web3Wrapper {
         }
 
         let prevNodeVersion: string;
-        let prevUserEtherBalanceInEth = new BigNumber(0);
-        let prevUserAddress: string;
+        this.prevUserEtherBalanceInEth = new BigNumber(0);
         this.dispatcher.updateNetworkId(this.prevNetworkId);
         this.watchNetworkAndBalanceIntervalId = window.setInterval(async () => {
             // Check for network state changes
@@ -108,21 +113,30 @@ export class Web3Wrapper {
             if (this.shouldPollUserAddress) {
                 const userAddressIfExists = await this.getFirstAccountIfExistsAsync();
                 // Update makerAddress on network change
-                if (prevUserAddress !== userAddressIfExists) {
-                    prevUserAddress = userAddressIfExists;
+                if (this.prevUserAddress !== userAddressIfExists) {
+                    this.prevUserAddress = userAddressIfExists;
                     this.dispatcher.updateUserAddress(userAddressIfExists);
                 }
 
                 // Check for user ether balance changes
                 if (userAddressIfExists !== '') {
-                    const balance = await this.getBalanceInEthAsync(userAddressIfExists);
-                    if (!balance.eq(prevUserEtherBalanceInEth)) {
-                        prevUserEtherBalanceInEth = balance;
-                        this.dispatcher.updateUserEtherBalance(balance);
-                    }
+                    await this.updateUserEtherBalanceAsync(userAddressIfExists);
+                }
+            } else {
+                // This logic is primarily for the Ledger, since we don't regularly poll for the address
+                // we simply update the balance for the last fetched address.
+                if (!_.isEmpty(this.prevUserAddress)) {
+                    await this.updateUserEtherBalanceAsync(this.prevUserAddress);
                 }
             }
         }, 1000);
+    }
+    private async updateUserEtherBalanceAsync(userAddress: string) {
+        const balance = await this.getBalanceInEthAsync(userAddress);
+        if (!balance.eq(this.prevUserEtherBalanceInEth)) {
+            this.prevUserEtherBalanceInEth = balance;
+            this.dispatcher.updateUserEtherBalance(balance);
+        }
     }
     private stopEmittingNetworkConnectionAndUserBalanceStateAsync() {
         clearInterval(this.watchNetworkAndBalanceIntervalId);
