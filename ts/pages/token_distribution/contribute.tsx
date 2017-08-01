@@ -5,6 +5,7 @@ import * as BigNumber from 'bignumber.js';
 import * as moment from 'moment';
 import ReactTooltip = require('react-tooltip');
 import {colors} from 'material-ui/styles';
+import Paper from 'material-ui/Paper';
 import CircularProgress from 'material-ui/CircularProgress';
 import {ZeroEx} from '0x.js';
 import {utils} from 'ts/utils/utils';
@@ -183,244 +184,265 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         );
     }
     private renderContributionForm() {
-      const now = moment().unix();
-      const nextPeriodTimestamp = now + constants.CAP_PERIOD_IN_SEC;
-      const capPeriodEndIfExists = this.getCapPeriodEndTimestampIfExists();
-      const labelLeft = this.props.injectedProviderName !== constants.PUBLIC_PROVIDER_NAME ?
+        const style = {
+            height: '60vh',
+            width: '60vw',
+            display: 'inline-block',
+        };
+        if (!_.isUndefined(this.state.startTimeInSec) && this.state.startTimeInSec.gt(moment().unix())) {
+            const startTime = moment.unix(this.state.startTimeInSec.toNumber());
+            return (
+                <div className="block mx-auto pt4">
+                    <Paper style={style} zDepth={1}>
+                        <div className="flex items-center justify-center fit" style={{height: '100%'}}>
+                            <div className="self-center">
+                                Contribution period had not started yet!
+                                <br/>
+                                Start time: {startTime.format('MMMM Do h:mm:ss a')}
+                            </div>
+                        </div>
+                    </Paper>
+                </div>
+            );
+        }
+        const now = moment().unix();
+        const nextPeriodTimestamp = now + constants.CAP_PERIOD_IN_SEC;
+        const capPeriodEndIfExists = this.getCapPeriodEndTimestampIfExists();
+        const labelLeft = this.props.injectedProviderName !== constants.PUBLIC_PROVIDER_NAME ?
                         this.props.injectedProviderName :
                         'Injected Web3';
-      const isLedgerProvider = this.props.providerType === ProviderType.LEDGER;
-      let ZRXAmountToReceive = 0;
-      if (!_.isUndefined(this.state.contributionAmountInBaseUnits)) {
-          const zrxEquivalentAmount = this.state.contributionAmountInBaseUnits.mul(this.state.zrxToEthExchangeRate);
-          ZRXAmountToReceive = this.formatCurrencyAmount(zrxEquivalentAmount);
-      }
-      const tokenSaleAddress = this.blockchain.getTokenSaleAddress();
-      const etherscanTokenSaleContractUrl = utils.getEtherScanLinkIfExists(tokenSaleAddress,
+        const isLedgerProvider = this.props.providerType === ProviderType.LEDGER;
+        let ZRXAmountToReceive = 0;
+        if (!_.isUndefined(this.state.contributionAmountInBaseUnits)) {
+            const zrxEquivalentAmount = this.state.contributionAmountInBaseUnits.mul(this.state.zrxToEthExchangeRate);
+            ZRXAmountToReceive = this.formatCurrencyAmount(zrxEquivalentAmount);
+        }
+        const tokenSaleAddress = this.blockchain.getTokenSaleAddress();
+        const etherscanTokenSaleContractUrl = utils.getEtherScanLinkIfExists(tokenSaleAddress,
                                                                            this.props.networkId,
                                                                            EtherscanLinkSuffixes.address);
-      return (
-        <div className="clearfix max-width-4 mx-auto" style={{paddingTop: 43, width: '100%'}}>
-            {this.props.screenWidth === ScreenWidths.SM &&
-                this.renderSaleStats(capPeriodEndIfExists)
-            }
-            <div className="col lg-col-9 md-col-9 col-12">
-                <div className="mx-auto sm-px2" style={{maxWidth: 530}}>
-                    <div className="h2 pt3">Make a contribution</div>
-                    <div className="clearfix pt3">
-                        <div className="col col-1">
-                            {this.renderStepNumber(1)}
+        return (
+            <div className="clearfix max-width-4 mx-auto" style={{paddingTop: 43, width: '100%'}}>
+                {this.props.screenWidth === ScreenWidths.SM &&
+                    this.renderSaleStats(capPeriodEndIfExists)
+                }
+                <div className="col lg-col-9 md-col-9 col-12">
+                    <div className="mx-auto sm-px2" style={{maxWidth: 530}}>
+                        <div className="h2 pt3">Make a contribution</div>
+                        <div className="clearfix pt3">
+                            <div className="col col-1">
+                                {this.renderStepNumber(1)}
+                            </div>
+                            <div className="col col-11">
+                                <div className="h3">Select your wallet:</div>
+                                <div className="pt2 pb3 mx-auto" style={{maxWidth: 440}}>
+                                    <LabeledSwitcher
+                                        labelLeft={labelLeft}
+                                        labelRight="Ledger Nano S"
+                                        isLeftInitiallySelected={!isLedgerProvider}
+                                        onLeftLabelClickAsync={this.onInjectedWeb3Click.bind(this)}
+                                        onRightLabelClickAsync={this.onLedgerClickAsync.bind(this)}
+                                    />
+                                    <div
+                                        className="clearfix"
+                                        style={{fontSize: 14, color: '#635F5E', paddingTop: 11}}
+                                    >
+                                        <div className="col col-6 center">
+                                            <div>
+                                                address connected via Web3
+                                            </div>
+                                            <div>
+                                                (i.e{' '}
+                                                <a
+                                                    className="underline"
+                                                    style={{color: '#635F5E'}}
+                                                    href={constants.METAMASK_CHROME_STORE_URL}
+                                                    target="_blank"
+                                                >
+                                                    Metamask
+                                                </a>{' '}or{' '}
+                                                <a
+                                                    className="underline"
+                                                    style={{color: '#635F5E'}}
+                                                    href={constants.PARITY_CHROME_STORE_URL}
+                                                    target="_blank"
+                                                >
+                                                    Parity Signer
+                                                </a>)
+                                            </div>
+                                        </div>
+                                        <div className="col col-6 center">
+                                            Ledger hardware wallet
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="col col-11">
-                            <div className="h3">Select your wallet:</div>
-                            <div className="pt2 pb3 mx-auto" style={{maxWidth: 440}}>
-                                <LabeledSwitcher
-                                    labelLeft={labelLeft}
-                                    labelRight="Ledger Nano S"
-                                    isLeftInitiallySelected={!isLedgerProvider}
-                                    onLeftLabelClickAsync={this.onInjectedWeb3Click.bind(this)}
-                                    onRightLabelClickAsync={this.onLedgerClickAsync.bind(this)}
+                        <div className="clearfix">
+                            <div className="col col-5">
+                                <Party
+                                    label="Your address"
+                                    address={this.props.userAddress}
+                                    identiconDiameter={30}
+                                    identiconStyle={{marginTop: 10, marginBottom: 10}}
+                                    noAddressLabel="No address found"
                                 />
                                 <div
-                                    className="clearfix"
-                                    style={{fontSize: 14, color: '#635F5E', paddingTop: 11}}
+                                    className="pt1 mx-auto center"
+                                    style={{fontSize: 12, maxWidth: 132}}
                                 >
-                                    <div className="col col-6 center">
-                                        <div>
-                                            address connected via Web3
+                                    {!_.isEmpty(this.props.userAddress) && this.state.didLoadConstantTokenSaleInfo &&
+                                        <div className="pb1">
+                                            {this.state.isAddressRegistered ?
+                                                <div style={{color: 'rgb(0, 195, 62)'}}>
+                                                    <span><i className="zmdi zmdi-check-circle" /></span>{' '}
+                                                    <span>Address registered</span>
+                                                </div> :
+                                                <div
+                                                    style={{color: colors.red500}}
+                                                    data-tip={true}
+                                                    data-for="notRegisteredTooltip"
+                                                >
+                                                    <span><i className="zmdi zmdi-alert-triangle" /></span>{' '}
+                                                    <span>Unregistered address</span>
+                                                    <ReactTooltip id="notRegisteredTooltip">
+                                                        You can only contribute from an address that was<br />
+                                                        registered during the mandatory registration period<br />
+                                                        (Aug. 9th-12th).
+                                                    </ReactTooltip>
+                                                </div>
+                                            }
                                         </div>
-                                        <div>
-                                            (i.e{' '}
-                                            <a
-                                                className="underline"
-                                                style={{color: '#635F5E'}}
-                                                href={constants.METAMASK_CHROME_STORE_URL}
-                                                target="_blank"
-                                            >
-                                                Metamask
-                                            </a>{' '}or{' '}
-                                            <a
-                                                className="underline"
-                                                style={{color: '#635F5E'}}
-                                                href={constants.PARITY_CHROME_STORE_URL}
-                                                target="_blank"
-                                            >
-                                                Parity Signer
-                                            </a>)
-                                        </div>
-                                    </div>
-                                    <div className="col col-6 center">
-                                        Ledger hardware wallet
+                                    }
+                                    <div>
+                                        ZRX will be instantly sent to this address
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div className="clearfix">
-                        <div className="col col-5">
-                            <Party
-                                label="Your address"
-                                address={this.props.userAddress}
-                                identiconDiameter={30}
-                                identiconStyle={{marginTop: 10, marginBottom: 10}}
-                                noAddressLabel="No address found"
-                            />
-                            <div
-                                className="pt1 mx-auto center"
-                                style={{fontSize: 12, maxWidth: 132}}
-                            >
-                                {!_.isEmpty(this.props.userAddress) && this.state.didLoadConstantTokenSaleInfo &&
-                                    <div className="pb1">
-                                        {this.state.isAddressRegistered ?
-                                            <div style={{color: 'rgb(0, 195, 62)'}}>
-                                                <span><i className="zmdi zmdi-check-circle" /></span>{' '}
-                                                <span>Address registered</span>
-                                            </div> :
-                                            <div
-                                                style={{color: colors.red500}}
-                                                data-tip={true}
-                                                data-for="notRegisteredTooltip"
-                                            >
-                                                <span><i className="zmdi zmdi-alert-triangle" /></span>{' '}
-                                                <span>Unregistered address</span>
-                                                <ReactTooltip id="notRegisteredTooltip">
-                                                    You can only contribute from an address that was<br />
-                                                    registered during the mandatory registration period<br />
-                                                    (Aug. 9th-12th).
-                                                </ReactTooltip>
-                                            </div>
-                                        }
-                                    </div>
-                                }
-                                <div>
-                                    ZRX will be instantly sent to this address
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col col-2">
-                            <div className="mx-auto" style={{width: 17, marginTop: 24}}>
-                                <i
-                                    style={{fontSize: 54, color: '#DDDDDD'}}
-                                    className="zmdi zmdi-chevron-right"
-                                />
-                            </div>
-                        </div>
-                        <div className="col col-5">
-                            <Party
-                                label="ZRX sale address"
-                                address={tokenSaleAddress}
-                                identiconDiameter={30}
-                                identiconStyle={{marginTop: 10, marginBottom: 10}}
-                                noAddressLabel="No address found"
-                            />
-                            <div
-                                className="pt1 mx-auto center underline"
-                                style={{width: 108, cursor: 'pointer'}}
-                            >
-                                <a
-                                    style={{color: '#00C33E', fontSize: 12}}
-                                    href={etherscanTokenSaleContractUrl}
-                                    target="_blank"
-                                >
-                                    Verify source code on Etherscan
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="clearfix pt3">
-                        <div className="col col-1">
-                            {this.renderStepNumber(2)}
-                        </div>
-                        <div className="col col-11">
-                            <div className="h3">Choose an amount:</div>
-                            <div className="clearfix">
-                                <div className="col col-6" style={{maxWidth: 235}}>
-                                    <EthAmountInput
-                                        amount={this.state.contributionAmountInBaseUnits}
-                                        balance={this.props.userEtherBalance}
-                                        shouldCheckBalance={true}
-                                        shouldShowIncompleteErrs={false}
-                                        onChange={this.onContributionAmountChanged.bind(this)}
-                                        shouldHideVisitBalancesLink={true}
+                            <div className="col col-2">
+                                <div className="mx-auto" style={{width: 17, marginTop: 24}}>
+                                    <i
+                                        style={{fontSize: 54, color: '#DDDDDD'}}
+                                        className="zmdi zmdi-chevron-right"
                                     />
                                 </div>
-                                {ZRXAmountToReceive !== 0 &&
-                                    <div
-                                        className="col col-6 pl1"
-                                        style={{color: CUSTOM_LIGHT_GRAY, paddingTop: 15}}
-                                    >
-                                        = {ZRXAmountToReceive} ZRX
-                                    </div>
-                                }
                             </div>
-                            <div style={{fontSize: 13}}>
-                                <div>
+                            <div className="col col-5">
+                                <Party
+                                    label="ZRX sale address"
+                                    address={tokenSaleAddress}
+                                    identiconDiameter={30}
+                                    identiconStyle={{marginTop: 10, marginBottom: 10}}
+                                    noAddressLabel="No address found"
+                                />
+                                <div
+                                    className="pt1 mx-auto center underline"
+                                    style={{width: 108, cursor: 'pointer'}}
+                                >
+                                    <a
+                                        style={{color: '#00C33E', fontSize: 12}}
+                                        href={etherscanTokenSaleContractUrl}
+                                        target="_blank"
+                                    >
+                                        Verify source code on Etherscan
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="clearfix pt3">
+                            <div className="col col-1">
+                                {this.renderStepNumber(2)}
+                            </div>
+                            <div className="col col-11">
+                                <div className="h3">Choose an amount:</div>
+                                <div className="clearfix">
+                                    <div className="col col-6" style={{maxWidth: 235}}>
+                                        <EthAmountInput
+                                            amount={this.state.contributionAmountInBaseUnits}
+                                            balance={this.props.userEtherBalance}
+                                            shouldCheckBalance={true}
+                                            shouldShowIncompleteErrs={false}
+                                            onChange={this.onContributionAmountChanged.bind(this)}
+                                            shouldHideVisitBalancesLink={true}
+                                        />
+                                    </div>
+                                    {ZRXAmountToReceive !== 0 &&
+                                        <div
+                                            className="col col-6 pl1"
+                                            style={{color: CUSTOM_LIGHT_GRAY, paddingTop: 15}}
+                                        >
+                                            = {ZRXAmountToReceive} ZRX
+                                        </div>
+                                    }
+                                </div>
+                                <div style={{fontSize: 13}}>
                                     <div>
-                                        <span style={{color: CUSTOM_LIGHT_GRAY}}>
-                                            current contribution cap:{' '}
-                                        </span>
-                                        <span style={{color: CUSTOM_GRAY}}>
-                                            {this.renderEthCapPerAddress(now)} ETH/participant
-                                        </span>
+                                        <div>
+                                            <span style={{color: CUSTOM_LIGHT_GRAY}}>
+                                                current contribution cap:{' '}
+                                            </span>
+                                            <span style={{color: CUSTOM_GRAY}}>
+                                                {this.renderEthCapPerAddress(now)} ETH/participant
+                                            </span>
+                                        </div>
+                                        <div className="pt1">
+                                            <span style={{color: CUSTOM_LIGHT_GRAY}}>
+                                                cap increases to:{' '}
+                                                <span style={{color: CUSTOM_GRAY}}>
+                                                    {this.renderEthCapPerAddress(nextPeriodTimestamp)} ETH
+                                                </span>{' '}
+                                                {this.renderTimeUntilCapIncrease(capPeriodEndIfExists)}
+                                            </span>
+                                        </div>
                                     </div>
                                     <div className="pt1">
                                         <span style={{color: CUSTOM_LIGHT_GRAY}}>
-                                            cap increases to:{' '}
-                                            <span style={{color: CUSTOM_GRAY}}>
-                                                {this.renderEthCapPerAddress(nextPeriodTimestamp)} ETH
-                                            </span>{' '}
-                                            {this.renderTimeUntilCapIncrease(capPeriodEndIfExists)}
+                                            contributed from your address so far:{' '}
+                                        </span>
+                                        <span style={{color: CUSTOM_GRAY}}>
+                                            {_.isUndefined(this.state.ethContributedAmount) ?
+                                                <span style={{paddingRight: 3, paddingLeft: 3}}>
+                                                    <CircularProgress size={10} />
+                                                </span> :
+                                                this.formatCurrencyAmount(this.state.ethContributedAmount)
+                                            } ETH
                                         </span>
                                     </div>
                                 </div>
-                                <div className="pt1">
-                                    <span style={{color: CUSTOM_LIGHT_GRAY}}>
-                                        contributed from your address so far:{' '}
-                                    </span>
-                                    <span style={{color: CUSTOM_GRAY}}>
-                                        {_.isUndefined(this.state.ethContributedAmount) ?
-                                            <span style={{paddingRight: 3, paddingLeft: 3}}>
-                                                <CircularProgress size={10} />
-                                            </span> :
-                                            this.formatCurrencyAmount(this.state.ethContributedAmount)
-                                        } ETH
-                                    </span>
-                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="clearfix pt3">
-                        <div className="col col-1">
-                            {this.renderStepNumber(3)}
-                        </div>
-                        <div className="col col-11">
-                            <div className="h3 pb2">Verify information and purchase ZRX</div>
-                            <LifeCycleRaisedButton
-                                labelReady="Purchase ZRX"
-                                labelLoading="Purchasing ZRX..."
-                                labelComplete="ZRX purchased!"
-                                isPrimary={true}
-                                isDisabled={_.isEmpty(this.props.userAddress) ||
-                                            _.isUndefined(this.state.contributionAmountInBaseUnits)}
-                                onClickAsyncFn={this.onPurchaseZRXClickAsync.bind(this)}
-                            />
-                            <div
-                                className="pt2 pb4 center"
-                                style={{color: CUSTOM_LIGHT_GRAY, fontSize: 13}}
-                            >
-                                To avoid issues and phishing scams we highly recommend
-                                you check your address, and verify the 0x address with
-                                Etherscan before you continue
+                        <div className="clearfix pt3">
+                            <div className="col col-1">
+                                {this.renderStepNumber(3)}
+                            </div>
+                            <div className="col col-11">
+                                <div className="h3 pb2">Verify information and purchase ZRX</div>
+                                <LifeCycleRaisedButton
+                                    labelReady="Purchase ZRX"
+                                    labelLoading="Purchasing ZRX..."
+                                    labelComplete="ZRX purchased!"
+                                    isPrimary={true}
+                                    isDisabled={_.isEmpty(this.props.userAddress) ||
+                                                _.isUndefined(this.state.contributionAmountInBaseUnits)}
+                                    onClickAsyncFn={this.onPurchaseZRXClickAsync.bind(this)}
+                                />
+                                <div
+                                    className="pt2 pb4 center"
+                                    style={{color: CUSTOM_LIGHT_GRAY, fontSize: 13}}
+                                >
+                                    To avoid issues and phishing scams we highly recommend
+                                    you check your address, and verify the 0x address with
+                                    Etherscan before you continue
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                {this.props.screenWidth !== ScreenWidths.SM &&
+                    this.renderSaleStats(capPeriodEndIfExists)
+                }
             </div>
-            {this.props.screenWidth !== ScreenWidths.SM &&
-                this.renderSaleStats(capPeriodEndIfExists)
-            }
-        </div>
-      );
+        );
     }
     private renderSaleStats(capPeriodEndIfExists: number) {
         return (
