@@ -193,8 +193,9 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                     width: '60vw',
                     display: 'inline-block',
                 };
-                const startDate = moment.unix(this.state.startTimeInSec.toNumber()).format('MMMM Do h:mm:ss a');
-                const startDateMessage = this.state.isInitialized ? `Start time: ${startDate}` : '';
+                const startDateMessage = this.state.isInitialized
+                    ? `Start time: ${moment.unix(this.state.startTimeInSec.toNumber()).format('MMMM Do h:mm:ss a')}`
+                    : '';
                 return (
                     <div className="block mx-auto pt4">
                         <Paper style={style} zDepth={1}>
