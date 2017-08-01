@@ -55,10 +55,12 @@ export class Blockchain {
     private userAddress: string;
     private cachedProvider: Web3.Provider;
     private ledgerSubProvider: LedgerWalletSubprovider;
-    constructor(dispatcher: Dispatcher) {
+    private isRegistrationFlow: boolean;
+    constructor(dispatcher: Dispatcher, isRegistrationFlow: boolean = false) {
         this.dispatcher = dispatcher;
         this.userAddress = '';
         this.exchangeLogFillEvents = [];
+        this.isRegistrationFlow = isRegistrationFlow;
         this.onPageLoadInitFireAndForgetAsync();
     }
     public async networkIdUpdatedFireAndForgetAsync(newNetworkId: number) {
@@ -70,14 +72,20 @@ export class Blockchain {
         } else if (this.networkId !== newNetworkId) {
             this.networkId = newNetworkId;
             this.dispatcher.encounteredBlockchainError('');
-            await this.instantiateContractsAsync();
-            await this.rehydrateStoreWithContractEvents();
+            if (!this.isRegistrationFlow) {
+                await this.instantiateContractsAsync();
+                await this.rehydrateStoreWithContractEvents();
+            } else {
+                this.dispatcher.updateBlockchainIsLoaded(true);
+            }
         }
     }
     public async userAddressUpdatedFireAndForgetAsync(newUserAddress: string) {
         if (this.userAddress !== newUserAddress) {
             this.userAddress = newUserAddress;
-            await this.rehydrateStoreWithContractEvents();
+            if (!this.isRegistrationFlow) {
+                await this.rehydrateStoreWithContractEvents();
+            }
         }
     }
     public async nodeVersionUpdatedFireAndForgetAsync(nodeVersion: string) {
