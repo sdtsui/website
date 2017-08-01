@@ -711,6 +711,7 @@ export class Blockchain {
         if (!_.isUndefined(contractAddress)) {
             const doesContractExist = await this.doesContractExistAtAddressAsync(contractAddress);
             if (!doesContractExist) {
+                utils.consoleLog(`Contract does not exist: ${artifact.contract_name} at ${contractAddress}`);
                 throw new Error(BlockchainCallErrs.CONTRACT_DOES_NOT_EXIST);
             }
         }
