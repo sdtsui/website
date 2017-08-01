@@ -64,6 +64,7 @@ interface ContributeState {
     totalZrxSupply: BigNumber.BigNumber;
     isAddressRegistered: boolean;
     didLoadConstantTokenSaleInfo: boolean;
+    isInitialized: boolean;
 }
 
 export class Contribute extends React.Component<ContributeProps, ContributeState> {
@@ -84,6 +85,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             totalZrxSupply: ZeroEx.toBaseUnitAmount(new BigNumber(500000000), 18),
             isAddressRegistered: false,
             didLoadConstantTokenSaleInfo: false,
+            isInitialized: false,
         };
     }
     public componentDidMount() {
@@ -184,29 +186,29 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         );
     }
     private renderContributionForm() {
-        if (_.isUndefined(this.state.startTimeInSec) || this.state.startTimeInSec.gt(moment().unix())) {
-            const style = {
-                height: '60vh',
-                width: '60vw',
-                display: 'inline-block',
-            };
-            const startTime = this.state.startTimeInSec;
-            const startDateIfExists = startTime
-                                        ? moment.unix(startTime.toNumber()).format('MMMM Do h:mm:ss a')
-                                        : undefined;
-            return (
-                <div className="block mx-auto pt4">
-                    <Paper style={style} zDepth={1}>
-                        <div className="flex items-center justify-center fit" style={{height: '100%'}}>
-                            <div className="self-center">
-                                Contribution period had not started yet.
-                                <br/>
-                                {startDateIfExists && `Start time: ${startDateIfExists}`}
+        if (this.state.didLoadConstantTokenSaleInfo) {
+            if (!this.state.isInitialized || this.state.startTimeInSec.gt(moment().unix())) {
+                const style = {
+                    height: '60vh',
+                    width: '60vw',
+                    display: 'inline-block',
+                };
+                const startDate = moment.unix(this.state.startTimeInSec.toNumber()).format('MMMM Do h:mm:ss a');
+                const startDateMessage = this.state.isInitialized ? `Start time: ${startDate}` : '';
+                return (
+                    <div className="block mx-auto pt4">
+                        <Paper style={style} zDepth={1}>
+                            <div className="flex items-center justify-center fit" style={{height: '100%'}}>
+                                <div className="self-center">
+                                    Contribution period had not started yet.
+                                    <br/>
+                                    {startDateMessage}
+                                </div>
                             </div>
-                        </div>
-                    </Paper>
-                </div>
-            );
+                        </Paper>
+                    </div>
+                );
+            }
         }
         const now = moment().unix();
         const nextPeriodTimestamp = now + constants.CAP_PERIOD_IN_SEC;
@@ -522,11 +524,13 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             baseEthCapPerAddress,
             startTimeInSec,
             totalZrxSupply,
+            isInitialized,
         ] = await Promise.all([
             this.blockchain.getTokenSaleExchangeRateAsync(),
             this.blockchain.getTokenSaleBaseEthCapPerAddressAsync(),
             this.blockchain.getTokenSaleStartTimeInSecAsync(),
             this.blockchain.getTokenSaleTotalSupplyAsync(),
+            this.blockchain.getTokenSaleIsInitialiized(),
         ]);
 
         this.setState({
@@ -534,6 +538,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             baseEthCapPerAddress,
             startTimeInSec,
             totalZrxSupply,
+            isInitialized,
             didLoadConstantTokenSaleInfo: true,
         });
     }
