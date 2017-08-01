@@ -433,6 +433,12 @@ export class Blockchain {
         const userAddressIfExists = await this.web3Wrapper.getAccountsAsync();
         return userAddressIfExists;
     }
+    // HACK: When a user is using a Ledger, we simply dispatch the selected userAddress, which
+    // by-passes the web3Wrapper logic for updating the prevUserAddress. We therefore need to
+    // manually update it. This should only be called by the LedgerConfigDialog.
+    public updateWeb3WrapperPrevUserAddress(newUserAddress: string) {
+        this.web3Wrapper.updatePrevUserAddress(newUserAddress);
+    }
     private doesUserAddressExist(): boolean {
         return this.userAddress !== '';
     }
