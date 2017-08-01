@@ -184,12 +184,12 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         );
     }
     private renderContributionForm() {
-        const style = {
-            height: '60vh',
-            width: '60vw',
-            display: 'inline-block',
-        };
         if (_.isUndefined(this.state.startTimeInSec) || this.state.startTimeInSec.gt(moment().unix())) {
+            const style = {
+                height: '60vh',
+                width: '60vw',
+                display: 'inline-block',
+            };
             const startTime = this.state.startTimeInSec;
             const startDateIfExists = startTime
                                         ? moment.unix(startTime.toNumber()).format('MMMM Do h:mm:ss a')
