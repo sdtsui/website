@@ -189,16 +189,19 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             width: '60vw',
             display: 'inline-block',
         };
-        if (!_.isUndefined(this.state.startTimeInSec) && this.state.startTimeInSec.gt(moment().unix())) {
-            const startTime = moment.unix(this.state.startTimeInSec.toNumber());
+        if (_.isUndefined(this.state.startTimeInSec) || this.state.startTimeInSec.gt(moment().unix())) {
+            const startTime = this.state.startTimeInSec;
+            const startDateIfExists = startTime
+                                        ? moment.unix(startTime.toNumber()).format('MMMM Do h:mm:ss a')
+                                        : undefined;
             return (
                 <div className="block mx-auto pt4">
                     <Paper style={style} zDepth={1}>
                         <div className="flex items-center justify-center fit" style={{height: '100%'}}>
                             <div className="self-center">
-                                Contribution period had not started yet!
+                                Contribution period had not started yet.
                                 <br/>
-                                Start time: {startTime.format('MMMM Do h:mm:ss a')}
+                                {startDateIfExists && `Start time: ${startDateIfExists}`}
                             </div>
                         </div>
                     </Paper>
