@@ -227,7 +227,12 @@ export class Blockchain {
         // Hack: for some reason default estimated gas amount causes `base fee exceeds gas limit` exception
         // on testrpc. Probably related to https://github.com/ethereumjs/testrpc/issues/294
         // TODO: Debug issue in testrpc and submit a PR, then remove this hack
-        const gas = this.networkId === constants.TESTRPC_NETWORK_ID ? ALLOWANCE_TO_ZERO_GAS_AMOUNT : undefined;
+        const estimatedGas = await tokenContract.approve.estimateGas(this.tokenTransferProxy.address,
+                                                                      amountInBaseUnits, {
+                                                                        from: this.userAddress,
+                                                                        gas: ALLOWANCE_TO_ZERO_GAS_AMOUNT,
+        });
+        const gas = this.networkId === constants.TESTRPC_NETWORK_ID ? ALLOWANCE_TO_ZERO_GAS_AMOUNT : estimatedGas;
         await tokenContract.approve(this.tokenTransferProxy.address, amountInBaseUnits, {
             from: this.userAddress,
             gas,
