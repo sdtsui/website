@@ -77,7 +77,8 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
     }
     public componentWillMount() {
         this.setIsNYIPFireAndForgetAsync();
-        this.blockchain = new Blockchain(this.props.dispatcher);
+        const isRegistrationFlow = true;
+        this.blockchain = new Blockchain(this.props.dispatcher, isRegistrationFlow);
     }
     public componentDidMount() {
         this.civicSip.on('auth-code-received', (event: any) => {
