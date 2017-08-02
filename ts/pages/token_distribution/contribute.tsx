@@ -186,25 +186,23 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         );
     }
     private renderContributionForm() {
-        if (this.state.didLoadConstantTokenSaleInfo) {
-            if (!this.state.isInitialized || this.state.startTimeInSec.gt(moment().unix())) {
-                const startDateMessage = this.state.isInitialized
-                    ? `Start time: ${moment.unix(this.state.startTimeInSec.toNumber()).format('MMMM Do h:mm:ss a')}`
-                    : '';
-                return (
-                    <ContributionNotice>
-                        Contribution period had not started yet.
-                        <br/>
-                        {startDateMessage}
-                    </ContributionNotice>
-                );
-            } else if (this.state.isFinished) {
-                return (
-                    <ContributionNotice>
-                        The sale had already been finished
-                    </ContributionNotice>
-                );
-            }
+        if (!this.state.isInitialized || this.state.startTimeInSec.gt(moment().unix())) {
+            const startDateMessage = this.state.isInitialized
+                ? `Start time: ${moment.unix(this.state.startTimeInSec.toNumber()).format('MMMM Do h:mm:ss a')}`
+                : '';
+            return (
+                <ContributionNotice>
+                    The contribution period has not started yet.
+                    <br/>
+                    {startDateMessage}
+                </ContributionNotice>
+            );
+        } else if (this.state.isFinished) {
+            return (
+                <ContributionNotice>
+                    The contribution period had already ended
+                </ContributionNotice>
+            );
         }
         const now = moment().unix();
         const nextPeriodTimestamp = now + constants.CAP_PERIOD_IN_SEC;
@@ -542,10 +540,17 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         });
     }
     private async updateVariableTokenSaleInfoFireAndForgetAsync() {
-        const orderHash = await this.blockchain.getTokenSaleOrderHashAsync();
+        const [
+            orderHash,
+            zrxToEthExchangeRate,
+        ] = await Promise.all([
+            this.blockchain.getTokenSaleOrderHashAsync(),
+            this.blockchain.getTokenSaleExchangeRateAsync(),
+        ]);
+
         const ethContributedInWei = await this.blockchain.getFillAmountAsync(orderHash);
         const ethContributed = ZeroEx.toUnitAmount(ethContributedInWei, ZRX_ETH_DECIMAL_PLACES);
-        const zrxToEthExchangeRate = await this.blockchain.getTokenSaleExchangeRateAsync();
+
         const zrxSold = ethContributed.mul(zrxToEthExchangeRate);
 
         let ethContributedAmount = new BigNumber(0);
