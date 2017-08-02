@@ -64,8 +64,8 @@ interface ContributeState {
     totalZrxSupply: BigNumber.BigNumber;
     isAddressRegistered: boolean;
     didLoadConstantTokenSaleInfo: boolean;
-    isInitialized: boolean;
-    isFinished: boolean;
+    isInitialized?: boolean;
+    isFinished?: boolean;
 }
 
 export class Contribute extends React.Component<ContributeProps, ContributeState> {
@@ -86,8 +86,6 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             totalZrxSupply: ZeroEx.toBaseUnitAmount(new BigNumber(500000000), 18),
             isAddressRegistered: false,
             didLoadConstantTokenSaleInfo: false,
-            isInitialized: false,
-            isFinished: false,
         };
     }
     public componentDidMount() {
