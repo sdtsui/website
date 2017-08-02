@@ -78,13 +78,14 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                         </div>
                         <div className="pt2" style={{lineHeight: 1.5}}>
                             In order to register a contribution address, you must prove ownership by
-                            signing a message with the corresponding private key.
+                            signing a message with the corresponding private key. Any ZRX you eventually
+                            purchase will be sent to this address.
                         </div>
 
                         <div className="pt2 pb2">
                             Notice: You cannot use an exchange address (i.e Coinbase, Kraken)
                         </div>
-                        <div className="pt2 pb3 mx-auto" style={{maxWidth: 435}}>
+                        <div className="pt2 pb3">
                             <LabeledSwitcher
                                 labelLeft={labelLeft}
                                 labelRight="Ledger Nano S"
@@ -180,10 +181,14 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
     private renderUserAddress() {
         const userAddress = this.props.userAddress;
         const identiconDiameter = 25;
+        const inputLabel = <InputLabel text="Accessible contribution address" />;
         return (
             <div>
                 <div className="pb1" style={{fontSize: 12}}>
-                    <RequiredLabel label={<InputLabel text="Accessible contribution address" />} />
+                    {_.isEmpty(userAddress) ?
+                        <RequiredLabel label={inputLabel} /> :
+                        inputLabel
+                    }
                 </div>
                 {_.isEmpty(this.props.userAddress) ?
                     <div className="py2" style={{fontSize: 12}}>
@@ -225,7 +230,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                 }
                 <div>
                     {_.isEmpty(userAddress) &&
-                        <div className="pt2" style={{fontSize: 12}}>
+                        <div className="pt1" style={{fontSize: 12}}>
                             {this.renderEmptyUserAddressMsg()}
                         </div>
                     }
