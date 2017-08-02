@@ -55,10 +55,12 @@ export class Blockchain {
     private userAddress: string;
     private cachedProvider: Web3.Provider;
     private ledgerSubProvider: LedgerWalletSubprovider;
-    constructor(dispatcher: Dispatcher) {
+    private isRegistrationFlow: boolean;
+    constructor(dispatcher: Dispatcher, isRegistrationFlow: boolean = false) {
         this.dispatcher = dispatcher;
         this.userAddress = '';
         this.exchangeLogFillEvents = [];
+        this.isRegistrationFlow = isRegistrationFlow;
         this.onPageLoadInitFireAndForgetAsync();
     }
     public async networkIdUpdatedFireAndForgetAsync(newNetworkId: number) {
@@ -70,14 +72,20 @@ export class Blockchain {
         } else if (this.networkId !== newNetworkId) {
             this.networkId = newNetworkId;
             this.dispatcher.encounteredBlockchainError('');
-            await this.instantiateContractsAsync();
-            await this.rehydrateStoreWithContractEvents();
+            if (!this.isRegistrationFlow) {
+                await this.instantiateContractsAsync();
+                await this.rehydrateStoreWithContractEvents();
+            } else {
+                this.dispatcher.updateBlockchainIsLoaded(true);
+            }
         }
     }
     public async userAddressUpdatedFireAndForgetAsync(newUserAddress: string) {
         if (this.userAddress !== newUserAddress) {
             this.userAddress = newUserAddress;
-            await this.rehydrateStoreWithContractEvents();
+            if (!this.isRegistrationFlow) {
+                await this.rehydrateStoreWithContractEvents();
+            }
         }
     }
     public async nodeVersionUpdatedFireAndForgetAsync(nodeVersion: string) {
@@ -239,7 +247,12 @@ export class Blockchain {
         // Hack: for some reason default estimated gas amount causes `base fee exceeds gas limit` exception
         // on testrpc. Probably related to https://github.com/ethereumjs/testrpc/issues/294
         // TODO: Debug issue in testrpc and submit a PR, then remove this hack
-        const gas = this.networkId === constants.TESTRPC_NETWORK_ID ? ALLOWANCE_TO_ZERO_GAS_AMOUNT : undefined;
+        const estimatedGas = await tokenContract.approve.estimateGas(this.tokenTransferProxy.address,
+                                                                      amountInBaseUnits, {
+                                                                        from: this.userAddress,
+                                                                        gas: ALLOWANCE_TO_ZERO_GAS_AMOUNT,
+        });
+        const gas = this.networkId === constants.TESTRPC_NETWORK_ID ? ALLOWANCE_TO_ZERO_GAS_AMOUNT : estimatedGas;
         await tokenContract.approve(this.tokenTransferProxy.address, amountInBaseUnits, {
             from: this.userAddress,
             gas,
@@ -439,6 +452,12 @@ export class Blockchain {
     public async getUserAccountsAsync() {
         const userAddressIfExists = await this.web3Wrapper.getAccountsAsync();
         return userAddressIfExists;
+    }
+    // HACK: When a user is using a Ledger, we simply dispatch the selected userAddress, which
+    // by-passes the web3Wrapper logic for updating the prevUserAddress. We therefore need to
+    // manually update it. This should only be called by the LedgerConfigDialog.
+    public updateWeb3WrapperPrevUserAddress(newUserAddress: string) {
+        this.web3Wrapper.updatePrevUserAddress(newUserAddress);
     }
     private doesUserAddressExist(): boolean {
         return this.userAddress !== '';
@@ -723,6 +742,7 @@ export class Blockchain {
         if (!_.isUndefined(contractAddress)) {
             const doesContractExist = await this.doesContractExistAtAddressAsync(contractAddress);
             if (!doesContractExist) {
+                utils.consoleLog(`Contract does not exist: ${artifact.contract_name} at ${contractAddress}`);
                 throw new Error(BlockchainCallErrs.CONTRACT_DOES_NOT_EXIST);
             }
         }
