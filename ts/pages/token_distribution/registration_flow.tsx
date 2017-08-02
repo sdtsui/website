@@ -378,6 +378,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
     private async sendAuthCodeAsync(jwtToken: string) {
         const body = JSON.stringify({
             jwtToken,
+            queueItToken: this.state.queueItToken,
         });
         const response = await fetch(`${configs.BACKEND_BASE_URL}/civic_auth`, {
             method: 'POST',
