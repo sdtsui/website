@@ -200,13 +200,13 @@ export class Blockchain {
         const isRegistered = await this.tokenSale.registered.call(this.userAddress);
         return isRegistered;
     }
-    public async getTokenSaleIsInitialiized(): Promise<boolean> {
+    public async getIsTokenSaleInitialized(): Promise<boolean> {
         utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
 
         const isSaleInitialized = await this.tokenSale.isSaleInitialized.call();
         return isSaleInitialized;
     }
-    public async getTokenSaleIsFinished(): Promise<boolean> {
+    public async getIsTokenSaleFinished(): Promise<boolean> {
         utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
 
         const isSaleFinished = await this.tokenSale.isSaleFinished.call();

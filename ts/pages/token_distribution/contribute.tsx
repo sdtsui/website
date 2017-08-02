@@ -529,8 +529,8 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             this.blockchain.getTokenSaleBaseEthCapPerAddressAsync(),
             this.blockchain.getTokenSaleStartTimeInSecAsync(),
             this.blockchain.getTokenSaleTotalSupplyAsync(),
-            this.blockchain.getTokenSaleIsInitialiized(),
-            this.blockchain.getTokenSaleIsFinished(),
+            this.blockchain.getIsTokenSaleInitialized(),
+            this.blockchain.getIsTokenSaleFinished(),
         ]);
 
         this.setState({
