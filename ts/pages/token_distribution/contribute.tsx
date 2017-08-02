@@ -152,7 +152,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                     blockchainIsLoaded={false}
                     location={this.props.location}
                 />
-                {this.props.blockchainIsLoaded ?
+                {this.props.blockchainIsLoaded && this.state.didLoadConstantTokenSaleInfo ?
                   this.renderContributionForm() :
                   <div className="pt4">
                       <Loading />
