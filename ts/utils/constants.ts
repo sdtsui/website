@@ -1,4 +1,4 @@
-import {ExchangeContractErrs} from 'ts/types';
+import {ExchangeContractErrs, PublicNodeUrlByNetworkId} from 'ts/types';
 import * as BigNumber from 'bignumber.js';
 
 export const constants = {
@@ -13,7 +13,6 @@ export const constants = {
     ETHER_FAUCET_ENDPOINT: 'https://faucet.0xproject.com/rain',
     FEE_RECIPIENT_ADDRESS: '0x0000000000000000000000000000000000000000',
     FIREFOX_U2F_ADDON: 'https://addons.mozilla.org/en-US/firefox/addon/u2f-support-add-on/',
-    HOSTED_TESTNET_URL: 'https://kovan.0xproject.com',
     IP_API_KEY: 'LLx6EVQHoOOfrjl',
     IP_API_ENDPOINT: 'https://pro.ip-api.com/json',
     GITHUB_0X_JS_URL: 'https://github.com/0xProject/0x.js',
@@ -21,9 +20,15 @@ export const constants = {
     LEDGER_PROVIDER_NAME: 'Ledger',
     METAMASK_PROVIDER_NAME: 'Metamask',
     PUBLIC_PROVIDER_NAME: '0x Public',
+    PUBLIC_NODE_URL_BY_NETWORK_ID: {
+        [1]: 'https://mainnet.0xproject.com',
+        [42]: 'https://kovan.0xproject.com',
+    } as PublicNodeUrlByNetworkId,
     PARITY_SIGNER_PROVIDER_NAME: 'Parity Signer',
     GENERIC_PROVIDER_NAME: 'Injected Web3',
     MAKER_FEE: new BigNumber(0),
+    MAINNET_NAME: 'Main network',
+    MAINNET_NETWORK_ID: 1,
     METAMASK_CHROME_STORE_URL: 'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
     PARITY_CHROME_STORE_URL: 'https://chrome.google.com/webstore/detail/parity-signer-ui/\
     fgodinogimdopkigkcoelpfkbnpngalc',

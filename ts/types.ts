@@ -442,3 +442,7 @@ export const TokenSaleErrs = strEnum([
   'ADDRESS_NOT_REGISTERED',
 ]);
 export type TokenSaleErrs = keyof typeof TokenSaleErrs;
+
+export interface PublicNodeUrlByNetworkId {
+    [networkId: number]: string;
+};

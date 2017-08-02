@@ -14,10 +14,10 @@ export class Web3Wrapper {
     private watchNetworkAndBalanceIntervalId: number;
     private prevUserEtherBalanceInEth: BigNumber.BigNumber;
     private prevUserAddress: string;
-    constructor(dispatcher: Dispatcher, provider: Web3.Provider, networkId: number,
+    constructor(dispatcher: Dispatcher, provider: Web3.Provider, networkIdIfExists: number,
                 shouldPollUserAddress: boolean) {
         this.dispatcher = dispatcher;
-        this.prevNetworkId = networkId;
+        this.prevNetworkId = networkIdIfExists;
         this.shouldPollUserAddress = shouldPollUserAddress;
 
         this.web3 = new Web3();

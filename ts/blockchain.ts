@@ -132,7 +132,8 @@ export class Blockchain {
                 provider.addProvider(this.ledgerSubProvider);
                 provider.addProvider(new FilterSubprovider());
                 provider.addProvider(new RpcSubprovider({
-                    rpcUrl: constants.HOSTED_TESTNET_URL, // TODO: use mainnet url here after contracts deployed
+                    // TODO: use mainnet url here after contracts are deployed
+                    rpcUrl: constants.PUBLIC_NODE_URL_BY_NETWORK_ID[constants.TESTNET_NETWORK_ID],
                 }));
                 provider.start();
                 this.web3Wrapper.destroy();
@@ -207,6 +208,18 @@ export class Blockchain {
 
         const isRegistered = await this.tokenSale.registered.call(this.userAddress);
         return isRegistered;
+    }
+    public async getIsTokenSaleInitialized(): Promise<boolean> {
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
+
+        const isSaleInitialized = await this.tokenSale.isSaleInitialized.call();
+        return isSaleInitialized;
+    }
+    public async getIsTokenSaleFinished(): Promise<boolean> {
+        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
+
+        const isSaleFinished = await this.tokenSale.isSaleFinished.call();
+        return isSaleFinished;
     }
     public async tokenSaleFillOrderWithEthAsync(amountInBaseUnits: BigNumber.BigNumber): Promise<string> {
         utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
@@ -623,30 +636,33 @@ export class Blockchain {
     private getBlockchainNetworkId() {
         return this.networkId;
     }
-    private async getProviderAsync(injectedWeb3: Web3, networkId: number) {
+    private async getProviderAsync(injectedWeb3: Web3, networkIdIfExists: number) {
         const doesInjectedWeb3Exist = !_.isUndefined(injectedWeb3);
-        const isPublicNodeAvailable = networkId === constants.TESTNET_NETWORK_ID;
+        const publicNodeUrlIfExistsForNetworkId = constants.PUBLIC_NODE_URL_BY_NETWORK_ID[networkIdIfExists];
+        const isPublicNodeAvailableForNetworkId = !_.isUndefined(publicNodeUrlIfExistsForNetworkId);
 
         let provider;
-        if (doesInjectedWeb3Exist && isPublicNodeAvailable) {
+        if (doesInjectedWeb3Exist && isPublicNodeAvailableForNetworkId) {
             // We catch all requests involving a users account and send it to the injectedWeb3
             // instance. All other requests go to the public hosted node.
             provider = new ProviderEngine();
             provider.addProvider(new InjectedWeb3SubProvider(injectedWeb3));
             provider.addProvider(new FilterSubprovider());
             provider.addProvider(new RpcSubprovider({
-                rpcUrl: constants.HOSTED_TESTNET_URL,
+                rpcUrl: publicNodeUrlIfExistsForNetworkId,
             }));
             provider.start();
         } else if (doesInjectedWeb3Exist) {
             // Since no public node for this network, all requests go to injectedWeb3 instance
             provider = injectedWeb3.currentProvider;
         } else {
-            // If no injectedWeb3 instance, all requests go to our public hosted node
+            // If no injectedWeb3 instance, all requests fallback to our public hosted kovan node
+            // We do this so that users can still browse the OTC DApp even if they do not have web3
+            // injected into their browser.
             provider = new ProviderEngine();
             provider.addProvider(new FilterSubprovider());
             provider.addProvider(new RpcSubprovider({
-                rpcUrl: constants.HOSTED_TESTNET_URL,
+                rpcUrl: constants.PUBLIC_NODE_URL_BY_NETWORK_ID[constants.TESTNET_NETWORK_ID],
             }));
             provider.start();
         }
