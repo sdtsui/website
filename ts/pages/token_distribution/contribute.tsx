@@ -5,7 +5,6 @@ import * as BigNumber from 'bignumber.js';
 import * as moment from 'moment';
 import ReactTooltip = require('react-tooltip');
 import {colors} from 'material-ui/styles';
-import Paper from 'material-ui/Paper';
 import CircularProgress from 'material-ui/CircularProgress';
 import {ZeroEx} from '0x.js';
 import {utils} from 'ts/utils/utils';
@@ -25,6 +24,7 @@ import {Party} from 'ts/components/ui/party';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 import {SaleStats} from 'ts/pages/token_distribution/sale_stats';
 import {Loading} from 'ts/components/ui/loading';
+import {ContributionNotice} from 'ts/pages/token_distribution/contribution_notice';
 
 const CUSTOM_GRAY = '#464646';
 const CUSTOM_LIGHT_GRAY = '#BBBBBB';
@@ -65,6 +65,7 @@ interface ContributeState {
     isAddressRegistered: boolean;
     didLoadConstantTokenSaleInfo: boolean;
     isInitialized: boolean;
+    isFinished: boolean;
 }
 
 export class Contribute extends React.Component<ContributeProps, ContributeState> {
@@ -86,6 +87,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             isAddressRegistered: false,
             didLoadConstantTokenSaleInfo: false,
             isInitialized: false,
+            isFinished: false,
         };
     }
     public componentDidMount() {
@@ -188,26 +190,21 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
     private renderContributionForm() {
         if (this.state.didLoadConstantTokenSaleInfo) {
             if (!this.state.isInitialized || this.state.startTimeInSec.gt(moment().unix())) {
-                const style = {
-                    height: '60vh',
-                    width: '60vw',
-                    display: 'inline-block',
-                };
                 const startDateMessage = this.state.isInitialized
                     ? `Start time: ${moment.unix(this.state.startTimeInSec.toNumber()).format('MMMM Do h:mm:ss a')}`
                     : '';
                 return (
-                    <div className="block mx-auto pt4">
-                        <Paper style={style} zDepth={1}>
-                            <div className="flex items-center justify-center fit" style={{height: '100%'}}>
-                                <div className="self-center">
-                                    Contribution period had not started yet.
-                                    <br/>
-                                    {startDateMessage}
-                                </div>
-                            </div>
-                        </Paper>
-                    </div>
+                    <ContributionNotice>
+                        Contribution period had not started yet.
+                        <br/>
+                        {startDateMessage}
+                    </ContributionNotice>
+                );
+            } else if (this.state.isFinished) {
+                return (
+                    <ContributionNotice>
+                        The sale had already been finished
+                    </ContributionNotice>
                 );
             }
         }
@@ -526,12 +523,14 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             startTimeInSec,
             totalZrxSupply,
             isInitialized,
+            isFinished,
         ] = await Promise.all([
             this.blockchain.getTokenSaleExchangeRateAsync(),
             this.blockchain.getTokenSaleBaseEthCapPerAddressAsync(),
             this.blockchain.getTokenSaleStartTimeInSecAsync(),
             this.blockchain.getTokenSaleTotalSupplyAsync(),
             this.blockchain.getTokenSaleIsInitialiized(),
+            this.blockchain.getTokenSaleIsFinished(),
         ]);
 
         this.setState({
@@ -540,6 +539,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             startTimeInSec,
             totalZrxSupply,
             isInitialized,
+            isFinished,
             didLoadConstantTokenSaleInfo: true,
         });
     }
