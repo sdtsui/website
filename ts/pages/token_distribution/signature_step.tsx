@@ -185,19 +185,44 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                 <div className="pb1" style={{fontSize: 12}}>
                     <RequiredLabel label={<InputLabel text="Accessible contribution address" />} />
                 </div>
-                <div className="flex">
-                    <div className="pr2">
-                        <Identicon address={userAddress} diameter={identiconDiameter} />
+                {_.isEmpty(this.props.userAddress) ?
+                    <div className="py2" style={{fontSize: 12}}>
+                        <span style={{color: '#ff4f4d', fontStyle: 'italic'}}>
+                            No injected Web3 found.
+                        </span>
+                        <span className="pl1">
+                            Install{' '}<a
+                                className="underline"
+                                style={{color: '#635F5E'}}
+                                href={constants.METAMASK_CHROME_STORE_URL}
+                                target="_blank"
+                            >
+                                Metamask
+                            </a>{' '}or{' '}
+                            <a
+                                className="underline"
+                                style={{color: '#635F5E'}}
+                                href={constants.PARITY_CHROME_STORE_URL}
+                                target="_blank"
+                            >
+                                Parity Signer
+                            </a>{' '}to use this option.
+                        </span>
+                    </div> :
+                    <div className="flex">
+                        <div className="pr2">
+                            <Identicon address={userAddress} diameter={identiconDiameter} />
+                        </div>
+                        <div
+                            style={styles.address}
+                            data-tip={true}
+                            data-for="userAddressTooltip"
+                        >
+                            {userAddress}
+                        </div>
+                        <ReactTooltip id="userAddressTooltip">{userAddress}</ReactTooltip>
                     </div>
-                    <div
-                        style={styles.address}
-                        data-tip={true}
-                        data-for="userAddressTooltip"
-                    >
-                        {!_.isEmpty(userAddress) ? userAddress : 'None found'}
-                    </div>
-                    <ReactTooltip id="userAddressTooltip">{userAddress}</ReactTooltip>
-                </div>
+                }
                 <div>
                     {_.isEmpty(userAddress) &&
                         <div className="pt2" style={{fontSize: 12}}>
