@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as queryString from 'query-string';
+import * as Recaptcha from 'react-recaptcha';
 import {colors} from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
 import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
@@ -10,7 +11,6 @@ import {configs} from 'ts/utils/configs';
 import {constants} from 'ts/utils/constants';
 import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
-import {ContributionAmountStep} from 'ts/pages/token_distribution/contribution_amount_step';
 import {SignatureStep} from 'ts/pages/token_distribution/signature_step';
 import {TermsAndConditions} from 'ts/pages/token_distribution/terms_and_conditions';
 import {RegisterButton} from 'ts/pages/token_distribution/register_button';
@@ -27,7 +27,6 @@ enum RegistrationFlowSteps {
     ACCEPT_TERMS_AND_CONDITIONS,
     VERIFY_IDENTITY,
     SIGNATURE_PROOF,
-    CONTRIBUTION_AMOUNT,
     REGISTRATION_COMPLETE,
 }
 
@@ -56,11 +55,13 @@ interface RegistrationFlowState {
     isLoadingRegistrationFlow: boolean;
     isNYIP: boolean;
     queueItToken: string;
+    recaptchaToken?: string;
 }
 
 export class RegistrationFlow extends React.Component<RegistrationFlowProps, RegistrationFlowState> {
     private blockchain: Blockchain;
     private civicSip: CivicSip;
+    private recaptchaInstance: any;
     constructor(props: RegistrationFlowProps) {
         super(props);
         this.civicSip = new (global as any).civic.sip({
@@ -77,6 +78,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             isLoadingRegistrationFlow: true,
             isNYIP: false,
             queueItToken: undefined,
+            recaptchaToken: undefined,
         };
     }
     public componentWillMount() {
@@ -161,9 +163,6 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                                 <StepLabel>Ownership proof</StepLabel>
                             </Step>
                             <Step>
-                                <StepLabel>Contribution amount</StepLabel>
-                            </Step>
-                            <Step>
                                 <StepLabel>Complete</StepLabel>
                             </Step>
                         </Stepper>
@@ -217,13 +216,6 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                                     providerType={this.props.providerType}
                                 />
                             </div>
-                        }
-                        {this.state.stepIndex === RegistrationFlowSteps.CONTRIBUTION_AMOUNT &&
-                            <ContributionAmountStep
-                                civicUserId={this.state.civicUserId}
-                                dispatcher={this.props.dispatcher}
-                                onSubmittedContributionInfo={this.onSubmittedContributionInfo.bind(this)}
-                            />
                         }
                         {this.state.stepIndex === RegistrationFlowSteps.REGISTRATION_COMPLETE &&
                             this.renderThankYouStep()
@@ -325,10 +317,22 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                                             Click the button below, scan the QR code and authenticate with 0x.
                                         </li>
                                     </ul>
-                                    <div className="pt1 pb4 left-align" style={{maxWidth: 357}}>
-                                        <RegisterButton
-                                            onClick={this.onRegisterClick.bind(this)}
-                                        />
+                                    <div className="pb4 left-align" style={{maxWidth: 357}}>
+                                        <div className="mx-auto pt2 pb3" style={{width: 302}}>
+                                            <Recaptcha
+                                                sitekey={configs.RECAPTCHA_SITE_KEY}
+                                                render="explicit"
+                                                ref={this.setRecaptchaInstance.bind(this)}
+                                                onloadCallback={_.noop}
+                                                verifyCallback={this.verifyCaptchaCallback.bind(this)}
+                                            />
+                                        </div>
+                                        <div className="pt1">
+                                            <RegisterButton
+                                                onClick={this.onRegisterClick.bind(this)}
+                                                isDisabled={_.isUndefined(this.state.recaptchaToken)}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -351,14 +355,9 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             </div>
         );
     }
-    private onSubmittedContributionInfo() {
-        this.setState({
-            stepIndex: RegistrationFlowSteps.REGISTRATION_COMPLETE,
-        });
-    }
     private onSubmittedOwnershipProof() {
         this.setState({
-            stepIndex: RegistrationFlowSteps.CONTRIBUTION_AMOUNT,
+            stepIndex: RegistrationFlowSteps.REGISTRATION_COMPLETE,
         });
     }
     private onAcceptTermsAndConditions() {
@@ -379,6 +378,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         const body = JSON.stringify({
             jwtToken,
             queueItToken: this.state.queueItToken,
+            recaptchaToken: this.state.recaptchaToken,
         });
         const response = await fetch(`${configs.BACKEND_BASE_URL}/civic_auth`, {
             method: 'POST',
@@ -438,5 +438,16 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             queueItTokenStorage.addToken(queueItToken);
         }
         return queueItToken;
+    }
+    private setRecaptchaInstance(recaptchaInstance: any) {
+        this.recaptchaInstance = recaptchaInstance;
+    }
+    private resetRecaptcha() {
+        this.recaptchaInstance.reset();
+    }
+    private verifyCaptchaCallback(recaptchaToken: string) {
+        this.setState({
+            recaptchaToken,
+        });
     }
 }

@@ -37,7 +37,7 @@ export class TermsAndConditions extends React.Component<TermsAndConditionsProps,
                 <div className="my3">
                     <div
                         id="termsAndConditons"
-                        className="left-align overflow-scroll sm-px3"
+                        className="left-align overflow-scroll sm-px3 px2 sm-mx2"
                         style={{height: 300}}
                     >
                         <ReactMarkdown
