@@ -7,20 +7,17 @@ interface ContributionNoticeSteps {}
 
 export class ContributionNotice extends React.Component<ContributionNoticeProps, ContributionNoticeSteps> {
     public render() {
-        const style = {
-            height: '60vh',
-            width: '60vw',
-            display: 'inline-block',
-        };
         return (
-            <div className="block mx-auto pt4">
-                <Paper style={style} zDepth={1}>
-                    <div className="flex items-center justify-center fit" style={{height: '100%'}}>
-                        <div className="self-center">
-                            {this.props.children}
-                        </div>
-                    </div>
-                </Paper>
+            <div className="pt4 my4 mx-auto max-width-3">
+                <div className="center pt4">
+                    <img
+                        src="/images/zrx_token.png"
+                        style={{width: 150}}
+                    />
+                </div>
+                <div>
+                    {this.props.children}
+                </div>
             </div>
         );
     }

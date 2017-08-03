@@ -192,15 +192,20 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                 : '';
             return (
                 <ContributionNotice>
-                    The contribution period has not started yet.
-                    <br/>
-                    {startDateMessage}
+                    <div className="center h2 sm-px2">
+                        The contribution period has not started yet
+                    </div>
+                    <div className="center pt2 mt1" style={{color: 'gray'}}>
+                        {startDateMessage}
+                    </div>
                 </ContributionNotice>
             );
         } else if (this.state.isFinished) {
             return (
                 <ContributionNotice>
-                    The contribution period had already ended
+                    <div className="center h2 sm-px2">
+                        The contribution period had already ended
+                    </div>
                 </ContributionNotice>
             );
         }
