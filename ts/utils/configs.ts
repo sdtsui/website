@@ -13,6 +13,7 @@ export const configs = {
     BASE_URL,
     ENVIRONMENT: isDevelopment ? Environments.DEVELOPMENT : Environments.PRODUCTION,
     BACKEND_BASE_URL: isDevelopment ? 'https://localhost:3001' : 'https://api.0xproject.com',
+    IS_REGISTRATION_OPEN: true,
     RECAPTCHA_SITE_KEY: '6LcXHicUAAAAAOmRl4ZpDf2MxLEiHolYp1vpdOII',
     CIVIC_APP_ID: 'H1dfQuJEb',
     QUEUE_IT_URL: `https://zeroex.queue-it.net/?c=${QUEUE_IT_CUSTOMER_ID}&e=${QUEUE_IT_EVENT_ID}`,

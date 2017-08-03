@@ -13,7 +13,6 @@ import {Partnerships} from 'ts/pages/home/partnerships';
 import {NewsletterInput} from 'ts/pages/home/newsletter_input';
 import {Fact, ScreenWidths} from 'ts/types';
 
-const IS_REGISTRATION_OPEN = true;
 const THROTTLE_TIMEOUT = 100;
 const CUSTOM_DARK_GRAY = '#575757';
 
@@ -83,7 +82,7 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                             className="pt1 pb4"
                             style={{fontSize: 18, color: '#B4B4B4'}}
                         >
-                            {IS_REGISTRATION_OPEN ?
+                            {configs.IS_REGISTRATION_OPEN ?
                                 'Registration is now open. Sale begins August 15' :
                                 'Registration begins August 9'
                             }
@@ -98,7 +97,7 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                             className="relative pt2 mx-auto sm-px3"
                             style={{maxWidth: 308, height: 145}}
                         >
-                            {IS_REGISTRATION_OPEN ?
+                            {configs.IS_REGISTRATION_OPEN ?
                                 <div>
                                     <RaisedButton
                                         label="Register for the launch"
