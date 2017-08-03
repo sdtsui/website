@@ -268,14 +268,9 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                             style={{width: 150}}
                         />
                     </div>
-                    <div className="pt3 mx-auto" style={{maxWidth: 440}}>
-                        <div className="left-align pb2">
-                            Get a reminder email when the contribution period opens
-                        </div>
-                        <NewsletterInput
-                            buttonBackgroundColor="#575757"
-                            buttonLabelColor="white"
-                        />
+                    <div className="pt1 mx-auto" style={{maxWidth: 440}}>
+                        We have sent a registration confirmation email to your Civic-associated email
+                        address. You will also receive a reminder email before the contribution period opens.
                     </div>
                 </div>
             </div>
