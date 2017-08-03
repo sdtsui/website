@@ -228,7 +228,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                 <div className="col lg-col-9 md-col-9 col-12">
                     <div className="mx-auto sm-px2" style={{maxWidth: 530}}>
                         <div className="h2 pt3">Make a contribution</div>
-                        <div className="clearfix pt3">
+                        <div className="clearfix pt3 pb1">
                             <div className="col col-1">
                                 {this.renderStepNumber(1)}
                             </div>
@@ -348,7 +348,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                 </div>
                             </div>
                         </div>
-                        <div className="clearfix pt3">
+                        <div className="clearfix pt3 pb2">
                             <div className="col col-1">
                                 {this.renderStepNumber(2)}
                             </div>
