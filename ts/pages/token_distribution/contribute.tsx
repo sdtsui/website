@@ -147,7 +147,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                 .updateShouldBlockchainErrDialogBeOpen.bind(this.props.dispatcher);
         return (
             <div style={contributeStyle}>
-                <DocumentTitle title="Contribute"/>
+                <DocumentTitle title="Contribute - 0x Token Launch"/>
                 <TopBar
                     blockchainIsLoaded={false}
                     location={this.props.location}

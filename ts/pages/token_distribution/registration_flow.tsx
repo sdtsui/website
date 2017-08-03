@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import * as DocumentTitle from 'react-document-title';
 import * as queryString from 'query-string';
 import * as Recaptcha from 'react-recaptcha';
 import {colors} from 'material-ui/styles';
@@ -143,6 +144,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         };
         return (
             <div id="tokenDistribution" style={registrationStyle}>
+                <DocumentTitle title="Registration - 0x Token Launch"/>
                 <TopBar
                     blockchainIsLoaded={false}
                     location={this.props.location}
