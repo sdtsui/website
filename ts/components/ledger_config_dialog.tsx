@@ -171,7 +171,6 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
             const networkName = constants.networkNameById[this.props.networkId];
             // We specifically prefix kovan ETH.
             // TODO: We should probably add prefixes for all networks
-            console.log('networkName', networkName);
             const isKovanNetwork = networkName === 'Kovan';
             const balanceString = `${balance.toString()} ${isKovanNetwork ? 'Kovan ' : ''}ETH`;
             return (
