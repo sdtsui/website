@@ -10,6 +10,7 @@ import ethUtil = require('ethereumjs-util');
 import ProviderEngine = require('web3-provider-engine');
 import FilterSubprovider = require('web3-provider-engine/subproviders/filters');
 import RpcSubprovider = require('web3-provider-engine/subproviders/rpc');
+import {RedundantRPCSubprovider} from 'ts/subproviders/redundant_rpc_subprovider';
 import {InjectedWeb3SubProvider} from 'ts/subproviders/injected_web3_subprovider';
 import {ledgerWalletSubproviderFactory, LedgerWallet} from 'ts/subproviders/ledger_wallet_subprovider_factory';
 import {Dispatcher} from 'ts/redux/dispatcher';
@@ -131,10 +132,10 @@ export class Blockchain {
                 this.ledgerSubProvider = ledgerWalletSubproviderFactory(this.getBlockchainNetworkId.bind(this));
                 provider.addProvider(this.ledgerSubProvider);
                 provider.addProvider(new FilterSubprovider());
-                provider.addProvider(new RpcSubprovider({
-                    // TODO: use mainnet url here after contracts are deployed
-                    rpcUrl: constants.PUBLIC_NODE_URL_BY_NETWORK_ID[constants.TESTNET_NETWORK_ID],
-                }));
+                provider.addProvider(new RedundantRPCSubprovider(
+                    constants.PUBLIC_NODE_URLS_BY_NETWORK_ID[constants.TESTNET_NETWORK_ID],
+                    RpcSubprovider,
+                ));
                 provider.start();
                 this.web3Wrapper.destroy();
                 const shouldPollUserAddress = false;
@@ -638,8 +639,8 @@ export class Blockchain {
     }
     private async getProviderAsync(injectedWeb3: Web3, networkIdIfExists: number) {
         const doesInjectedWeb3Exist = !_.isUndefined(injectedWeb3);
-        const publicNodeUrlIfExistsForNetworkId = constants.PUBLIC_NODE_URL_BY_NETWORK_ID[networkIdIfExists];
-        const isPublicNodeAvailableForNetworkId = !_.isUndefined(publicNodeUrlIfExistsForNetworkId);
+        const publicNodeUrlsIfExistsForNetworkId = constants.PUBLIC_NODE_URLS_BY_NETWORK_ID[networkIdIfExists];
+        const isPublicNodeAvailableForNetworkId = !_.isUndefined(publicNodeUrlsIfExistsForNetworkId);
 
         let provider;
         if (doesInjectedWeb3Exist && isPublicNodeAvailableForNetworkId) {
@@ -648,9 +649,10 @@ export class Blockchain {
             provider = new ProviderEngine();
             provider.addProvider(new InjectedWeb3SubProvider(injectedWeb3));
             provider.addProvider(new FilterSubprovider());
-            provider.addProvider(new RpcSubprovider({
-                rpcUrl: publicNodeUrlIfExistsForNetworkId,
-            }));
+            provider.addProvider(new RedundantRPCSubprovider(
+                constants.PUBLIC_NODE_URLS_BY_NETWORK_ID[constants.TESTNET_NETWORK_ID],
+                RpcSubprovider,
+            ));
             provider.start();
         } else if (doesInjectedWeb3Exist) {
             // Since no public node for this network, all requests go to injectedWeb3 instance
@@ -661,9 +663,10 @@ export class Blockchain {
             // injected into their browser.
             provider = new ProviderEngine();
             provider.addProvider(new FilterSubprovider());
-            provider.addProvider(new RpcSubprovider({
-                rpcUrl: constants.PUBLIC_NODE_URL_BY_NETWORK_ID[constants.TESTNET_NETWORK_ID],
-            }));
+            provider.addProvider(new RedundantRPCSubprovider(
+                constants.PUBLIC_NODE_URLS_BY_NETWORK_ID[constants.TESTNET_NETWORK_ID],
+                RpcSubprovider,
+            ));
             provider.start();
         }
 

@@ -10,8 +10,6 @@ declare module 'web3-provider-engine';
 declare module 'whatwg-fetch';
 declare module 'react-html5video';
 declare module 'web3-provider-engine/subproviders/filters';
-declare module 'web3-provider-engine/subproviders/rpc';
-declare module 'web3-provider-engine/subproviders/hooked-wallet';
 declare module 'thenby';
 declare module 'react-highlight';
 declare module 'react-recaptcha';
@@ -123,4 +121,22 @@ declare interface BlockiesConfig {
 declare function blockies(config: BlockiesConfig): BlockiesIcon;
 declare module 'blockies' {
     export = blockies;
+}
+
+// web3-provider-engine declarations
+declare class Subprovider {}
+declare module 'web3-provider-engine/subproviders/subprovider' {
+    export = Subprovider;
+}
+declare class RpcSubprovider {
+    constructor(options: {rpcUrl: string});
+}
+declare module 'web3-provider-engine/subproviders/rpc' {
+    export = RpcSubprovider;
+}
+declare class HookedWalletSubprovider {
+    constructor(wallet: any);
+}
+declare module 'web3-provider-engine/subproviders/hooked-wallet' {
+    export = HookedWalletSubprovider;
 }
