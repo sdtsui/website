@@ -30,6 +30,7 @@ const CUSTOM_GRAY = '#464646';
 const CUSTOM_LIGHT_GRAY = '#BBBBBB';
 const ZRX_ETH_DECIMAL_PLACES = 18;
 const THROTTLE_TIMEOUT = 100;
+const VARIABLE_TOKEN_SALE_INFO_INTERVAL = 2000;
 
 export interface ContributeProps {
     location: Location;
@@ -71,6 +72,7 @@ interface ContributeState {
 export class Contribute extends React.Component<ContributeProps, ContributeState> {
     private blockchain: Blockchain;
     private throttledScreenWidthUpdate: () => void;
+    private updateVariableTokenSaleInfoIntervalId: number;
     constructor(props: ContributeProps) {
         super(props);
         this.throttledScreenWidthUpdate = _.throttle(this.updateScreenWidth.bind(this), THROTTLE_TIMEOUT);
@@ -91,9 +93,15 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
     public componentDidMount() {
         window.addEventListener('resize', this.throttledScreenWidthUpdate);
         window.scrollTo(0, 0);
+        this.updateVariableTokenSaleInfoIntervalId = window.setInterval(() => {
+            if (this.props.blockchainIsLoaded) {
+                this.updateVariableTokenSaleInfoFireAndForgetAsync();
+            }
+        }, VARIABLE_TOKEN_SALE_INFO_INTERVAL);
     }
     public componentWillUnmount() {
         window.removeEventListener('resize', this.throttledScreenWidthUpdate);
+        clearInterval(this.updateVariableTokenSaleInfoIntervalId);
 
         // Reset the redux state so that if the user navigate to OTC or some other page, it can initialize
         // itself properly.
