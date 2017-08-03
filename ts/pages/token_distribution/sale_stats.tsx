@@ -23,18 +23,23 @@ export class SaleStats extends React.Component<SaleStatsProps, SaleStatsState> {
                 className="sm-mx-auto"
                 style={{color: CUSTOM_LIGHT_GRAY, maxWidth: 230}}
             >
-                <div className="pb1 pl1">ZRX sold</div>
                 <div
                     className="p1 rounded"
-                    style={{border: `3px solid #ebebeb`, height: 75}}
+                    style={{border: `3px solid #ebebeb`}}
                 >
+                    <div
+                        className="center"
+                        style={{paddingTop: 7, color: 'gray', fontSize: 13}}
+                    >
+                        ZRX sold
+                    </div>
                     {this.props.isLoading ?
                         <div className="center pt4 mt2">
                             <CircularProgress size={30} />
                         </div> :
-                        <div className="pt3 px1 relative">
-                            <div className="absolute" style={{right: 8, top: 7}}>
-                                <div style={{fontSize: 12}}>500M Cap</div>
+                        <div className="px1 relative" style={{paddingBottom: 7, paddingTop: 26}}>
+                            <div className="absolute" style={{right: 8, top: 3}}>
+                                <div style={{fontSize: 12}}>500M</div>
                                 <div
                                     className="right"
                                     style={{width: 2, height: 15, backgroundColor: CUSTOM_LIGHT_GRAY}}
@@ -49,7 +54,7 @@ export class SaleStats extends React.Component<SaleStatsProps, SaleStatsState> {
                                 className="center"
                                 style={{color: constants.CUSTOM_BLUE, fontSize: 13, paddingTop: 10}}
                             >
-                                {roundedZrxSold} ZRX ({roundedPercentRaised}%) sold
+                                {roundedZrxSold} ZRX ({roundedPercentRaised}%)
                             </div>
                         </div>
                     }
