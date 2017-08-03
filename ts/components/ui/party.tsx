@@ -12,7 +12,7 @@ interface PartyProps {
     address: string;
     identiconDiameter: number;
     identiconStyle?: React.CSSProperties;
-    noAddressLabel?: string;
+    noAddressLabel?: string|React.ReactNode;
 }
 
 interface PartyState {}
@@ -30,14 +30,27 @@ export class Party extends React.Component<PartyProps, PartyState> {
         const addressWidth = identiconDiameter > MIN_ADDRESS_WIDTH ?
                              identiconDiameter : MIN_ADDRESS_WIDTH;
         const truncatedAddress = `${address.substring(0, 6)}...${address.substr(-4)}`; // 0x3d5a...b287
+        const emptyIdenticonStyles = {
+            width: identiconDiameter,
+            height: identiconDiameter,
+            backgroundColor: 'lightgray',
+            marginTop: 13,
+            marginBottom: 10,
+        };
         return (
             <div style={{overflow: 'hidden'}}>
                 <div className="pb1 center">{label}</div>
-                <Identicon
-                    address={this.props.address}
-                    diameter={identiconDiameter}
-                    style={this.props.identiconStyle}
-                />
+                {_.isEmpty(address) ?
+                    <div
+                        className="circle mx-auto"
+                        style={emptyIdenticonStyles}
+                    /> :
+                    <Identicon
+                        address={this.props.address}
+                        diameter={identiconDiameter}
+                        style={this.props.identiconStyle}
+                    />
+                }
                 <div
                     className="mx-auto center pt1"
                 >
