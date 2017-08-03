@@ -185,6 +185,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                     bodyStyle={{backgroundColor: constants.CUSTOM_BLUE}}
                 />
                 <LedgerConfigDialog
+                    networkId={this.props.networkId}
                     blockchain={this.blockchain}
                     dispatcher={this.props.dispatcher}
                     toggleDialogFn={this.onToggleLedgerDialog.bind(this)}

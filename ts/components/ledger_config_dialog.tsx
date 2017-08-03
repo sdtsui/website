@@ -31,6 +31,7 @@ interface LedgerConfigDialogProps {
     toggleDialogFn: (isOpen: boolean) => void;
     dispatcher: Dispatcher;
     blockchain: Blockchain;
+    networkId: number;
 }
 
 interface LedgerConfigDialogState {
@@ -167,7 +168,12 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
             const balance = this.state.addressBalances[i];
             const addressTooltipId = `address-${userAddress}`;
             const balanceTooltipId = `balance-${userAddress}`;
-            const balanceString = `${balance.toString()} ETH`;
+            const networkName = constants.networkNameById[this.props.networkId];
+            // We specifically prefix kovan ETH.
+            // TODO: We should probably add prefixes for all networks
+            console.log('networkName', networkName);
+            const isKovanNetwork = networkName === 'Kovan';
+            const balanceString = `${balance.toString()} ${isKovanNetwork ? 'Kovan ' : ''}ETH`;
             return (
                 <TableRow key={userAddress} style={{height: 40}}>
                     <TableRowColumn colSpan={2}>

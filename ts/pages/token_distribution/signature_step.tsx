@@ -28,6 +28,7 @@ export interface SignatureStepProps {
     civicUserId: string;
     dispatcher: Dispatcher;
     injectedProviderName: string;
+    networkId: number;
     userAddress: string;
     onSubmittedOwnershipProof: () => void;
     providerType: ProviderType;
@@ -155,6 +156,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                     </div>
                 }
                 <LedgerConfigDialog
+                    networkId={this.props.networkId}
                     blockchain={this.props.blockchain}
                     dispatcher={this.props.dispatcher}
                     toggleDialogFn={this.onToggleLedgerDialog.bind(this)}

@@ -218,6 +218,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                                     civicUserId={this.state.civicUserId}
                                     dispatcher={this.props.dispatcher}
                                     injectedProviderName={this.props.injectedProviderName}
+                                    networkId={this.props.networkId}
                                     userAddress={this.props.userAddress}
                                     onSubmittedOwnershipProof={this.onSubmittedOwnershipProof.bind(this)}
                                     providerType={this.props.providerType}
