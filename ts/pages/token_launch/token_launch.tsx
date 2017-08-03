@@ -1,8 +1,10 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as DocumentTitle from 'react-document-title';
+import RaisedButton from 'material-ui/RaisedButton';
 import {DefaultPlayer as Video} from 'react-html5video';
 import {utils} from 'ts/utils/utils';
+import {configs} from 'ts/utils/configs';
 import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
 import {Distribution} from 'ts/pages/token_launch/distribution';
@@ -12,6 +14,7 @@ import {NewsletterInput} from 'ts/pages/home/newsletter_input';
 import {Fact, ScreenWidths} from 'ts/types';
 
 const THROTTLE_TIMEOUT = 100;
+const CUSTOM_DARK_GRAY = '#575757';
 
 const TOKEN_FACTS: Fact[] = [
     {
@@ -79,7 +82,10 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                             className="pt1 pb4"
                             style={{fontSize: 18, color: '#B4B4B4'}}
                         >
-                            Registration begins August 9
+                            {configs.IS_REGISTRATION_OPEN ?
+                                'Registration is now open. Sale begins August 15' :
+                                'Registration begins August 9'
+                            }
                         </div>
                         <div className="mx-auto pb2">
                             <img
@@ -91,17 +97,30 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                             className="relative pt2 mx-auto sm-px3"
                             style={{maxWidth: 308, height: 145}}
                         >
-                            <div className="absolute" style={{maxWidth: 308}}>
-                                <div style={{textAlign: 'left', fontSize: 14}}>
-                                    Receive notifications about registration & launch
-                                </div>
-                                <div className="pt1">
-                                    <NewsletterInput
-                                        buttonBackgroundColor="#575757"
-                                        buttonLabelColor="white"
+                            {configs.IS_REGISTRATION_OPEN ?
+                                <div>
+                                    <RaisedButton
+                                        label="Register for the launch"
+                                        labelColor="white"
+                                        backgroundColor={CUSTOM_DARK_GRAY}
+                                        onClick={this.onRegisterClick.bind(this)}
                                     />
+                                    <div className="pt2" style={{fontSize: 13}}>
+                                        Registration is required for launch participation
+                                    </div>
+                                </div> :
+                                <div className="absolute" style={{maxWidth: 308}}>
+                                    <div style={{textAlign: 'left', fontSize: 14}}>
+                                        Receive notifications about registration & launch
+                                    </div>
+                                    <div className="pt1">
+                                        <NewsletterInput
+                                            buttonBackgroundColor={CUSTOM_DARK_GRAY}
+                                            buttonLabelColor="white"
+                                        />
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         </div>
                     </div>
                     <KeyDates
@@ -200,6 +219,9 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
             );
         });
         return facts;
+    }
+    private onRegisterClick() {
+        window.location.href = configs.QUEUE_IT_URL;
     }
     private updateScreenWidth() {
         const newScreenWidth = utils.getScreenWidth();

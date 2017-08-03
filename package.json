@@ -19,6 +19,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "0x.js": "0.6.1",
+    "@types/query-string": "^5.0.0",
     "basscss": "^8.0.3",
     "bignumber.js": "^4.0.2",
     "blockies": "^0.0.2",
@@ -37,6 +38,7 @@
     "less": "^2.7.2",
     "material-ui": "^0.17.1",
     "moment": "^2.18.1",
+    "query-string": "^5.0.0",
     "react": "15.6.1",
     "react-copy-to-clipboard": "^4.2.3",
     "react-document-title": "^2.0.3",

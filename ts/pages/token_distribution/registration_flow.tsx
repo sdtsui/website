@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import * as queryString from 'query-string';
 import * as Recaptcha from 'react-recaptcha';
 import {colors} from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
@@ -19,6 +20,7 @@ import {FlashMessage} from 'ts/components/ui/flash_message';
 import {NewsletterInput} from 'ts/pages/home/newsletter_input';
 import {SimpleLoading} from 'ts/components/ui/simple_loading';
 import {BlockchainErrDialog} from 'ts/components/blockchain_err_dialog';
+import {queueItTokenStorage} from 'ts/local_storage/queue_it_token_storage';
 
 const CUSTOM_GRAY = '#635F5E';
 enum RegistrationFlowSteps {
@@ -52,6 +54,7 @@ interface RegistrationFlowState {
     prevProviderType: ProviderType;
     isLoadingRegistrationFlow: boolean;
     isNYIP: boolean;
+    queueItToken: string;
     recaptchaToken?: string;
 }
 
@@ -74,11 +77,13 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             prevProviderType: this.props.providerType,
             isLoadingRegistrationFlow: true,
             isNYIP: false,
+            queueItToken: undefined,
             recaptchaToken: undefined,
         };
     }
     public componentWillMount() {
         this.setIsNYIPFireAndForgetAsync();
+        this.setQueueItTokenOrRedirectIfNoneExistsFireAndForgetAsync();
         const isRegistrationFlow = true;
         this.blockchain = new Blockchain(this.props.dispatcher, isRegistrationFlow);
     }
@@ -372,6 +377,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
     private async sendAuthCodeAsync(jwtToken: string) {
         const body = JSON.stringify({
             jwtToken,
+            queueItToken: this.state.queueItToken,
             recaptchaToken: this.state.recaptchaToken,
         });
         const response = await fetch(`${configs.BACKEND_BASE_URL}/civic_auth`, {
@@ -408,6 +414,30 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             isNYIP,
             isLoadingRegistrationFlow: false,
         });
+    }
+    private async setQueueItTokenOrRedirectIfNoneExistsFireAndForgetAsync() {
+        const queueItTokenIfExists = this.getQueueItTokenIfExists();
+        if (_.isUndefined(queueItTokenIfExists)) {
+            // Re-direct to QueueIt if they haven't been through it yet.
+            window.location.href = configs.QUEUE_IT_URL;
+        } else {
+            this.setState({
+                queueItToken: queueItTokenIfExists,
+            });
+        }
+    }
+    private getQueueItTokenIfExists(): string|undefined {
+        const parsed = queryString.parse(window.location.search);
+        let queueItToken = parsed.queueittoken;
+        if (_.isUndefined(queueItToken)) {
+            queueItToken = queueItTokenStorage.getToken();
+            if (_.isUndefined(queueItToken) || _.isEmpty(queueItToken)) {
+                return;
+            }
+        } else {
+            queueItTokenStorage.addToken(queueItToken);
+        }
+        return queueItToken;
     }
     private setRecaptchaInstance(recaptchaInstance: any) {
         this.recaptchaInstance = recaptchaInstance;
