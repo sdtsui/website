@@ -115,6 +115,7 @@ export class Blockchain {
     public async providerTypeUpdatedFireAndForgetAsync(providerType: ProviderType) {
         // Should actually be Web3.Provider|ProviderEngine union type but it causes issues
         // later on in the logic.
+        let provider;
         switch (providerType) {
             case ProviderType.LEDGER: {
                 const isU2FSupported = await utils.isU2FSupportedAsync();
@@ -127,7 +128,7 @@ export class Blockchain {
 
                 this.dispatcher.updateUserAddress(''); // Clear old userAddress
 
-                const provider = new ProviderEngine();
+                provider = new ProviderEngine();
                 this.ledgerSubProvider = ledgerWalletSubproviderFactory(this.getBlockchainNetworkId.bind(this));
                 provider.addProvider(this.ledgerSubProvider);
                 provider.addProvider(new FilterSubprovider());
@@ -146,7 +147,7 @@ export class Blockchain {
                 if (_.isUndefined(this.cachedProvider)) {
                     return; // Going from injected to injected, so we noop
                 }
-                const provider = this.cachedProvider;
+                provider = this.cachedProvider;
                 const shouldPollUserAddress = true;
                 this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, this.networkId, shouldPollUserAddress);
                 delete this.ledgerSubProvider;
@@ -157,6 +158,8 @@ export class Blockchain {
             default:
                 throw utils.spawnSwitchErr('providerType', providerType);
         }
+
+        await this.instantiateContractsAsync();
     }
     public getTokenSaleAddress(): string {
       utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
