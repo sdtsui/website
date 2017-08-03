@@ -223,7 +223,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         return (
             <div className="clearfix max-width-4 mx-auto" style={{paddingTop: 43, width: '100%'}}>
                 {this.props.screenWidth === ScreenWidths.SM &&
-                    this.renderSaleStats(capPeriodEndIfExists)
+                    this.renderSaleStats()
                 }
                 <div className="col lg-col-9 md-col-9 col-12">
                     <div className="mx-auto sm-px2" style={{maxWidth: 530}}>
@@ -234,7 +234,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                             </div>
                             <div className="col col-11">
                                 <div className="h3">Select your wallet:</div>
-                                <div className="pt2 pb3 mx-auto" style={{maxWidth: 440}}>
+                                <div className="pt2 pb3">
                                     <LabeledSwitcher
                                         labelLeft={labelLeft}
                                         labelRight="Ledger Nano S"
@@ -284,7 +284,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                     address={this.props.userAddress}
                                     identiconDiameter={30}
                                     identiconStyle={{marginTop: 10, marginBottom: 10}}
-                                    noAddressLabel="No address found"
+                                    noAddressLabel={<span style={{color: '#ff3333'}}>No address found</span>}
                                 />
                                 <div
                                     className="pt1 mx-auto center"
@@ -378,7 +378,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                     <div>
                                         <div>
                                             <span style={{color: CUSTOM_LIGHT_GRAY}}>
-                                                current contribution cap:{' '}
+                                                current contribution limit:{' '}
                                             </span>
                                             <span style={{color: CUSTOM_GRAY}}>
                                                 {this.renderEthCapPerAddress(now)} ETH/participant
@@ -386,7 +386,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                         </div>
                                         <div className="pt1">
                                             <span style={{color: CUSTOM_LIGHT_GRAY}}>
-                                                cap increases to:{' '}
+                                                Limit increases to:{' '}
                                                 <span style={{color: CUSTOM_GRAY}}>
                                                     {this.renderEthCapPerAddress(nextPeriodTimestamp)} ETH
                                                 </span>{' '}
@@ -438,12 +438,12 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                     </div>
                 </div>
                 {this.props.screenWidth !== ScreenWidths.SM &&
-                    this.renderSaleStats(capPeriodEndIfExists)
+                    this.renderSaleStats()
                 }
             </div>
         );
     }
-    private renderSaleStats(capPeriodEndIfExists: number) {
+    private renderSaleStats() {
         return (
             <div className="col lg-col-3 md-col-3 col-12">
                 <div className="lg-pt4 md-pt4 sm-pt2">
@@ -451,7 +451,6 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                         isLoading={!this.state.didLoadConstantTokenSaleInfo}
                         totalZrxSupply={this.state.totalZrxSupply}
                         zrxSold={this.state.zrxSold}
-                        capPeriodEnd={_.isUndefined(capPeriodEndIfExists) ? 0 : capPeriodEndIfExists}
                     />
                 </div>
             </div>
