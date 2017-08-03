@@ -350,14 +350,9 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             </div>
         );
     }
-    private onSubmittedContributionInfo() {
-        this.setState({
-            stepIndex: RegistrationFlowSteps.REGISTRATION_COMPLETE,
-        });
-    }
     private onSubmittedOwnershipProof() {
         this.setState({
-            stepIndex: RegistrationFlowSteps.CONTRIBUTION_AMOUNT,
+            stepIndex: RegistrationFlowSteps.REGISTRATION_COMPLETE,
         });
     }
     private onAcceptTermsAndConditions() {
