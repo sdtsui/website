@@ -139,12 +139,12 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                                 />
                                 <div
                                     className="pt2"
-                                    style={{color: 'lightgray', fontSize: 13}}
+                                    style={{color: '#565656', fontSize: 13}}
                                 >
                                     You can follow{' '}
                                     <span
                                         className="underline"
-                                        style={{cursor: 'pointer'}}
+                                        style={{cursor: 'pointer', color: '#04b504'}}
                                         onClick={this.toggleMsgSigningDialog.bind(this, true)}
                                     >
                                         these steps
