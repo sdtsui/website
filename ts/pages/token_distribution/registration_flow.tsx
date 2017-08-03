@@ -88,6 +88,11 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         const isRegistrationFlow = true;
         this.blockchain = new Blockchain(this.props.dispatcher, isRegistrationFlow);
     }
+    public componentWillUnmount() {
+        // Reset the redux state so that if the user navigate to OTC or some other page, it can initialize
+        // itself properly.
+        this.props.dispatcher.resetState();
+    }
     public componentDidMount() {
         this.civicSip.on('auth-code-received', (event: any) => {
             const jwtToken = event.response;

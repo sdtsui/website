@@ -94,6 +94,10 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
     }
     public componentWillUnmount() {
         window.removeEventListener('resize', this.throttledScreenWidthUpdate);
+
+        // Reset the redux state so that if the user navigate to OTC or some other page, it can initialize
+        // itself properly.
+        this.props.dispatcher.resetState();
     }
     public componentWillMount() {
         this.blockchain = new Blockchain(this.props.dispatcher);
