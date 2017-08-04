@@ -1,35 +1,39 @@
 import * as _ from 'lodash';
+import {JSONRPCPayload} from 'ts/types';
+import promisify = require('es6-promisify');
 import Subprovider = require('web3-provider-engine/subproviders/subprovider');
+import RpcSubprovider = require('web3-provider-engine/subproviders/rpc');
 
 export class RedundantRPCSubprovider extends Subprovider {
-    private RPCs: any[];
-    constructor(endpoints: string[], RpcSubprovider: any) {
+    private rpcs: RpcSubprovider[];
+    constructor(endpoints: string[]) {
         super();
-        this.RPCs = _.map(endpoints, endpoint => {
+        this.rpcs = _.map(endpoints, endpoint => {
             return new RpcSubprovider({
                 rpcUrl: endpoint,
             });
         });
-        this.handleRequest = this.handleRequest.bind(this);
     }
-    public handleRequest(payload: any, next: any, end: any): void {
-        this.firstSuccess(this.RPCs.slice(), payload, next, end);
+    public async handleRequest(payload: JSONRPCPayload, next: () => void,
+                               end: (err?: Error, data?: any) =>  void): Promise<void> {
+        const rpcsCopy = this.rpcs.slice();
+        try {
+            const data = await this.firstSuccessAsync(rpcsCopy, payload, next);
+            end(null, data);
+        } catch (err) {
+            end(err);
+        }
+
     }
-    private firstSuccess(RPCs: any[], payload: any, next: any, end: (err?: Error, data?: any) => void): void {
-        const RPC = RPCs.shift();
-        RPC.handleRequest(payload, next, (err?: Error, data?: any) => {
-            if (err) {
-                if (RPCs.length !== 0) {
-                    // Try next RPC
-                    this.firstSuccess(RPCs, payload, next, end);
-                } else {
-                    // All RPCs failed
-                    end(err);
-                }
-            } else {
-                // Success
-                end(undefined, data);
+    private async firstSuccessAsync(rpcs: RpcSubprovider[], payload: JSONRPCPayload, next: () => void): Promise<any> {
+        for (const rpc of rpcs) {
+            try {
+                const data = await promisify(rpc.handleRequest.bind(rpc))(payload, next);
+                return data;
+            } catch (e) {
+                continue;
             }
-        });
+        }
+        throw Error('All nodes are down');
     }
 }

@@ -446,3 +446,8 @@ export type TokenSaleErrs = keyof typeof TokenSaleErrs;
 export interface PublicNodeUrlsByNetworkId {
     [networkId: number]: string[];
 };
+
+export interface JSONRPCPayload {
+    params: any[];
+    method: string;
+}

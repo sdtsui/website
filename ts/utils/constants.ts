@@ -20,9 +20,16 @@ export const constants = {
     LEDGER_PROVIDER_NAME: 'Ledger',
     METAMASK_PROVIDER_NAME: 'Metamask',
     PUBLIC_PROVIDER_NAME: '0x Public',
+    // The order matters. We first try first node and only then fall back to others.
     PUBLIC_NODE_URLS_BY_NETWORK_ID: {
-        [1]: ['https://mainnet.0xproject.com', 'https://infura.io'],
-        [42]: ['https://kovan.0xproject.com', 'https://kovan.infura.io'],
+        [1]: [
+            'https://mainnet.0xproject.com',
+            'https://infura.io',
+        ],
+        [42]: [
+            'https://kovan.0xproject.com',
+            'https://kovan.infura.io',
+        ],
     } as PublicNodeUrlsByNetworkId,
     PARITY_SIGNER_PROVIDER_NAME: 'Parity Signer',
     GENERIC_PROVIDER_NAME: 'Injected Web3',

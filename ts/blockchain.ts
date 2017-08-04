@@ -9,7 +9,6 @@ import contract = require('truffle-contract');
 import ethUtil = require('ethereumjs-util');
 import ProviderEngine = require('web3-provider-engine');
 import FilterSubprovider = require('web3-provider-engine/subproviders/filters');
-import RpcSubprovider = require('web3-provider-engine/subproviders/rpc');
 import {RedundantRPCSubprovider} from 'ts/subproviders/redundant_rpc_subprovider';
 import {InjectedWeb3SubProvider} from 'ts/subproviders/injected_web3_subprovider';
 import {ledgerWalletSubproviderFactory, LedgerWallet} from 'ts/subproviders/ledger_wallet_subprovider_factory';
@@ -134,7 +133,6 @@ export class Blockchain {
                 provider.addProvider(new FilterSubprovider());
                 provider.addProvider(new RedundantRPCSubprovider(
                     constants.PUBLIC_NODE_URLS_BY_NETWORK_ID[constants.TESTNET_NETWORK_ID],
-                    RpcSubprovider,
                 ));
                 provider.start();
                 this.web3Wrapper.destroy();
@@ -651,7 +649,6 @@ export class Blockchain {
             provider.addProvider(new FilterSubprovider());
             provider.addProvider(new RedundantRPCSubprovider(
                 constants.PUBLIC_NODE_URLS_BY_NETWORK_ID[constants.TESTNET_NETWORK_ID],
-                RpcSubprovider,
             ));
             provider.start();
         } else if (doesInjectedWeb3Exist) {
@@ -665,7 +662,6 @@ export class Blockchain {
             provider.addProvider(new FilterSubprovider());
             provider.addProvider(new RedundantRPCSubprovider(
                 constants.PUBLIC_NODE_URLS_BY_NETWORK_ID[constants.TESTNET_NETWORK_ID],
-                RpcSubprovider,
             ));
             provider.start();
         }

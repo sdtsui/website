@@ -130,6 +130,7 @@ declare module 'web3-provider-engine/subproviders/subprovider' {
 }
 declare class RpcSubprovider {
     constructor(options: {rpcUrl: string});
+    public handleRequest(payload: any, next: any, end: (err?: Error, data?: any) =>  void): void;
 }
 declare module 'web3-provider-engine/subproviders/rpc' {
     export = RpcSubprovider;
