@@ -177,6 +177,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                     isOpen={this.props.shouldBlockchainErrDialogBeOpen}
                     userAddress={this.props.userAddress}
                     toggleDialogFn={updateShouldBlockchainErrDialogBeOpen}
+                    isTokenLaunchPage={true}
                 />
                 <FlashMessage
                     dispatcher={this.props.dispatcher}

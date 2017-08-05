@@ -13,9 +13,13 @@ interface BlockchainErrDialogProps {
     isOpen: boolean;
     userAddress: string;
     toggleDialogFn: (isOpen: boolean) => void;
+    isTokenLaunchPage?: boolean;
 }
 
 export class BlockchainErrDialog extends React.Component<BlockchainErrDialogProps, undefined> {
+    public static defaultProps: Partial<BlockchainErrDialogProps> = {
+        isTokenLaunchPage: false,
+    };
     public render() {
         const dialogActions = [
             <FlatButton
@@ -87,24 +91,30 @@ export class BlockchainErrDialog extends React.Component<BlockchainErrDialogProp
             <div>
                 <div>
                     We were unable to access an Ethereum wallet you control. In order to interact
-                    {' '}with the OTC dApp, we need a way to interact with one of your Ethereum wallets.
+                    {' '}with the {this.props.isTokenLaunchPage ? '0x token launch dApp' : 'OTC dApp'},
+                    we need a way to interact with one of your Ethereum wallets.
                     {' '}There are two easy ways you can enable us to do that:
                 </div>
-                <h4>1. Chrome extension Ethereum wallet</h4>
+                <h4>1. Metamask chrome extension</h4>
                 <div>
-                    You can install a Chrome extension Ethereum wallet such as{' '}
+                    You can install the
                     <a href={constants.METAMASK_CHROME_STORE_URL} target="_blank">
                         Metamask
-                    </a>. Once installed and set up, refresh this page.
+                    </a> Chrome extension Ethereum wallet. Once installed and set up, refresh this page.
                     <div className="pt1">
                         <span className="bold">Note:</span>
                         {' '}If you already have Metamask installed, make sure it is unlocked.
                     </div>
                 </div>
-                <h4>2. Use the Mist browser</h4>
+                <h4>Parity Signer</h4>
                 <div>
-                    Install the <a href={constants.MIST_DOWNLOAD_URL} target="_blank">Mist</a>
-                    {' '}app, and browse to this site from within the in-app Mist browser.
+                    The <a href={constants.PARITY_CHROME_STORE_URL} target="_blank">Parity Signer
+                    Chrome extension</a>{' '} lets you connect to a locally running Parity node.
+                    Make sure you have started your local Parity node with `parity ui`
+                    {this.props.isTokenLaunchPage ?
+                        'to connect to the mainnet.' :
+                        'or `parity --chain kovan ui` in order to connect to mainnet or Kovan respectively'
+                    }.
                 </div>
                 <div className="pt2">
                     <span className="bold">Note:</span>
@@ -121,9 +131,13 @@ export class BlockchainErrDialog extends React.Component<BlockchainErrDialogProp
                 <div>
                     The 0x smart contracts are not deployed on the Ethereum network you are
                     {' '}currently connected to (network Id: {this.props.blockchain.networkId}).
-                    {' '}In order to use the OTC DApp, please connect to the {constants.TESTNET_NAME}
-                    {' '}testnet (network Id: {constants.TESTNET_NETWORK_ID}) or {constants.MAINNET_NAME}
-                    {' '} (network Id: {constants.MAINNET_NETWORK_ID}).
+                    {' '}In order to use the {this.props.isTokenLaunchPage ? '0x token launch dApp' : 'OTC dApp'},
+                    {' '}please connect to the{' '}
+                    {this.props.isTokenLaunchPage ?
+                        `${constants.MAINNET_NAME} (network Id: ${constants.MAINNET_NETWORK_ID}).` :
+                        `${constants.TESTNET_NAME} testnet (network Id: ${constants.TESTNET_NETWORK_ID}) or
+                         ${constants.MAINNET_NAME} (network Id: ${constants.MAINNET_NETWORK_ID}).`
+                    }
                 </div>
                 <h4>Metamask</h4>
                 <div>
@@ -135,8 +149,11 @@ export class BlockchainErrDialog extends React.Component<BlockchainErrDialogProp
                 <h4>Parity Signer</h4>
                 <div>
                     If using the <a href={constants.PARITY_CHROME_STORE_URL} target="_blank">Parity Signer
-                    Chrome extension</a>{' '}, make sure to start your local Parity node with `parity ui` or
-                    `parity --chain kovan ui` in order to connect to mainnet or Kovan respectively.
+                    Chrome extension</a>{' '}, make sure to start your local Parity node with `parity ui`
+                    {this.props.isTokenLaunchPage ?
+                        'to connect to the mainnet.' :
+                        'or `parity --chain kovan ui` in order to connect to mainnet or Kovan respectively'
+                    }
                 </div>
             </div>
         );
