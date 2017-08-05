@@ -26,14 +26,16 @@ export class RedundantRPCSubprovider extends Subprovider {
 
     }
     private async firstSuccessAsync(rpcs: RpcSubprovider[], payload: JSONRPCPayload, next: () => void): Promise<any> {
+        let lastErr;
         for (const rpc of rpcs) {
             try {
                 const data = await promisify(rpc.handleRequest.bind(rpc))(payload, next);
                 return data;
-            } catch (e) {
+            } catch (err) {
+                lastErr = err;
                 continue;
             }
         }
-        throw Error('All nodes are down');
+        throw Error(lastErr);
     }
 }
