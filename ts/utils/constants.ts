@@ -37,8 +37,8 @@ export const constants = {
     MAINNET_NAME: 'Main network',
     MAINNET_NETWORK_ID: 1,
     METAMASK_CHROME_STORE_URL: 'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
-    PARITY_CHROME_STORE_URL: 'https://chrome.google.com/webstore/detail/parity-signer-ui/\
-    fgodinogimdopkigkcoelpfkbnpngalc',
+    // tslint:disable-next-line:max-line-length
+    PARITY_CHROME_STORE_URL: 'https://chrome.google.com/webstore/detail/parity-ethereum-integrati/himekenlppkgeaoeddcliojfddemadig',
     MIST_DOWNLOAD_URL: 'https://github.com/ethereum/mist/releases',
     NULL_ADDRESS: '0x0000000000000000000000000000000000000000',
     ROLLBAR_ACCESS_TOKEN: 'a6619002b51c4464928201e6ea94de65',

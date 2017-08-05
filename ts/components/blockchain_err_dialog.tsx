@@ -132,10 +132,11 @@ export class BlockchainErrDialog extends React.Component<BlockchainErrDialogProp
                         Metamask
                     </a>, you can switch networks in the top left corner of the extension popover.
                 </div>
-                <h4>Mist</h4>
+                <h4>Parity Signer</h4>
                 <div>
-                    In the <a href={constants.MIST_DOWNLOAD_URL} target="_blank">Mist</a>
-                    {' '}app, navigate to develop -> network, and choose the 'testnet' option.
+                    If using the <a href={constants.PARITY_CHROME_STORE_URL} target="_blank">Parity Signer
+                    Chrome extension</a>{' '}, make sure to start your local Parity node with `parity ui` or
+                    `parity --chain kovan ui` in order to connect to mainnet or Kovan respectively.
                 </div>
             </div>
         );
