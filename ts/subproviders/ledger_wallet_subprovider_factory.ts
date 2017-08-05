@@ -3,7 +3,7 @@ import Web3 = require('web3');
 import * as EthereumTx from 'ethereumjs-tx';
 import ethUtil = require('ethereumjs-util');
 import * as ledger from 'ledgerco';
-import * as HookedWalletSubprovider from 'web3-provider-engine/subproviders/hooked-wallet';
+import HookedWalletSubprovider = require('web3-provider-engine/subproviders/hooked-wallet');
 import {constants} from 'ts/utils/constants';
 import {LedgerEthConnection, SignPersonalMessageParams, TxParams} from 'ts/types';
 
@@ -162,9 +162,9 @@ export class LedgerWallet {
     }
 }
 
-export const ledgerWalletSubproviderFactory = (getNetworkIdFn: () => number) => {
+export const ledgerWalletSubproviderFactory = (getNetworkIdFn: () => number): LedgerWallet => {
     const ledgerWallet = new LedgerWallet(getNetworkIdFn);
-    const ledgerWalletSubprovider = new HookedWalletSubprovider(ledgerWallet);
+    const ledgerWalletSubprovider = new HookedWalletSubprovider(ledgerWallet) as LedgerWallet;
     ledgerWalletSubprovider.getPath = ledgerWallet.getPath.bind(ledgerWallet);
     ledgerWalletSubprovider.setPath = ledgerWallet.setPath.bind(ledgerWallet);
     ledgerWalletSubprovider.setPathIndex = ledgerWallet.setPathIndex.bind(ledgerWallet);

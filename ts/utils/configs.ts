@@ -17,7 +17,7 @@ export const configs = {
     RECAPTCHA_SITE_KEY: '6LcXHicUAAAAAOmRl4ZpDf2MxLEiHolYp1vpdOII',
     CIVIC_APP_ID: 'H1dfQuJEb',
     QUEUE_IT_URL: `https://zeroex.queue-it.net/?c=${QUEUE_IT_CUSTOMER_ID}&e=${QUEUE_IT_EVENT_ID}`,
-    symbolsOfMintableTokens: ['MKR', 'MLN', 'GNT', 'DGD', 'REP', 'ZRX'],
+    symbolsOfMintableTokens: ['MKR', 'MLN', 'GNT', 'DGD', 'REP'],
     mostPopularTradingPairSymbols: ['WETH', 'ZRX'],
     lastLocalStorageFillClearanceDate: '2017-07-07',
 };

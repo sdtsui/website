@@ -443,6 +443,11 @@ export const TokenSaleErrs = strEnum([
 ]);
 export type TokenSaleErrs = keyof typeof TokenSaleErrs;
 
-export interface PublicNodeUrlByNetworkId {
-    [networkId: number]: string;
+export interface PublicNodeUrlsByNetworkId {
+    [networkId: number]: string[];
 };
+
+export interface JSONRPCPayload {
+    params: any[];
+    method: string;
+}

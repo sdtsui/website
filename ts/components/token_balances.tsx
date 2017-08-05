@@ -224,7 +224,8 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
     private renderTokenRow(tokenColSpan: number, actionPaddingX: number, token: Token) {
         const tokenLink = utils.getEtherScanLinkIfExists(token.address, this.props.networkId,
                                                          EtherscanLinkSuffixes.address);
-        const isMintable = _.includes(configs.symbolsOfMintableTokens, token.symbol);
+        const isMintable = _.includes(configs.symbolsOfMintableTokens, token.symbol) &&
+            this.props.networkId !== constants.MAINNET_NETWORK_ID;
         return (
             <TableRow key={token.address} style={{height: TOKEN_TABLE_ROW_HEIGHT}}>
                 <TableRowColumn
