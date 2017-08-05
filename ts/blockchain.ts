@@ -648,7 +648,7 @@ export class Blockchain {
             provider.addProvider(new InjectedWeb3SubProvider(injectedWeb3));
             provider.addProvider(new FilterSubprovider());
             provider.addProvider(new RedundantRPCSubprovider(
-                constants.PUBLIC_NODE_URLS_BY_NETWORK_ID[constants.TESTNET_NETWORK_ID],
+                publicNodeUrlsIfExistsForNetworkId,
             ));
             provider.start();
         } else if (doesInjectedWeb3Exist) {
