@@ -94,8 +94,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         this.props.dispatcher.resetState();
     }
     public componentDidMount() {
-        this.civicSip.on('auth-code-received', (event: any) => {
-            const jwtToken = event.response;
+        this.civicSip.on('data-received', jwtToken => {
             this.sendAuthCodeAsync(jwtToken);
         });
 
