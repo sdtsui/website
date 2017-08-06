@@ -172,7 +172,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                     }
                     isOpen={this.state.isMsgSigningExplanationDialogOpen}
                     handleClose={this.toggleMsgSigningDialog.bind(this, false)}
-                    message={`0x${this.props.civicUserId}`}
+                    message={this.props.civicUserId}
                 />
             </div>
         );
@@ -289,7 +289,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
     private async onSignProofAsync() {
         let signatureData;
         try {
-            signatureData = await this.props.blockchain.sendSignRequestAsync(`0x${this.props.civicUserId}`);
+            signatureData = await this.props.blockchain.sendSignRequestAsync(this.props.civicUserId);
         } catch (err) {
             const errMsg = `${err}`;
             if (utils.didUserDenyWeb3Request(errMsg)) {
