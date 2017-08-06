@@ -336,20 +336,24 @@ export class Blockchain {
         return this.web3Wrapper.isAddress(lowercaseAddress);
     }
     public getPersonalMessageHashHex(dataHashHex: string): string {
+        const dataHashBuff = ethUtil.toBuffer(dataHashHex);
+        const msgHashBuff = ethUtil.hashPersonalMessage(dataHashBuff);
+        const msgHashHex = ethUtil.bufferToHex(msgHashBuff);
+        return msgHashHex;
+    }
+    public getSignRequestMessage(dataHashHex: string): string {
         const isParityNode = _.includes(this.nodeVersion, 'Parity');
         const isTestRpc = _.includes(this.nodeVersion, 'TestRPC');
         if (isParityNode || isTestRpc) {
             // Parity and TestRpc nodes add the personalMessage prefix itself
             return dataHashHex;
         } else {
-            const dataHashBuff = ethUtil.toBuffer(dataHashHex);
-            const msgHashBuff = ethUtil.hashPersonalMessage(dataHashBuff);
-            const msgHashHex = ethUtil.bufferToHex(msgHashBuff);
+            const msgHashHex = this.getPersonalMessageHashHex(dataHashHex);
             return msgHashHex;
         }
     }
     public async sendSignRequestAsync(dataHashHex: string): Promise<SignatureData> {
-        const msgHashHex = this.getPersonalMessageHashHex(dataHashHex);
+        const msgHashHex = this.getSignRequestMessage(dataHashHex);
         const makerAddress = this.userAddress;
         // If makerAddress is undefined, this means they have a web3 instance injected into their browser
         // but no account addresses associated with it.
