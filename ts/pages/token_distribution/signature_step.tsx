@@ -167,7 +167,9 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                     onToggleDialog={this.onToggleU2FDialog.bind(this)}
                 />
                 <MsgSigningExplanationDialog
-                    getPersonalMessageHashHex={this.props.blockchain.getPersonalMessageHashHex}
+                    getPersonalMessageHashHex={
+                        this.props.blockchain.getPersonalMessageHashHex.bind(this.props.blockchain)
+                    }
                     isOpen={this.state.isMsgSigningExplanationDialogOpen}
                     handleClose={this.toggleMsgSigningDialog.bind(this, false)}
                     message={`0x${this.props.civicUserId}`}
