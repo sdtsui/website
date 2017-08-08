@@ -56,7 +56,7 @@ export class Footer extends React.Component<FooterProps, FooterState> {
                                 </a>
                             </div>
                             <div className="col col-3 pt1">
-                                <a href="https://slack.0xproject.com/" target="_blank">
+                                <a href="https://0xproject.slack.com/" target="_blank">
                                     <div className="rounded" style={{...styles.slackIcon}}>
                                         <img src="/images/slack_icon.png" style={{width: 13}} />
                                     </div>

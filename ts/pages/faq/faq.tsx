@@ -412,7 +412,7 @@ const sections: FAQSection[] = [
                 prompt: 'How can I get involved?',
                 answer: (
                     <div>
-                        Join our <a href="https://slack.0xproject.com/" target="_blank">Slack</a>!
+                        Join our <a href="https://0xproject.slack.com/" target="_blank">Slack</a>!
                         As an open source project, 0x will rely on a worldwide community of passionate
                         developers to contribute proposals, ideas and code.
                     </div>
