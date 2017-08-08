@@ -187,7 +187,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
                             style={{maxWidth: 750, ...styles.paragraph}}
                         >
                             <p>
-                                The Ethereum blockchain has become host to a variety of{' '}
+                                The Ethereum blockchain has become host to a{' '}
                                 <a href="https://etherscan.io/tokens" target="_blank">
                                     variety of digital assets
                                 </a>, with{' '}
