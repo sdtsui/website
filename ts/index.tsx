@@ -98,7 +98,9 @@ render(
                             <Route path="/token" component={TokenLaunch as any} />
                             <Route path="/faq" component={FAQ as any} />
                             <Route path="/registration" component={RegistrationFlow as any} />
-                            <Route path="/contribute" component={LazyContribute} />
+                            {configs.IS_CONTRIBUTE_OPEN &&
+                                <Route path="/contribute" component={LazyContribute} />
+                            }
                             <Route path="/registration_check" component={RegistrationCheck as any} />
                             <Route path="/docs/0xjs/:version?" component={LazyZeroExJSDocumentation} />
                             <Route component={NotFound as any} />
