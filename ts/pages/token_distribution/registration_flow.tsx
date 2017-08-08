@@ -54,7 +54,7 @@ interface RegistrationFlowState {
     prevUserAddress: string;
     prevProviderType: ProviderType;
     isLoadingRegistrationFlow: boolean;
-    isNYIP: boolean;
+    isDisallowedIp: boolean;
     queueItToken: string;
     recaptchaToken?: string;
 }
@@ -77,7 +77,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             prevUserAddress: this.props.userAddress,
             prevProviderType: this.props.providerType,
             isLoadingRegistrationFlow: true,
-            isNYIP: false,
+            isDisallowedIp: false,
             queueItToken: undefined,
             recaptchaToken: undefined,
         };
@@ -199,8 +199,8 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
     private renderMainContent() {
         return (
             <div>
-                {this.state.isNYIP ?
-                    this.renderNYForbiddenMessage() :
+                {this.state.isDisallowedIp ?
+                    this.renderIPForbiddenMessage() :
                     <div>
                         {this.state.stepIndex === RegistrationFlowSteps.ACCEPT_TERMS_AND_CONDITIONS &&
                             <TermsAndConditions
@@ -233,7 +233,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             </div>
         );
     }
-    private renderNYForbiddenMessage() {
+    private renderIPForbiddenMessage() {
         return (
             <div className="sm-px3">
                 <Paper
@@ -242,11 +242,11 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                 >
                     <div className="h3 thin">
                         <i className="zmdi zmdi-alert-triangle mr1" />
-                        New York IP detected
+                        Disallowed IP detected
                     </div>
                     <div className="pt2">
-                        We are sorry but registration by New York residents goes against our terms and
-                        conditions.
+                        We are sorry but registration by individuals from certain cities and countries
+                        goes against our terms and conditions. We are not able to let you register.
                     </div>
                 </Paper>
             </div>
@@ -412,9 +412,9 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         }
     }
     private async setIsNYIPFireAndForgetAsync() {
-        const isNYIP = await ipUtils.isNewYorkIPAsync();
+        const isDisallowedIp = await ipUtils.isDisallowedIPAsync();
         this.setState({
-            isNYIP,
+            isDisallowedIp,
             isLoadingRegistrationFlow: false,
         });
     }
