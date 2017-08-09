@@ -113,6 +113,13 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
                 >
                     <MenuItem className="py2">Whitepaper</MenuItem>
                 </a>
+                <a
+                    className="text-decoration-none"
+                    target="_blank"
+                    href="https://blog.0xproject.com/latest"
+                >
+                    <MenuItem className="py2">Blog</MenuItem>
+                </a>
                 {this.renderHomepageMenuItem('team')}
                 <Link to="/token" className="text-decoration-none">
                     <MenuItem className="py2">Token launch</MenuItem>
