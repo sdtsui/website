@@ -98,13 +98,12 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                             {configs.IS_REGISTRATION_OPEN ?
                                 <div>
                                     <RaisedButton
-                                        label="Register for the launch"
-                                        labelColor="white"
-                                        backgroundColor={CUSTOM_DARK_GRAY}
+                                        label="Register for the sale"
+                                        primary={true}
                                         onClick={this.onRegisterClick.bind(this)}
                                     />
                                     <div className="pt2" style={{fontSize: 13}}>
-                                        Registration is required for launch participation
+                                        Registration is required to purchase ZRX
                                     </div>
                                 </div> :
                                 <div className="absolute" style={{maxWidth: 308}}>
