@@ -54,6 +54,8 @@ export class MsgSigningExplanationDialog
         const messageBuff = ethUtil.toBuffer(this.props.message);
         const messageSha256Buff = ethUtil.sha256(messageBuff);
         const messageSha256Hex = ethUtil.bufferToHex(messageSha256Buff);
+        const messageSha3Buff = ethUtil.sha3(messageBuff);
+        const messageSha3Hex = ethUtil.bufferToHex(messageSha3Buff);
         return (
             <div style={{color: CUSTOM_GRAY}}>
                 <div className="h4 pb1">
@@ -74,6 +76,18 @@ export class MsgSigningExplanationDialog
                                 style={codeStyle}
                             >
                                 sha256(message)
+                            </div>
+                        </div> :
+                        this.props.isInjectedWeb3ParitySigner ?
+                        <div>
+                            <div className="h4">
+                                Hash using SHA3:
+                            </div>
+                            <div
+                                className="px1 py2 mt1"
+                                style={codeStyle}
+                            >
+                                sha3(message)
                             </div>
                         </div> :
                         <div>
@@ -106,22 +120,11 @@ export class MsgSigningExplanationDialog
                             'The resulting hash you are about to sign:'
                         }
                     </div>
-                    {this.renderHex(this.props.isUsingLedger ? messageSha256Hex : personalMessageHashHex)}
+                    {this.renderHex(this.props.isUsingLedger ?
+                        messageSha256Hex :
+                        this.props.isInjectedWeb3ParitySigner ? messageSha3Hex : personalMessageHashHex)
+                    }
                 </div>
-                {this.props.isInjectedWeb3ParitySigner && !this.props.isUsingLedger &&
-                    <div className="pt3" style={{color: 'red', fontSize: 12}}>
-                        Notice: Unfortunately Parity Signer does not show the correct message you
-                        {' '}are about to sign in their user interfaces (See Github issue <a
-                            className="underline"
-                            style={{color: 'red'}}
-                            href="https://github.com/paritytech/parity-extension/issues/93"
-                            target="_blank"
-                        >
-                            here
-                        </a>). Please re-verify that you are on the official https://0xproject.com domain
-                        before confirming a signed request.
-                    </div>
-                }
             </div>
         );
     }
