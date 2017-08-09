@@ -84,6 +84,25 @@ export class MsgSigningExplanationDialog
                     </div>
                     {this.renderHex(personalMessageHashHex)}
                 </div>
+                <div className="pt3" style={{color: 'red', fontSize: 12}}>
+                    Notice: Unfortunately Parity Signer and Ledger do not show the correct message you
+                    {' '}are about to sign in their user interfaces (See respective Github issues <a
+                        className="underline"
+                        style={{color: 'red'}}
+                        href="https://github.com/paritytech/parity-extension/issues/93"
+                        target="_blank"
+                    >
+                        here
+                    </a> and <a
+                        className="underline"
+                        style={{color: 'red'}}
+                        href="https://github.com/LedgerHQ/lib-ledger-core/issues/2"
+                        target="_blank"
+                    >
+                        here
+                    </a>). Please re-verify that you are on the official https://0xproject.com domain
+                    before confirming a signed request.
+                </div>
             </div>
         );
     }

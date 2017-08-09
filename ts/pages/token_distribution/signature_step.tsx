@@ -139,17 +139,11 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                                     isDisabled={_.isEmpty(this.props.userAddress)}
                                 />
                                 <div
-                                    className="pt2"
-                                    style={{color: '#565656', fontSize: 13}}
+                                    className="underline pt2"
+                                    style={{cursor: 'pointer', color: 'lightgray', fontSize: 13}}
+                                    onClick={this.toggleMsgSigningDialog.bind(this, true)}
                                 >
-                                    You can follow{' '}
-                                    <span
-                                        className="underline"
-                                        style={{cursor: 'pointer', color: '#04b504'}}
-                                        onClick={this.toggleMsgSigningDialog.bind(this, true)}
-                                    >
-                                        these steps
-                                    </span> to verify the message you are about to sign.
+                                    What am I signing?
                                 </div>
                             </div>
                         </div>
