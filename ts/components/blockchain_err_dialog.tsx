@@ -91,7 +91,7 @@ export class BlockchainErrDialog extends React.Component<BlockchainErrDialogProp
             <div>
                 <div>
                     We were unable to access an Ethereum wallet you control. In order to interact
-                    {' '}with the {this.props.isTokenLaunchPage ? '0x token launch dApp' : 'OTC dApp'},
+                    {' '}with the {this.props.isTokenLaunchPage ? '0x token sale dApp' : 'OTC dApp'},
                     we need a way to interact with one of your Ethereum wallets.
                     {' '}There are two easy ways you can enable us to do that:
                 </div>
@@ -131,7 +131,7 @@ export class BlockchainErrDialog extends React.Component<BlockchainErrDialogProp
                 <div>
                     The 0x smart contracts are not deployed on the Ethereum network you are
                     {' '}currently connected to (network Id: {this.props.blockchain.networkId}).
-                    {' '}In order to use the {this.props.isTokenLaunchPage ? '0x token launch dApp' : 'OTC dApp'},
+                    {' '}In order to use the {this.props.isTokenLaunchPage ? '0x token sale dApp' : 'OTC dApp'},
                     {' '}please connect to the{' '}
                     {this.props.isTokenLaunchPage ?
                         `${constants.MAINNET_NAME} (network Id: ${constants.MAINNET_NETWORK_ID}).` :

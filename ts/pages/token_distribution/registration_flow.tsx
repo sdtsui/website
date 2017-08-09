@@ -148,7 +148,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         };
         return (
             <div id="tokenDistribution" style={registrationStyle}>
-                <DocumentTitle title="Registration - 0x Token Launch"/>
+                <DocumentTitle title="Registration - 0x Token Sale"/>
                 <TopBar
                     blockchainIsLoaded={false}
                     location={this.props.location}

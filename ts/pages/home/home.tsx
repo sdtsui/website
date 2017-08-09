@@ -112,7 +112,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
                                 <div className="flex sm-hide xs-hide">
                                     <Link to="/token">
                                         <RaisedButton
-                                            label="Token Launch"
+                                            label="Token Sale"
                                             primary={true}
                                             style={{marginRight: 12}}
                                             buttonStyle={{width: 136}}

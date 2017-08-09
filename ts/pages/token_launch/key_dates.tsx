@@ -21,7 +21,7 @@ const keyDates = [
     },
     {
         date: 'August 15',
-        description: 'Token launch',
+        description: 'Token sale',
     },
 ];
 
