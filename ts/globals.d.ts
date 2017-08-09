@@ -10,13 +10,12 @@ declare module 'web3-provider-engine';
 declare module 'whatwg-fetch';
 declare module 'react-html5video';
 declare module 'web3-provider-engine/subproviders/filters';
-declare module 'web3-provider-engine/subproviders/rpc';
-declare module 'web3-provider-engine/subproviders/hooked-wallet';
 declare module 'thenby';
 declare module 'react-highlight';
 declare module 'react-recaptcha';
 declare module 'react-document-title';
 declare module 'ledgerco';
+declare module 'ethereumjs-tx';
 
 declare module '*.json' {
     const json: any;
@@ -124,8 +123,21 @@ declare module 'blockies' {
     export = blockies;
 }
 
-// is-mobile declarations
-declare function isMobile(): boolean;
-declare module 'is-mobile' {
-    export = isMobile;
+// web3-provider-engine declarations
+declare class Subprovider {}
+declare module 'web3-provider-engine/subproviders/subprovider' {
+    export = Subprovider;
+}
+declare class RpcSubprovider {
+    constructor(options: {rpcUrl: string});
+    public handleRequest(payload: any, next: any, end: (err?: Error, data?: any) =>  void): void;
+}
+declare module 'web3-provider-engine/subproviders/rpc' {
+    export = RpcSubprovider;
+}
+declare class HookedWalletSubprovider {
+    constructor(wallet: any);
+}
+declare module 'web3-provider-engine/subproviders/hooked-wallet' {
+    export = HookedWalletSubprovider;
 }

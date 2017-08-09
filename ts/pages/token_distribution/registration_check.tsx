@@ -3,7 +3,7 @@ import * as React from 'react';
 import {Link} from 'react-router-dom';
 import * as DocumentTitle from 'react-document-title';
 import {utils} from 'ts/utils/utils';
-import {constants} from 'ts/utils/constants';
+import {configs} from 'ts/utils/configs';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 import {TopBar} from 'ts/components/top_bar';
 import {Footer} from 'ts/components/footer';
@@ -99,7 +99,7 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
         const body = JSON.stringify({
             ethereumAddress: this.state.ethereumAddress,
         });
-        const endpoint = `${constants.BACKEND_BASE_URL}/contributor_status`;
+        const endpoint = `${configs.BACKEND_BASE_URL}/contributor_status`;
         try {
             const result = await fetch(
                 endpoint,

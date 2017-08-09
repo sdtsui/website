@@ -8,7 +8,7 @@ interface DistributionProps {}
 const distributionEntities = [
     {
         percentage: '50%',
-        recipient: 'Token launch',
+        recipient: 'Token sale',
         color: '#00ba1e',
     },
     {

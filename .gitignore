@@ -1,11 +1,5 @@
 node_modules
 .DS_Store
 TODO.md
-public/bundle.js
-public/bundle.js.map
-public/bundle-0.js
-public/bundle-0.js.map
-public/bundle-1.js
-public/bundle-1.js.map
+public/bundle*
 transpiled
-contracts

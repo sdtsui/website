@@ -112,7 +112,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
                                 <div className="flex sm-hide xs-hide">
                                     <Link to="/token">
                                         <RaisedButton
-                                            label="Token Launch"
+                                            label="Token Sale"
                                             primary={true}
                                             style={{marginRight: 12}}
                                             buttonStyle={{width: 136}}
@@ -131,6 +131,14 @@ export class Home extends React.Component<HomeProps, HomeState> {
                                             label="FAQ"
                                         />
                                     </Link>
+                                    <a
+                                        target="_blank"
+                                        href="https://blog.0xproject.com/latest"
+                                    >
+                                        <FlatButton
+                                            label="Blog"
+                                        />
+                                    </a>
                                     <Link to="/docs/0xjs">
                                         <FlatButton
                                             label="Docs"
@@ -187,7 +195,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
                             style={{maxWidth: 750, ...styles.paragraph}}
                         >
                             <p>
-                                The Ethereum blockchain has become host to a variety of{' '}
+                                The Ethereum blockchain has become host to a{' '}
                                 <a href="https://etherscan.io/tokens" target="_blank">
                                     variety of digital assets
                                 </a>, with{' '}

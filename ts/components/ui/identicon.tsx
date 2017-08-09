@@ -6,11 +6,15 @@ import blockies = require('blockies');
 interface IdenticonProps {
     address: string;
     diameter: number;
+    style?: React.CSSProperties;
 }
 
 interface IdenticonState {}
 
 export class Identicon extends React.Component<IdenticonProps, IdenticonState> {
+    public static defaultProps: Partial<IdenticonProps> = {
+        style: {},
+    };
     public render() {
         let address = this.props.address;
         if (_.isEmpty(address)) {
@@ -23,7 +27,7 @@ export class Identicon extends React.Component<IdenticonProps, IdenticonState> {
         return (
             <div
                 className="circle mx-auto relative transitionFix"
-                style={{width: diameter, height: diameter, overflow: 'hidden'}}
+                style={{width: diameter, height: diameter, overflow: 'hidden', ...this.props.style}}
             >
                 <img src={icon.toDataURL()} style={{width: diameter, height: diameter, imageRendering: 'pixelated'}}/>
             </div>

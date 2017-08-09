@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactMarkdown from 'react-markdown';
+import * as Waypoint from 'react-waypoint';
 import {colors} from 'material-ui/styles';
 import Checkbox from 'material-ui/Checkbox';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -15,6 +16,7 @@ export interface TermsAndConditionsProps {
 }
 
 interface TermsAndConditionsState {
+    didScrollToTheEnd: boolean;
     didAcceptTermsAndCondition: boolean;
 }
 
@@ -22,6 +24,7 @@ export class TermsAndConditions extends React.Component<TermsAndConditionsProps,
     constructor(props: TermsAndConditionsProps) {
         super(props);
         this.state = {
+            didScrollToTheEnd: false,
             didAcceptTermsAndCondition: false,
         };
     }
@@ -37,17 +40,21 @@ export class TermsAndConditions extends React.Component<TermsAndConditionsProps,
                 <div className="my3">
                     <div
                         id="termsAndConditons"
-                        className="left-align overflow-scroll sm-px3"
+                        className="left-align overflow-scroll sm-px3 px2 sm-mx2"
                         style={{height: 300}}
                     >
                         <ReactMarkdown
                             source={termsAndConditionsMd}
+                        />
+                        <Waypoint
+                            onEnter={this.onScrollToTheEnd.bind(this)}
                         />
                     </div>
                     <div className="clearfix left-align pb3 pt3">
                         <div className="col lg-col-7 md-col-7 col-12 left-align pt1 sm-pl3 sm-pb3">
                             <Checkbox
                                 label="I agree to the terms & conditions"
+                                disabled={!this.state.didScrollToTheEnd}
                                 onCheck={this.onAcceptTermsCheckboxChecked.bind(this)}
                             />
                         </div>
@@ -63,6 +70,11 @@ export class TermsAndConditions extends React.Component<TermsAndConditionsProps,
                 </div>
             </div>
         );
+    }
+    private onScrollToTheEnd() {
+        this.setState({
+            didScrollToTheEnd: true,
+        });
     }
     private onAcceptTermsCheckboxChecked(event: any, isInputChecked: boolean) {
         this.setState({

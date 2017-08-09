@@ -15,7 +15,7 @@ const mapDispatchToProps = (dispatch: Dispatch<State>): ConnectedDispatch => ({
 });
 
 interface ConnectedState {
-    flashMessage?: string;
+    flashMessage?: string|React.ReactNode;
     blockchainIsLoaded: boolean;
     networkId: number;
     nodeVersion: string;

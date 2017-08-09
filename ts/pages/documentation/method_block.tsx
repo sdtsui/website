@@ -27,7 +27,7 @@ interface MethodBlockState {
 const styles: Styles = {
     chip: {
         fontSize: 14,
-        backgroundColor: colors.cyanA700,
+        backgroundColor: colors.lightBlueA700,
         color: 'white',
         height: 16,
         borderRadius: 14,

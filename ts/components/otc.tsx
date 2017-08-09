@@ -53,7 +53,7 @@ export interface OTCAllProps {
     shouldBlockchainErrDialogBeOpen: boolean;
     userSuppliedOrderCache: Order;
     location: Location;
-    flashMessage?: string;
+    flashMessage?: string|React.ReactNode;
 }
 
 interface OTCAllState {
@@ -122,7 +122,8 @@ export class OTC extends React.Component<OTCAllProps, OTCAllState> {
         }
         if (nextProps.userAddress !== this.state.prevUserAddress) {
             this.blockchain.userAddressUpdatedFireAndForgetAsync(nextProps.userAddress);
-            if (nextProps.userAddress !== '' && nextProps.blockchainIsLoaded) {
+            if (!_.isEmpty(nextProps.userAddress) && !_.isEmpty(this.state.prevUserAddress) &&
+                nextProps.blockchainIsLoaded) {
                 const tokens = _.values(nextProps.tokenByAddress);
                 this.updateBalanceAndAllowanceWithLoadingScreenAsync(tokens);
             }

@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import ethUtil = require('ethereumjs-util');
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import {CopyIcon} from 'ts/components/ui/copy_icon';
@@ -14,6 +15,8 @@ export interface MsgSigningExplanationDialogProps {
     isOpen: boolean;
     handleClose: () => void;
     message: string;
+    isUsingLedger: boolean;
+    isInjectedWeb3ParitySigner: boolean;
 }
 
 interface MsgSigningExplanationDialogState {}
@@ -48,6 +51,9 @@ export class MsgSigningExplanationDialog
             backgroundColor: CUSTOM_LIGHT_BLUE,
             color: CUSTOM_DARK_BLUE,
         };
+        const messageBuff = ethUtil.toBuffer(this.props.message);
+        const messageSha256Buff = ethUtil.sha256(messageBuff);
+        const messageSha256Hex = ethUtil.bufferToHex(messageSha256Buff);
         return (
             <div style={{color: CUSTOM_GRAY}}>
                 <div className="h4 pb1">
@@ -58,32 +64,64 @@ export class MsgSigningExplanationDialog
                 </div>
                 <div className="pt4 relative">
                     {this.renderChevron()}
-                    <div className="h4">
-                        Sign method:
-                    </div>
-                    <div
-                        className="px1 py2 mt1"
-                        style={codeStyle}
-                    >
-                        keccak256("\x19Ethereum Signed Message:\n" + len(message) + message))
-                    </div>
-                    <div style={{paddingTop: 3}}>
-                        <a
-                            className="underline"
-                            href={ETH_SIGN_DOCS_LINK}
-                            target="_blank"
-                        >
-                            source
-                        </a>
-                    </div>
+                    {this.props.isUsingLedger ?
+                        <div>
+                            <div className="h4">
+                                Hash using SHA256:
+                            </div>
+                            <div
+                                className="px1 py2 mt1"
+                                style={codeStyle}
+                            >
+                                sha256(message)
+                            </div>
+                        </div> :
+                        <div>
+                            <div className="h4">
+                                Sign method:
+                            </div>
+                            <div
+                                className="px1 py2 mt1"
+                                style={codeStyle}
+                            >
+                                keccak256("\x19Ethereum Signed Message:\n" + len(message) + message))
+                            </div>
+                            <div style={{paddingTop: 3}}>
+                                <a
+                                    className="underline"
+                                    href={ETH_SIGN_DOCS_LINK}
+                                    target="_blank"
+                                >
+                                    source
+                                </a>
+                            </div>
+                        </div>
+                    }
                 </div>
                 <div className="pt4 relative">
                     {this.renderChevron()}
                     <div className="pb1 h4">
-                        The resulting hash you are about to sign:
+                        {this.props.isUsingLedger ?
+                            'The resulting hash you can confirm on-device:' :
+                            'The resulting hash you are about to sign:'
+                        }
                     </div>
-                    {this.renderHex(personalMessageHashHex)}
+                    {this.renderHex(this.props.isUsingLedger ? messageSha256Hex : personalMessageHashHex)}
                 </div>
+                {this.props.isInjectedWeb3ParitySigner && !this.props.isUsingLedger &&
+                    <div className="pt3" style={{color: 'red', fontSize: 12}}>
+                        Notice: Unfortunately Parity Signer does not show the correct message you
+                        {' '}are about to sign in their user interfaces (See Github issue <a
+                            className="underline"
+                            style={{color: 'red'}}
+                            href="https://github.com/paritytech/parity-extension/issues/93"
+                            target="_blank"
+                        >
+                            here
+                        </a>). Please re-verify that you are on the official https://0xproject.com domain
+                        before confirming a signed request.
+                    </div>
+                }
             </div>
         );
     }

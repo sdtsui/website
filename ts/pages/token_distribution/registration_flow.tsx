@@ -1,15 +1,18 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import * as DocumentTitle from 'react-document-title';
+import * as queryString from 'query-string';
+import * as Recaptcha from 'react-recaptcha';
 import {colors} from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
 import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
 import {Blockchain} from 'ts/blockchain';
 import {ipUtils} from 'ts/utils/ip_utils';
+import {configs} from 'ts/utils/configs';
 import {constants} from 'ts/utils/constants';
 import {utils} from 'ts/utils/utils';
 import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
-import {ContributionAmountStep} from 'ts/pages/token_distribution/contribution_amount_step';
 import {SignatureStep} from 'ts/pages/token_distribution/signature_step';
 import {TermsAndConditions} from 'ts/pages/token_distribution/terms_and_conditions';
 import {RegisterButton} from 'ts/pages/token_distribution/register_button';
@@ -19,13 +22,13 @@ import {FlashMessage} from 'ts/components/ui/flash_message';
 import {NewsletterInput} from 'ts/pages/home/newsletter_input';
 import {SimpleLoading} from 'ts/components/ui/simple_loading';
 import {BlockchainErrDialog} from 'ts/components/blockchain_err_dialog';
+import {queueItTokenStorage} from 'ts/local_storage/queue_it_token_storage';
 
 const CUSTOM_GRAY = '#635F5E';
 enum RegistrationFlowSteps {
     ACCEPT_TERMS_AND_CONDITIONS,
     VERIFY_IDENTITY,
     SIGNATURE_PROOF,
-    CONTRIBUTION_AMOUNT,
     REGISTRATION_COMPLETE,
 }
 
@@ -38,7 +41,7 @@ export interface RegistrationFlowProps {
     providerType: ProviderType;
     injectedProviderName: string;
     userAddress: string;
-    flashMessage?: string;
+    flashMessage?: string|React.ReactNode;
     blockchainErr: BlockchainErrs;
     shouldBlockchainErrDialogBeOpen: boolean;
 }
@@ -52,16 +55,19 @@ interface RegistrationFlowState {
     prevUserAddress: string;
     prevProviderType: ProviderType;
     isLoadingRegistrationFlow: boolean;
-    isNYIP: boolean;
+    isDisallowedIp: boolean;
+    queueItToken: string;
+    recaptchaToken?: string;
 }
 
 export class RegistrationFlow extends React.Component<RegistrationFlowProps, RegistrationFlowState> {
     private blockchain: Blockchain;
     private civicSip: CivicSip;
+    private recaptchaInstance: any;
     constructor(props: RegistrationFlowProps) {
         super(props);
         this.civicSip = new (global as any).civic.sip({
-            appId: constants.CIVIC_APP_ID,
+            appId: configs.CIVIC_APP_ID,
         });
         this.state = {
             stepIndex: RegistrationFlowSteps.ACCEPT_TERMS_AND_CONDITIONS,
@@ -72,16 +78,24 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             prevUserAddress: this.props.userAddress,
             prevProviderType: this.props.providerType,
             isLoadingRegistrationFlow: true,
-            isNYIP: false,
+            isDisallowedIp: false,
+            queueItToken: undefined,
+            recaptchaToken: undefined,
         };
     }
     public componentWillMount() {
         this.setIsNYIPFireAndForgetAsync();
-        this.blockchain = new Blockchain(this.props.dispatcher);
+        this.setQueueItTokenOrRedirectIfNoneExistsFireAndForgetAsync();
+        const isRegistrationFlow = true;
+        this.blockchain = new Blockchain(this.props.dispatcher, isRegistrationFlow);
+    }
+    public componentWillUnmount() {
+        // Reset the redux state so that if the user navigate to OTC or some other page, it can initialize
+        // itself properly.
+        this.props.dispatcher.resetState();
     }
     public componentDidMount() {
-        this.civicSip.on('auth-code-received', (event: any) => {
-            const jwtToken = event.response;
+        this.civicSip.on('data-received', jwtToken => {
             this.sendAuthCodeAsync(jwtToken);
         });
 
@@ -135,6 +149,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         };
         return (
             <div id="tokenDistribution" style={registrationStyle}>
+                <DocumentTitle title="Registration - 0x Token Sale"/>
                 <TopBar
                     blockchainIsLoaded={false}
                     location={this.props.location}
@@ -155,9 +170,6 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                                 <StepLabel>Ownership proof</StepLabel>
                             </Step>
                             <Step>
-                                <StepLabel>Contribution amount</StepLabel>
-                            </Step>
-                            <Step>
                                 <StepLabel>Complete</StepLabel>
                             </Step>
                         </Stepper>
@@ -173,12 +185,13 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                     isOpen={this.props.shouldBlockchainErrDialogBeOpen}
                     userAddress={this.props.userAddress}
                     toggleDialogFn={updateShouldBlockchainErrDialogBeOpen}
+                    isTokenLaunchPage={true}
                 />
                 <FlashMessage
                     dispatcher={this.props.dispatcher}
                     flashMessage={this.props.flashMessage}
                     showDurationMs={10000}
-                    bodyStyle={{backgroundColor: colors.cyanA700}}
+                    bodyStyle={{backgroundColor: constants.CUSTOM_BLUE}}
                 />
                 <Footer />
             </div>
@@ -187,8 +200,8 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
     private renderMainContent() {
         return (
             <div>
-                {this.state.isNYIP ?
-                    this.renderNYForbiddenMessage() :
+                {this.state.isDisallowedIp ?
+                    this.renderIPForbiddenMessage() :
                     <div>
                         {this.state.stepIndex === RegistrationFlowSteps.ACCEPT_TERMS_AND_CONDITIONS &&
                             <TermsAndConditions
@@ -206,18 +219,12 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                                     civicUserId={this.state.civicUserId}
                                     dispatcher={this.props.dispatcher}
                                     injectedProviderName={this.props.injectedProviderName}
+                                    networkId={this.props.networkId}
                                     userAddress={this.props.userAddress}
                                     onSubmittedOwnershipProof={this.onSubmittedOwnershipProof.bind(this)}
                                     providerType={this.props.providerType}
                                 />
                             </div>
-                        }
-                        {this.state.stepIndex === RegistrationFlowSteps.CONTRIBUTION_AMOUNT &&
-                            <ContributionAmountStep
-                                civicUserId={this.state.civicUserId}
-                                dispatcher={this.props.dispatcher}
-                                onSubmittedContributionInfo={this.onSubmittedContributionInfo.bind(this)}
-                            />
                         }
                         {this.state.stepIndex === RegistrationFlowSteps.REGISTRATION_COMPLETE &&
                             this.renderThankYouStep()
@@ -227,7 +234,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             </div>
         );
     }
-    private renderNYForbiddenMessage() {
+    private renderIPForbiddenMessage() {
         return (
             <div className="sm-px3">
                 <Paper
@@ -236,11 +243,11 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                 >
                     <div className="h3 thin">
                         <i className="zmdi zmdi-alert-triangle mr1" />
-                        New York IP detected
+                        Disallowed IP detected
                     </div>
                     <div className="pt2">
-                        We are sorry but registration by New York residents goes against our terms and
-                        conditions.
+                        We are sorry but registration by individuals from certain cities and countries
+                        goes against our terms and conditions. We are not able to let you register.
                     </div>
                 </Paper>
             </div>
@@ -263,14 +270,9 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                             style={{width: 150}}
                         />
                     </div>
-                    <div className="pt3 mx-auto" style={{maxWidth: 440}}>
-                        <div className="left-align pb2">
-                            Get a reminder email when the contribution period opens
-                        </div>
-                        <NewsletterInput
-                            buttonBackgroundColor="#575757"
-                            buttonLabelColor="white"
-                        />
+                    <div className="pt1 mx-auto" style={{maxWidth: 440}}>
+                        We have sent a registration confirmation email to your Civic-associated email
+                        address. You will also receive a reminder email before the contribution period opens.
                     </div>
                 </div>
             </div>
@@ -328,10 +330,22 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                                             Click the button below, scan the QR code and authenticate with 0x.
                                         </li>
                                     </ul>
-                                    <div className="pt1 pb4 left-align" style={{maxWidth: 357}}>
-                                        <RegisterButton
-                                            onClick={this.onRegisterClick.bind(this)}
-                                        />
+                                    <div className="pb4 left-align" style={{maxWidth: 357}}>
+                                        <div className="mx-auto pt2 pb3" style={{width: 302}}>
+                                            <Recaptcha
+                                                sitekey={configs.RECAPTCHA_SITE_KEY}
+                                                render="explicit"
+                                                ref={this.setRecaptchaInstance.bind(this)}
+                                                onloadCallback={_.noop}
+                                                verifyCallback={this.verifyCaptchaCallback.bind(this)}
+                                            />
+                                        </div>
+                                        <div className="pt1">
+                                            <RegisterButton
+                                                onClick={this.onRegisterClick.bind(this)}
+                                                isDisabled={_.isUndefined(this.state.recaptchaToken)}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -354,14 +368,9 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
             </div>
         );
     }
-    private onSubmittedContributionInfo() {
-        this.setState({
-            stepIndex: RegistrationFlowSteps.REGISTRATION_COMPLETE,
-        });
-    }
     private onSubmittedOwnershipProof() {
         this.setState({
-            stepIndex: RegistrationFlowSteps.CONTRIBUTION_AMOUNT,
+            stepIndex: RegistrationFlowSteps.REGISTRATION_COMPLETE,
         });
     }
     private onAcceptTermsAndConditions() {
@@ -381,8 +390,10 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
     private async sendAuthCodeAsync(jwtToken: string) {
         const body = JSON.stringify({
             jwtToken,
+            queueItToken: this.state.queueItToken,
+            recaptchaToken: this.state.recaptchaToken,
         });
-        const response = await fetch(`${constants.BACKEND_BASE_URL}/civic_auth`, {
+        const response = await fetch(`${configs.BACKEND_BASE_URL}/civic_auth`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -411,11 +422,45 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         }
     }
     private async setIsNYIPFireAndForgetAsync() {
-        const isNYIP = await ipUtils.isNewYorkIPAsync();
+        const isDisallowedIp = await ipUtils.isDisallowedIPAsync();
         this.setState({
-            isNYIP,
+            isDisallowedIp,
             isLoadingRegistrationFlow: false,
         });
-
+    }
+    private async setQueueItTokenOrRedirectIfNoneExistsFireAndForgetAsync() {
+        const queueItTokenIfExists = this.getQueueItTokenIfExists();
+        if (_.isUndefined(queueItTokenIfExists)) {
+            // Re-direct to QueueIt if they haven't been through it yet.
+            window.location.href = configs.QUEUE_IT_URL;
+        } else {
+            this.setState({
+                queueItToken: queueItTokenIfExists,
+            });
+        }
+    }
+    private getQueueItTokenIfExists(): string|undefined {
+        const parsed = queryString.parse(window.location.search);
+        let queueItToken = parsed.queueittoken;
+        if (_.isUndefined(queueItToken)) {
+            queueItToken = queueItTokenStorage.getToken();
+            if (_.isUndefined(queueItToken) || _.isEmpty(queueItToken)) {
+                return;
+            }
+        } else {
+            queueItTokenStorage.addToken(queueItToken);
+        }
+        return queueItToken;
+    }
+    private setRecaptchaInstance(recaptchaInstance: any) {
+        this.recaptchaInstance = recaptchaInstance;
+    }
+    private resetRecaptcha() {
+        this.recaptchaInstance.reset();
+    }
+    private verifyCaptchaCallback(recaptchaToken: string) {
+        this.setState({
+            recaptchaToken,
+        });
     }
 }

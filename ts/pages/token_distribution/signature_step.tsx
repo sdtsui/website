@@ -7,6 +7,7 @@ import {Blockchain} from 'ts/blockchain';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {errorReporter} from 'ts/utils/error_reporter';
 import {utils} from 'ts/utils/utils';
+import {configs} from 'ts/utils/configs';
 import {constants} from 'ts/utils/constants';
 import {InputLabel} from 'ts/components/ui/input_label';
 import {RequiredLabel} from 'ts/components/ui/required_label';
@@ -27,6 +28,7 @@ export interface SignatureStepProps {
     civicUserId: string;
     dispatcher: Dispatcher;
     injectedProviderName: string;
+    networkId: number;
     userAddress: string;
     onSubmittedOwnershipProof: () => void;
     providerType: ProviderType;
@@ -77,13 +79,14 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                         </div>
                         <div className="pt2" style={{lineHeight: 1.5}}>
                             In order to register a contribution address, you must prove ownership by
-                            signing a message with the corresponding private key.
+                            signing a message with the corresponding private key. Any ZRX you eventually
+                            purchase will be sent to this address.
                         </div>
 
                         <div className="pt2 pb2">
                             Notice: You cannot use an exchange address (i.e Coinbase, Kraken)
                         </div>
-                        <div className="pt2 pb3 mx-auto" style={{maxWidth: 435}}>
+                        <div className="pt2 pb3">
                             <LabeledSwitcher
                                 labelLeft={labelLeft}
                                 labelRight="Ledger Nano S"
@@ -97,7 +100,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                             >
                                 <div className="col col-6 center">
                                     <div>
-                                        address connected via a Web3 instance
+                                        address connected via Web3
                                     </div>
                                     <div>
                                         (i.e{' '}
@@ -136,23 +139,18 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                                     isDisabled={_.isEmpty(this.props.userAddress)}
                                 />
                                 <div
-                                    className="pt2"
-                                    style={{color: 'lightgray', fontSize: 13}}
+                                    className="underline pt2"
+                                    style={{cursor: 'pointer', color: 'lightgray', fontSize: 13}}
+                                    onClick={this.toggleMsgSigningDialog.bind(this, true)}
                                 >
-                                    You can follow{' '}
-                                    <span
-                                        className="underline"
-                                        style={{cursor: 'pointer'}}
-                                        onClick={this.toggleMsgSigningDialog.bind(this, true)}
-                                    >
-                                        these steps
-                                    </span> to verify the message you are about to sign.
+                                    What am I signing?
                                 </div>
                             </div>
                         </div>
                     </div>
                 }
                 <LedgerConfigDialog
+                    networkId={this.props.networkId}
                     blockchain={this.props.blockchain}
                     dispatcher={this.props.dispatcher}
                     toggleDialogFn={this.onToggleLedgerDialog.bind(this)}
@@ -163,10 +161,16 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                     onToggleDialog={this.onToggleU2FDialog.bind(this)}
                 />
                 <MsgSigningExplanationDialog
-                    getPersonalMessageHashHex={this.props.blockchain.getPersonalMessageHashHex}
+                    getPersonalMessageHashHex={
+                        this.props.blockchain.getPersonalMessageHashHex.bind(this.props.blockchain)
+                    }
                     isOpen={this.state.isMsgSigningExplanationDialogOpen}
                     handleClose={this.toggleMsgSigningDialog.bind(this, false)}
-                    message={`0x${this.props.civicUserId}`}
+                    message={this.props.civicUserId}
+                    isUsingLedger={this.props.providerType === ProviderType.LEDGER}
+                    isInjectedWeb3ParitySigner={
+                        this.props.injectedProviderName === constants.PARITY_SIGNER_PROVIDER_NAME
+                    }
                 />
             </div>
         );
@@ -179,27 +183,56 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
     private renderUserAddress() {
         const userAddress = this.props.userAddress;
         const identiconDiameter = 25;
+        const inputLabel = <InputLabel text="Accessible contribution address" />;
         return (
             <div>
                 <div className="pb1" style={{fontSize: 12}}>
-                    <RequiredLabel label={<InputLabel text="Accessible contribution address" />} />
+                    {_.isEmpty(userAddress) ?
+                        <RequiredLabel label={inputLabel} /> :
+                        inputLabel
+                    }
                 </div>
-                <div className="flex">
-                    <div className="pr2">
-                        <Identicon address={userAddress} diameter={identiconDiameter} />
+                {_.isEmpty(this.props.userAddress) ?
+                    <div className="py2" style={{fontSize: 12}}>
+                        <span style={{color: '#ff4f4d', fontStyle: 'italic'}}>
+                            No injected Web3 found.
+                        </span>
+                        <span className="pl1">
+                            Install{' '}<a
+                                className="underline"
+                                style={{color: '#635F5E'}}
+                                href={constants.METAMASK_CHROME_STORE_URL}
+                                target="_blank"
+                            >
+                                Metamask
+                            </a>{' '}or{' '}
+                            <a
+                                className="underline"
+                                style={{color: '#635F5E'}}
+                                href={constants.PARITY_CHROME_STORE_URL}
+                                target="_blank"
+                            >
+                                Parity Signer
+                            </a>{' '}to use this option.
+                        </span>
+                    </div> :
+                    <div className="flex">
+                        <div className="pr2">
+                            <Identicon address={userAddress} diameter={identiconDiameter} />
+                        </div>
+                        <div
+                            style={styles.address}
+                            data-tip={true}
+                            data-for="userAddressTooltip"
+                        >
+                            {userAddress}
+                        </div>
+                        <ReactTooltip id="userAddressTooltip">{userAddress}</ReactTooltip>
                     </div>
-                    <div
-                        style={styles.address}
-                        data-tip={true}
-                        data-for="userAddressTooltip"
-                    >
-                        {!_.isEmpty(userAddress) ? userAddress : 'None found'}
-                    </div>
-                    <ReactTooltip id="userAddressTooltip">{userAddress}</ReactTooltip>
-                </div>
+                }
                 <div>
                     {_.isEmpty(userAddress) &&
-                        <div className="pt2" style={{fontSize: 12}}>
+                        <div className="pt1" style={{fontSize: 12}}>
                             {this.renderEmptyUserAddressMsg()}
                         </div>
                     }
@@ -254,7 +287,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
     private async onSignProofAsync() {
         let signatureData;
         try {
-            signatureData = await this.props.blockchain.sendSignRequestAsync(`0x${this.props.civicUserId}`);
+            signatureData = await this.props.blockchain.sendSignRequestAsync(this.props.civicUserId);
         } catch (err) {
             const errMsg = `${err}`;
             if (utils.didUserDenyWeb3Request(errMsg)) {
@@ -273,7 +306,7 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
             civicUserId: this.props.civicUserId,
             signatureData,
         });
-        const response = await fetch(`${constants.BACKEND_BASE_URL}/signature_proof`, {
+        const response = await fetch(`${configs.BACKEND_BASE_URL}/signature_proof`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

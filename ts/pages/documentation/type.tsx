@@ -90,7 +90,7 @@ export function Type(props: TypeProps): any {
                 href={typeNameUrlIfExists}
                 target="_blank"
                 className="text-decoration-none"
-                style={{color: colors.cyanA700}}
+                style={{color: colors.lightBlueA700}}
             >
                 {typeName}
             </a>
@@ -108,7 +108,7 @@ export function Type(props: TypeProps): any {
             >
                 <span
                     onClick={utils.setUrlHash.bind(null, typeDefinitionAnchorId)}
-                    style={{color: colors.cyanA700, cursor: 'pointer'}}
+                    style={{color: colors.lightBlueA700, cursor: 'pointer'}}
                 >
                     {typeName}
                 </span>

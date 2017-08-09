@@ -190,7 +190,7 @@ export class Dispatcher {
     }
 
     // Shared
-    public showFlashMessage(msg: string) {
+    public showFlashMessage(msg: string|React.ReactNode) {
         this.dispatch({
             data: msg,
             type: ActionTypes.SHOW_FLASH_MESSAGE,

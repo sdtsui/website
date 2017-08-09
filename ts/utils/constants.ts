@@ -1,21 +1,18 @@
-import {ExchangeContractErrs} from 'ts/types';
+import {ExchangeContractErrs, PublicNodeUrlsByNetworkId} from 'ts/types';
 import * as BigNumber from 'bignumber.js';
 
 export const constants = {
-    BACKEND_BASE_URL: 'https://localhost:3001', // 'https://api.0xproject.com',
     STAGING_DOMAIN: 'staging-0xproject.s3-website-us-east-1.amazonaws.com',
     PRODUCTION_DOMAIN: '0xproject.com',
     BIGNUMBERJS_GITHUB_URL: 'http://mikemcl.github.io/bignumber.js',
     BITLY_ACCESS_TOKEN: 'ffc4c1a31e5143848fb7c523b39f91b9b213d208',
     BITLY_ENDPOINT: 'https://api-ssl.bitly.com',
-    CIVIC_APP_ID: 'H1dfQuJEb',
+    CUSTOM_BLUE: '#60a4f4',
     DEFAULT_TOKEN_ICON_URL: '/images/token_icons/default.png',
     DEFAULT_DERIVATION_PATH: `44'/60'/0'`,
-    ETHER_SCAN_ENDPOINT: 'https://kovan.etherscan.io',
     ETHER_FAUCET_ENDPOINT: 'https://faucet.0xproject.com/rain',
     FEE_RECIPIENT_ADDRESS: '0x0000000000000000000000000000000000000000',
     FIREFOX_U2F_ADDON: 'https://addons.mozilla.org/en-US/firefox/addon/u2f-support-add-on/',
-    HOSTED_TESTNET_URL: 'https://kovan.0xproject.com',
     IP_API_KEY: 'LLx6EVQHoOOfrjl',
     IP_API_ENDPOINT: 'https://pro.ip-api.com/json',
     GITHUB_0X_JS_URL: 'https://github.com/0xProject/0x.js',
@@ -23,15 +20,27 @@ export const constants = {
     LEDGER_PROVIDER_NAME: 'Ledger',
     METAMASK_PROVIDER_NAME: 'Metamask',
     PUBLIC_PROVIDER_NAME: '0x Public',
+    // The order matters. We first try first node and only then fall back to others.
+    PUBLIC_NODE_URLS_BY_NETWORK_ID: {
+        [1]: [
+            'https://mainnet.0xproject.com',
+            'https://infura.io',
+        ],
+        [42]: [
+            'https://kovan.0xproject.com',
+            'https://kovan.infura.io',
+        ],
+    } as PublicNodeUrlsByNetworkId,
     PARITY_SIGNER_PROVIDER_NAME: 'Parity Signer',
     GENERIC_PROVIDER_NAME: 'Injected Web3',
     MAKER_FEE: new BigNumber(0),
+    MAINNET_NAME: 'Main network',
+    MAINNET_NETWORK_ID: 1,
     METAMASK_CHROME_STORE_URL: 'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
-    PARITY_CHROME_STORE_URL: 'https://chrome.google.com/webstore/detail/parity-signer-ui/\
-    fgodinogimdopkigkcoelpfkbnpngalc',
+    // tslint:disable-next-line:max-line-length
+    PARITY_CHROME_STORE_URL: 'https://chrome.google.com/webstore/detail/parity-ethereum-integrati/himekenlppkgeaoeddcliojfddemadig',
     MIST_DOWNLOAD_URL: 'https://github.com/ethereum/mist/releases',
     NULL_ADDRESS: '0x0000000000000000000000000000000000000000',
-    RECAPTCHA_SITE_KEY: '6LcXHicUAAAAAOmRl4ZpDf2MxLEiHolYp1vpdOII',
     ROLLBAR_ACCESS_TOKEN: 'a6619002b51c4464928201e6ea94de65',
     DOCS_SCROLL_DURATION_MS: 0,
     DOCS_CONTAINER_ID: 'documentation',
@@ -102,4 +111,6 @@ export const constants = {
         'ApprovalContractEventArgs',
         'TokenContractEventArgs',
     ],
+    // Crowdsale constants
+    CAP_PERIOD_IN_SEC: 86400, // 24hrs in seconds
 };

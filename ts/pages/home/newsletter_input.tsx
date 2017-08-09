@@ -3,7 +3,7 @@ import * as React from 'react';
 import TextField from 'material-ui/TextField';
 import {colors} from 'material-ui/styles';
 import {utils} from 'ts/utils/utils';
-import {constants} from 'ts/utils/constants';
+import {configs} from 'ts/utils/configs';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 
 const ENTER_KEY_CODE = 13;
@@ -98,7 +98,7 @@ export class NewsletterInput extends React.Component<NewsletterInputProps, Newsl
             return false;
         }
 
-        const endpoint = `${constants.BACKEND_BASE_URL}/newsletter_subscriber/${this.state.email}`;
+        const endpoint = `${configs.BACKEND_BASE_URL}/newsletter_subscriber/${this.state.email}`;
         const response = await fetch(endpoint);
         const responseText = await response.text();
         if (response.status === 200) {

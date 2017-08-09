@@ -31,6 +31,7 @@ interface LedgerConfigDialogProps {
     toggleDialogFn: (isOpen: boolean) => void;
     dispatcher: Dispatcher;
     blockchain: Blockchain;
+    networkId: number;
 }
 
 interface LedgerConfigDialogState {
@@ -58,7 +59,7 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
         const dialogActions = [
             <FlatButton
                 label="Cancel"
-                onTouchTap={this.props.toggleDialogFn.bind(this.props.toggleDialogFn, false)}
+                onTouchTap={this.onClose.bind(this)}
             />,
         ];
         const dialogTitle = this.state.stepIndex === LedgerSteps.CONNECT ?
@@ -70,7 +71,7 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
                 titleStyle={{fontWeight: 100}}
                 actions={dialogActions}
                 open={this.props.isOpen}
-                onRequestClose={this.props.toggleDialogFn.bind(this.props.toggleDialogFn, false)}
+                onRequestClose={this.onClose.bind(this)}
                 autoScrollBodyContent={true}
                 bodyStyle={{paddingBottom: 0}}
             >
@@ -167,7 +168,11 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
             const balance = this.state.addressBalances[i];
             const addressTooltipId = `address-${userAddress}`;
             const balanceTooltipId = `balance-${userAddress}`;
-            const balanceString = `${balance.toString()} ETH`;
+            const networkName = constants.networkNameById[this.props.networkId];
+            // We specifically prefix kovan ETH.
+            // TODO: We should probably add prefixes for all networks
+            const isKovanNetwork = networkName === 'Kovan';
+            const balanceString = `${balance.toString()} ${isKovanNetwork ? 'Kovan ' : ''}ETH`;
             return (
                 <TableRow key={userAddress} style={{height: 40}}>
                     <TableRowColumn colSpan={2}>
@@ -193,11 +198,21 @@ export class LedgerConfigDialog extends React.Component<LedgerConfigDialogProps,
         });
         return rows;
     }
+    private onClose() {
+        this.setState({
+            didConnectFail: false,
+        });
+        const isOpen = false;
+        this.props.toggleDialogFn(isOpen);
+    }
     private onAddressSelected(selectedRowIndexes: number[]) {
         const selectedRowIndex = selectedRowIndexes[0];
         this.props.blockchain.updateLedgerDerivationIndex(selectedRowIndex);
         const selectedAddress = this.state.userAddresses[selectedRowIndex];
+        const selectAddressBalance = this.state.addressBalances[selectedRowIndex];
         this.props.dispatcher.updateUserAddress(selectedAddress);
+        this.props.blockchain.updateWeb3WrapperPrevUserAddress(selectedAddress);
+        this.props.dispatcher.updateUserEtherBalance(selectAddressBalance);
         this.setState({
             stepIndex: LedgerSteps.CONNECT,
         });

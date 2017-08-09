@@ -8,6 +8,7 @@ import {Link} from 'react-router-dom';
 import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
 import {Question} from 'ts/pages/faq/question';
+import {configs} from 'ts/utils/configs';
 
 export interface FAQProps {
     source: string;
@@ -33,11 +34,12 @@ const sections: FAQSection[] = [
                         At its core, 0x is an open and non-rent seeking protocol that facilitates trustless,
                         low friction exchange of Ethereum-based assets. Developers can use 0x as a platform
                         to build exchange applications on top of{' '}
-                        (<a href="http://0xproject.com/docs/0xjs#introduction" target="blank">0x.js</a> is a
+                        (<a href={`${configs.BASE_URL}/docs/0xjs#introduction`} target="blank">0x.js</a> is a
                         Javascript library for interacting with the 0x protocol). For end users, 0x will be
                         the infrastructure of a wide variety of user-facing applications i.e.{' '}
-                        <a href="http://0xproject.com/otc" target="blank">0x OTC</a>, a decentralized application
-                         that facilitates trustless over-the-counter trading of Ethereum-based tokens.
+                        <a href={`${configs.BASE_URL}/otc`} target="blank">0x OTC</a>,
+                        a decentralized application that facilitates trustless over-the-counter trading of
+                        Ethereum-based tokens.
                     </div>
                 ),
             },
@@ -410,7 +412,7 @@ const sections: FAQSection[] = [
                 prompt: 'How can I get involved?',
                 answer: (
                     <div>
-                        Join our <a href="https://slack.0xproject.com/" target="_blank">Slack</a>!
+                        Join our <a href="https://0xproject.slack.com/" target="_blank">Slack</a>!
                         As an open source project, 0x will rely on a worldwide community of passionate
                         developers to contribute proposals, ideas and code.
                     </div>
