@@ -11,7 +11,7 @@ import {Distribution} from 'ts/pages/token_launch/distribution';
 import {KeyDates} from 'ts/pages/token_launch/key_dates';
 import {Partnerships} from 'ts/pages/home/partnerships';
 import {NewsletterInput} from 'ts/pages/home/newsletter_input';
-import {Fact, ScreenWidths} from 'ts/types';
+import {Fact, ScreenWidths, BlogPost} from 'ts/types';
 
 const THROTTLE_TIMEOUT = 100;
 const CUSTOM_DARK_GRAY = '#575757';
@@ -31,6 +31,30 @@ const TOKEN_FACTS: Fact[] = [
         image: '/images/liquidity_pool.png',
         title: 'Open and permissionless',
         explanation: '0x protocol enables a diverse ecosystem of exchanges run by anyone, anywhere.',
+    },
+];
+
+const BLOG_POSTS: BlogPost[] = [
+    {
+        image: '/images/blog/tutorial_blog_post.png',
+        title: 'Tutorials for the 0x Token Sale Registration',
+        description: 'Detailed tutorials for registration using MetaMask, Parity Signer and Ledger',
+        date: 'Aug 9th',
+        url: 'https://blog.0xproject.com/tutorials-for-the-0x-token-sale-registration-766064955d12',
+    },
+    {
+        image: '/images/blog/scams_blog_post.png',
+        title: 'A Note on Scams and Phishing Attempts',
+        description: 'Always verify instructions via official 0x communication channels',
+        date: 'Aug 8th',
+        url: 'https://blog.0xproject.com/a-note-on-scams-and-phishing-attempts-e2d72577a470',
+    },
+    {
+        image: '/images/blog/registration_blog_post.png',
+        title: '0x Token Sale and Registration Details',
+        description: 'Registration Requirements and Sale Overview',
+        date: 'Aug 5th',
+        url: 'https://blog.0xproject.com/0x-token-sale-and-registration-details-75d84af11c60',
     },
 ];
 
@@ -75,7 +99,7 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                 <div className="pt3">
                     <div className="mx-auto max-width-4 center pt2 mt2" style={{color: '#5D5D5D'}}>
                         <div className="mx-auto center">
-                            <div className="mt4" style={{fontSize: 42, color: '#292929'}}>
+                            <div className="mt4" style={{fontSize: 55, color: '#292929'}}>
                                 <span className="robotoMono">0</span>x Token Sale
                             </div>
                         </div>
@@ -85,7 +109,7 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                         >
                             Registration begins August 9 at 8AM PST
                         </div>
-                        <div className="mx-auto pb2">
+                        <div className="mx-auto pb1">
                             <img
                                 src="/images/zrx_token.png"
                                 style={{width: 150}}
@@ -124,6 +148,17 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                         key={`keyDates-${this.state.screenWidth}`}
                         screenWidth={this.state.screenWidth}
                     />
+                    <div
+                        className="lg-py3 md-py3 sm-pt1 sm-pb3"
+                        style={{backgroundColor: 'white'}}
+                    >
+                        <div className="mx-auto max-width-4 center">
+                            <h1 className="thin pb3">RECENT BLOG POSTS</h1>
+                            <div>
+                                {this.renderBlogPosts()}
+                            </div>
+                        </div>
+                    </div>
                     <div
                         className="lg-py4 md-py4 sm-pt1 sm-pb4"
                         style={{backgroundColor: isUserOnMobile ? 'rgb(29, 29, 29)' : '#202020'}}
@@ -187,6 +222,35 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                 <Footer />
             </div>
         );
+    }
+    private renderBlogPosts() {
+        const posts = _.map(BLOG_POSTS, post => {
+            return (
+                <div
+                    key={post.title}
+                    className="clearfix mx-auto pb3"
+                    style={{maxWidth: 570}}
+                >
+                    <a href={post.url} target="_blank">
+                        <div className="col col-3">
+                            <img src={post.image} style={{width: 130}} />
+                        </div>
+                        <div className="col col-9 left-align pl2" style={{color: '#808080'}}>
+                            <div className="pb1" style={{fontSize: 12}}>
+                                {post.date}
+                            </div>
+                            <div className="pb1" style={{fontSize: 14, color: '#252525'}}>
+                                {post.title}
+                            </div>
+                            <div style={{fontSize: 12}}>
+                                {post.description}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            );
+        });
+        return posts;
     }
     private renderTokenFacts() {
         const facts = _.map(TOKEN_FACTS, (fact: Fact) => {

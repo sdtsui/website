@@ -451,3 +451,11 @@ export interface JSONRPCPayload {
     params: any[];
     method: string;
 }
+
+export interface BlogPost {
+    image: string;
+    date: string;
+    title: string;
+    description: string;
+    url: string;
+}
