@@ -10,6 +10,7 @@ import {Blockchain} from 'ts/blockchain';
 import {ipUtils} from 'ts/utils/ip_utils';
 import {configs} from 'ts/utils/configs';
 import {constants} from 'ts/utils/constants';
+import {utils} from 'ts/utils/utils';
 import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
 import {SignatureStep} from 'ts/pages/token_distribution/signature_step';
@@ -278,6 +279,15 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         );
     }
     private renderVerifyIdentityStep() {
+        if (utils.isUserOnMobile()) {
+            return (
+                <div>
+                    Mobile devices are not supported.
+                    Please complete your registration on a Desktop
+                    using an ethereum enabled browser (Metamask or Parity Signer) or Ledger Nano S.
+                </div>
+            );
+        }
         return (
             <div>
                 {this.state.isVerifyingIdentity ?
