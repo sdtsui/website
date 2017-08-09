@@ -42,11 +42,11 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
                         style={{maxWidth: 600}}
                     >
                         <div className="lg-h2 md-h2 sm-h4 pb2 thin">
-                            Check if your contribution address is registered
+                            Check if your address is registered
                         </div>
                         <IdenticonAddressInput
                             initialAddress={''}
-                            label={'Your contribution address'}
+                            label={'Your address'}
                             updateOrderAddress={this.updateOrderAddress.bind(this)}
                         />
                         <div style={{width: 100}} className="right">
