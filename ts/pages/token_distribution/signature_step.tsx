@@ -167,6 +167,10 @@ export class SignatureStep extends React.Component<SignatureStepProps, Signature
                     isOpen={this.state.isMsgSigningExplanationDialogOpen}
                     handleClose={this.toggleMsgSigningDialog.bind(this, false)}
                     message={this.props.civicUserId}
+                    isUsingLedger={this.props.providerType === ProviderType.LEDGER}
+                    isInjectedWeb3ParitySigner={
+                        this.props.injectedProviderName === constants.PARITY_SIGNER_PROVIDER_NAME
+                    }
                 />
             </div>
         );
