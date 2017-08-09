@@ -14,7 +14,7 @@ export const configs = {
     BASE_URL,
     ENVIRONMENT: isDevelopment ? Environments.DEVELOPMENT : Environments.PRODUCTION,
     BACKEND_BASE_URL: isDevelopment ? 'https://localhost:3001' : 'https://api.0xproject.com',
-    IS_REGISTRATION_OPEN: false,
+    IS_REGISTRATION_OPEN: true,
     IS_CONTRIBUTE_OPEN: false,
     RECAPTCHA_SITE_KEY: '6LcXHicUAAAAAOmRl4ZpDf2MxLEiHolYp1vpdOII',
     CIVIC_APP_ID: 'H1dfQuJEb',
