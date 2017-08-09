@@ -123,6 +123,12 @@ declare module 'blockies' {
     export = blockies;
 }
 
+// is-mobile declarations
+declare function isMobile(): boolean;
+declare module 'is-mobile' {
+    export = isMobile;
+}
+
 // web3-provider-engine declarations
 declare class Subprovider {}
 declare module 'web3-provider-engine/subproviders/subprovider' {
