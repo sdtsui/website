@@ -232,10 +232,13 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                     style={{maxWidth: 570}}
                 >
                     <a href={post.url} target="_blank">
-                        <div className="col col-3">
+                        <div className="col lg-col-3 md-col-3 col-12">
                             <img src={post.image} style={{width: 130}} />
                         </div>
-                        <div className="col col-9 left-align pl2" style={{color: '#808080'}}>
+                        <div
+                            className="col lg-col-9 md-col-9 col-12 sm-pr3 sm-pl4 left-align lg-pl2 md-pl2"
+                            style={{color: '#808080'}}
+                        >
                             <div className="pb1" style={{fontSize: 12}}>
                                 {post.date}
                             </div>
