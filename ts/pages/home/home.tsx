@@ -131,6 +131,14 @@ export class Home extends React.Component<HomeProps, HomeState> {
                                             label="FAQ"
                                         />
                                     </Link>
+                                    <a
+                                        target="_blank"
+                                        href="https://blog.0xproject.com/latest"
+                                    >
+                                        <FlatButton
+                                            label="Blog"
+                                        />
+                                    </a>
                                     <Link to="/docs/0xjs">
                                         <FlatButton
                                             label="Docs"
