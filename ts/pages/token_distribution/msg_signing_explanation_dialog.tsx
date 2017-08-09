@@ -120,7 +120,10 @@ export class MsgSigningExplanationDialog
                             'The resulting hash you are about to sign:'
                         }
                     </div>
-                    {this.renderHex(this.props.isUsingLedger ? messageSha256Hex : this.props.isInjectedWeb3ParitySigner ? messageSha3Hex : personalMessageHashHex)}
+                    {this.renderHex(this.props.isUsingLedger ?
+                        messageSha256Hex :
+                        this.props.isInjectedWeb3ParitySigner ? messageSha3Hex : personalMessageHashHex)
+                    }
                 </div>
             </div>
         );
