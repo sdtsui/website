@@ -133,7 +133,7 @@ export class Blockchain {
                 provider.addProvider(this.ledgerSubProvider);
                 provider.addProvider(new FilterSubprovider());
                 provider.addProvider(new RedundantRPCSubprovider(
-                    constants.PUBLIC_NODE_URLS_BY_NETWORK_ID[constants.TESTNET_NETWORK_ID],
+                    constants.PUBLIC_NODE_URLS_BY_NETWORK_ID[constants.MAINNET_NETWORK_ID],
                 ));
                 provider.start();
                 this.web3Wrapper.destroy();
@@ -158,7 +158,9 @@ export class Blockchain {
                 throw utils.spawnSwitchErr('providerType', providerType);
         }
 
-        await this.instantiateContractsAsync();
+        if (!this.isRegistrationFlow) {
+            await this.instantiateContractsAsync();
+        }
     }
     public getTokenSaleAddress(): string {
       utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
