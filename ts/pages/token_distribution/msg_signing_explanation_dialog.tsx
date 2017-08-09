@@ -101,7 +101,10 @@ export class MsgSigningExplanationDialog
                 <div className="pt4 relative">
                     {this.renderChevron()}
                     <div className="pb1 h4">
-                        The resulting hash you are about to sign:
+                        {this.props.isUsingLedger ?
+                            'The resulting hash you can confirm on-device:' :
+                            'The resulting hash you are about to sign:'
+                        }
                     </div>
                     {this.renderHex(this.props.isUsingLedger ? messageSha256Hex : personalMessageHashHex)}
                 </div>
