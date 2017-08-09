@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactMarkdown from 'react-markdown';
-import * as Iframe from 'react-iframe';
 import {colors} from 'material-ui/styles';
 import Checkbox from 'material-ui/Checkbox';
 import RaisedButton from 'material-ui/RaisedButton';
