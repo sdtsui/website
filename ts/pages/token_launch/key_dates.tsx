@@ -16,7 +16,7 @@ const keyDates = [
         description: 'Registration begins',
     },
     {
-        date: 'August 12',
+        date: 'August 11',
         description: 'Registration ends',
     },
     {

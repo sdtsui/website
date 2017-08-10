@@ -88,7 +88,6 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
     }
     public render() {
         const isUserOnMobile = utils.isUserOnMobile();
-        // Registration is now open. Sale begins August 15
         return (
             <div>
                 <DocumentTitle title="0x Token Sale"/>
@@ -107,7 +106,7 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                             className="pt1 pb4"
                             style={{fontSize: 18, color: '#B4B4B4'}}
                         >
-                            Registration begins August 9 at 8AM PST
+                            Registration is now open. Sale begins August 15 8AM PST
                         </div>
                         <div className="mx-auto pb1">
                             <img
