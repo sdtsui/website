@@ -36,6 +36,13 @@ const TOKEN_FACTS: Fact[] = [
 
 const BLOG_POSTS: BlogPost[] = [
     {
+        image: '/images/blog/sale_registration_cutoff_blog_post.jpg',
+        title: 'ZRX Token Sale Registration Cutoff',
+        description: 'Registration will now close at 10pm PST on August 11th',
+        date: 'Aug 10th',
+        url: 'https://blog.0xproject.com/zrx-token-sale-registration-cutoff-d2a34c609295',
+    },
+    {
         image: '/images/blog/tutorial_blog_post.png',
         title: 'Tutorials for the 0x Token Sale Registration',
         description: 'Detailed tutorials for registration using MetaMask, Parity Signer and Ledger',
