@@ -187,7 +187,7 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                                     </div>
                                 </div>
                                 <div className="col lg-col-6 md-col-6 col-12 center">
-                                    <div style={{maxWidth: 400}}>
+                                    <div style={{maxWidth: 400, height: 383, overflow: 'hidden'}}>
                                         {isUserOnMobile ?
                                             <img className="p1" src="/gifs/atom_relay.gif" /> :
                                             <div style={{pointerEvents: 'none'}}>
