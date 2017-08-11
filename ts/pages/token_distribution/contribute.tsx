@@ -358,8 +358,8 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                 noAddressLabel="No address found"
                             />
                             <div
-                                className="pt1 mx-auto center underline"
-                                style={{width: 108, cursor: 'pointer'}}
+                                className="mx-auto center underline"
+                                style={{width: 108, cursor: 'pointer', paddingTop: 4}}
                             >
                                 <a
                                     style={{color: '#00C33E', fontSize: 12}}
