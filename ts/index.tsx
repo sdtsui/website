@@ -18,7 +18,7 @@ import {NotFound} from 'ts/pages/not_found';
 import {LazyComponent, createLazyComponent} from 'ts/lazy_component';
 import {State, reducer} from 'ts/redux/reducer';
 import {colors, getMuiTheme, MuiThemeProvider} from 'material-ui/styles';
-import {Switch, BrowserRouter as Router, Route, Link} from 'react-router-dom';
+import {Switch, BrowserRouter as Router, Route, Link, Redirect} from 'react-router-dom';
 import {tradeHistoryStorage} from 'ts/local_storage/trade_history_storage';
 import * as injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
@@ -98,8 +98,9 @@ render(
                             <Route path="/token" component={TokenLaunch as any} />
                             <Route path="/faq" component={FAQ as any} />
                             <Route path="/registration" component={RegistrationFlow as any} />
+                            <Redirect path="/contribute" to="/sale" />
                             {configs.IS_CONTRIBUTE_OPEN &&
-                                <Route path="/contribute" component={LazyContribute} />
+                                <Route path="/sale" component={LazyContribute} />
                             }
                             <Route path="/registration_check" component={RegistrationCheck as any} />
                             <Route path="/docs/0xjs/:version?" component={LazyZeroExJSDocumentation} />

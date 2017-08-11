@@ -159,7 +159,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                 .updateShouldBlockchainErrDialogBeOpen.bind(this.props.dispatcher);
         return (
             <div style={contributeStyle}>
-                <DocumentTitle title="Contribute - 0x Token Sale"/>
+                <DocumentTitle title="0x Token Sale"/>
                 <TopBar
                     blockchainIsLoaded={false}
                     location={this.props.location}
@@ -207,7 +207,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             return (
                 <ContributionNotice>
                     <div className="center h2 sm-px2">
-                        The contribution period has not started yet
+                        The token sale has not started yet
                     </div>
                     <div className="center pt2 mt1" style={{color: 'gray'}}>
                         {startDateMessage}
@@ -218,7 +218,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             return (
                 <ContributionNotice>
                     <div className="center h2 sm-px2">
-                        The contribution period had already ended
+                        The token sale had already ended
                     </div>
                 </ContributionNotice>
             );
@@ -246,7 +246,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                 }
                 <div className="col lg-col-9 md-col-9 col-12">
                     <div className="mx-auto sm-px2" style={{maxWidth: 530}}>
-                        <div className="h2 pt3">Make a contribution</div>
+                        <div className="h2 pt3">Token sale</div>
                         <div className="clearfix pt3 pb1">
                             <div className="col col-1">
                                 {this.renderStepNumber(1)}
@@ -324,7 +324,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                                     <span><i className="zmdi zmdi-alert-triangle" /></span>{' '}
                                                     <span>Unregistered address</span>
                                                     <ReactTooltip id="notRegisteredTooltip">
-                                                        You can only contribute from an address that was<br />
+                                                        You can only purchase from an address that was<br />
                                                         registered during the mandatory registration period<br />
                                                         (Aug. 9th-12th).
                                                     </ReactTooltip>
@@ -397,7 +397,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                     <div>
                                         <div>
                                             <span style={{color: CUSTOM_LIGHT_GRAY}}>
-                                                current contribution limit:{' '}
+                                                current purchase limit:{' '}
                                             </span>
                                             <span style={{color: CUSTOM_GRAY}}>
                                                 {this.renderEthCapPerAddress(now)} ETH/participant
@@ -415,7 +415,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                     </div>
                                     <div className="pt1">
                                         <span style={{color: CUSTOM_LIGHT_GRAY}}>
-                                            contributed from your address so far:{' '}
+                                            Bought from your address so far:{' '}
                                         </span>
                                         <span style={{color: CUSTOM_GRAY}}>
                                             {_.isUndefined(this.state.ethContributedAmount) ?
@@ -633,7 +633,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         const isAmountBelowCurrentCap = this.isAmountBelowCurrentCap();
         if (!isAmountBelowCurrentCap) {
             const desiredContributionAmount = this.formatCurrencyAmount(this.state.contributionAmountInBaseUnits);
-            const errMsg = `Cannot contribute ${desiredContributionAmount} ETH without exceeding the current cap`;
+            const errMsg = `Cannot purchase ${desiredContributionAmount} ETH without exceeding the current limit`;
             this.props.dispatcher.showFlashMessage(errMsg);
             return false;
         }
@@ -650,7 +650,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             if (utils.didUserDenyWeb3Request(errMsg)) {
                 this.props.dispatcher.showFlashMessage('You denied the transaction confirmation');
             } else if (_.includes(errMsg, TokenSaleErrs.ADDRESS_NOT_REGISTERED)) {
-                this.props.dispatcher.showFlashMessage('You cannot contribute from an unregistered address');
+                this.props.dispatcher.showFlashMessage('You cannot purchase from an unregistered address');
             } else if (_.includes(errMsg, 'TOO_OLD_LEDGER_FIRMWARE')) {
                 this.props.dispatcher.showFlashMessage('Your Ledger firmware is too old. Please update it.');
             } else {

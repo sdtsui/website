@@ -272,7 +272,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                     </div>
                     <div className="pt1 mx-auto" style={{maxWidth: 440}}>
                         We have sent a registration confirmation email to your Civic-associated email
-                        address. You will also receive a reminder email before the contribution period opens.
+                        address. You will also receive a reminder email before the token sale starts.
                     </div>
                 </div>
             </div>
