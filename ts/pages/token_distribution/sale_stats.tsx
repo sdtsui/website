@@ -24,41 +24,36 @@ export class SaleStats extends React.Component<SaleStatsProps, SaleStatsState> {
                 style={{color: CUSTOM_LIGHT_GRAY, maxWidth: 230}}
             >
                 <div
-                    className="p1 rounded"
-                    style={{border: `3px solid #ebebeb`}}
+                    className="left"
+                    style={{paddingTop: 7, color: 'gray', fontSize: 13, paddingBottom: 9, paddingLeft: 8}}
                 >
-                    <div
-                        className="center"
-                        style={{paddingTop: 7, color: 'gray', fontSize: 13}}
-                    >
-                        ZRX sold
-                    </div>
-                    {this.props.isLoading ?
-                        <div className="center pt4 mt2">
-                            <CircularProgress size={30} />
-                        </div> :
-                        <div className="px1 relative" style={{paddingBottom: 7, paddingTop: 26}}>
-                            <div className="absolute" style={{right: 8, top: 3}}>
-                                <div style={{fontSize: 12}}>500M</div>
-                                <div
-                                    className="right"
-                                    style={{width: 2, height: 15, backgroundColor: CUSTOM_LIGHT_GRAY}}
-                                />
-                            </div>
-                            <LinearProgress
-                                mode="determinate"
-                                value={percentRaised.toNumber()}
-                                style={{height: 10, backgroundColor: '#ebebeb'}}
-                            />
-                            <div
-                                className="center"
-                                style={{color: constants.CUSTOM_BLUE, fontSize: 13, paddingTop: 10}}
-                            >
-                                {roundedZrxSold} ZRX ({roundedPercentRaised}%)
-                            </div>
-                        </div>
-                    }
+                    ZRX sold
                 </div>
+                {this.props.isLoading ?
+                    <div className="center pt4 mt2">
+                        <CircularProgress size={30} />
+                    </div> :
+                    <div className="px1 relative" style={{paddingBottom: 7, paddingTop: 26}}>
+                        <div className="absolute" style={{right: 8, top: 11}}>
+                            <div style={{fontSize: 12}}>500M</div>
+                            <div
+                                className="right"
+                                style={{width: 2, height: 15, backgroundColor: CUSTOM_LIGHT_GRAY}}
+                            />
+                        </div>
+                        <LinearProgress
+                            mode="determinate"
+                            value={percentRaised.toNumber()}
+                            style={{height: 10, backgroundColor: '#ebebeb'}}
+                        />
+                        <div
+                            className="center"
+                            style={{color: constants.CUSTOM_BLUE, fontSize: 13, paddingTop: 10}}
+                        >
+                            {roundedZrxSold} ZRX ({roundedPercentRaised}%)
+                        </div>
+                    </div>
+                }
             </div>
         );
     }
