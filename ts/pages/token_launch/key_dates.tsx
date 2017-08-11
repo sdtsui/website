@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import {configs} from 'ts/utils/configs';
 import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
 import {utils} from 'ts/utils/utils';
 import {ScreenWidths} from 'ts/types';
@@ -55,7 +56,7 @@ export class KeyDates extends React.Component<KeyDatesProps, KeyDatesState> {
                     <div className="sm-px4 sm-mx2">
                         <Stepper
                             orientation={orientation}
-                            activeStep={1}
+                            activeStep={configs.IS_REGISTRATION_OPEN ? 1 : 2}
                         >
                             {steps}
                         </Stepper>

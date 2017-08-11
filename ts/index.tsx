@@ -97,7 +97,9 @@ render(
                             <Route path="/otc" component={LazyOTC} />
                             <Route path="/token" component={TokenLaunch as any} />
                             <Route path="/faq" component={FAQ as any} />
-                            <Route path="/registration" component={RegistrationFlow as any} />
+                            {configs.IS_REGISTRATION_OPEN &&
+                                <Route path="/registration" component={RegistrationFlow as any} />
+                            }
                             <Redirect path="/contribute" to="/sale" />
                             {configs.IS_CONTRIBUTE_OPEN &&
                                 <Route path="/sale" component={LazyContribute} />

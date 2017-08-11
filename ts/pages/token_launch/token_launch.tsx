@@ -113,7 +113,10 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                             className="pt1 pb4"
                             style={{fontSize: 18, color: '#B4B4B4'}}
                         >
-                            Registration is now open. Sale begins August 15 8AM PST
+                            {configs.IS_REGISTRATION_OPEN ?
+                                'Registration is now open. Sale begins August 15 8AM PST' :
+                                'Registration has ended. Sale begins August 15 8AM PST'
+                            }
                         </div>
                         <div className="mx-auto pb1">
                             <img
@@ -139,7 +142,7 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                                 </div> :
                                 <div className="absolute" style={{maxWidth: 308}}>
                                     <div style={{textAlign: 'left', fontSize: 14}}>
-                                        Receive notifications about registration & launch
+                                        Receive notifications about the launch
                                     </div>
                                     <div className="pt1">
                                         <NewsletterInput
