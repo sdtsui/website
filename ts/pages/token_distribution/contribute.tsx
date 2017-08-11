@@ -555,9 +555,8 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         ]);
 
         const ethContributedInWei = await this.blockchain.getFillAmountAsync(orderHash);
-        const ethContributed = ZeroEx.toUnitAmount(ethContributedInWei, ZRX_ETH_DECIMAL_PLACES);
 
-        const zrxSold = ethContributed.mul(zrxToEthExchangeRate);
+        const zrxSold = ethContributedInWei.mul(zrxToEthExchangeRate);
 
         let ethContributedAmount = new BigNumber(0);
         let isAddressRegistered = false;

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {ZeroEx} from '0x.js';
 import LinearProgress from 'material-ui/LinearProgress';
 import CircularProgress from 'material-ui/CircularProgress';
 import {constants} from 'ts/utils/constants';
@@ -17,7 +18,8 @@ export class SaleStats extends React.Component<SaleStatsProps, SaleStatsState> {
     public render() {
         const percentRaised = this.props.zrxSold.div(this.props.totalZrxSupply).mul(100);
         const roundedPercentRaised = percentRaised.round().toString();
-        const roundedZrxSold = Math.round(this.props.zrxSold.toNumber() * 100000) / 100000;
+        const zrxSoldInEth = ZeroEx.toUnitAmount(this.props.zrxSold, 18);
+        const roundedZrxSold = Math.round(zrxSoldInEth.toNumber() * 100000) / 100000;
         return (
             <div
                 className="sm-mx-auto"
