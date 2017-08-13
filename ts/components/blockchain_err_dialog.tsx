@@ -4,6 +4,7 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import {colors} from 'material-ui/styles';
 import {constants} from 'ts/utils/constants';
+import {configs} from 'ts/utils/configs';
 import {Blockchain} from 'ts/blockchain';
 import {BlockchainErrs} from 'ts/types';
 
@@ -97,7 +98,7 @@ export class BlockchainErrDialog extends React.Component<BlockchainErrDialogProp
                 </div>
                 <h4>1. Metamask chrome extension</h4>
                 <div>
-                    You can install the
+                    You can install the{' '}
                     <a href={constants.METAMASK_CHROME_STORE_URL} target="_blank">
                         Metamask
                     </a> Chrome extension Ethereum wallet. Once installed and set up, refresh this page.
@@ -109,12 +110,15 @@ export class BlockchainErrDialog extends React.Component<BlockchainErrDialogProp
                 <h4>Parity Signer</h4>
                 <div>
                     The <a href={constants.PARITY_CHROME_STORE_URL} target="_blank">Parity Signer
-                    Chrome extension</a>{' '} lets you connect to a locally running Parity node.
-                    Make sure you have started your local Parity node with `parity ui`
+                    Chrome extension</a>{' '}lets you connect to a locally running Parity node.
+                    Make sure you have started your local Parity node with{' '}
                     {this.props.isTokenLaunchPage ?
-                        'to connect to the mainnet.' :
-                        'or `parity --chain kovan ui` in order to connect to mainnet or Kovan respectively'
-                    }.
+                        '`parity ui` to connect to the mainnet.' :
+                        configs.IS_OTC_MAINNET_DEPLOYED ?
+                            '`parity ui` or `parity --chain kovan ui` in order to connect to mainnet \
+                             or Kovan respectively.' :
+                            '`parity --chain kovan ui` to connect to the Kovan testnet.'
+                    }
                 </div>
                 <div className="pt2">
                     <span className="bold">Note:</span>
@@ -135,8 +139,10 @@ export class BlockchainErrDialog extends React.Component<BlockchainErrDialogProp
                     {' '}please connect to the{' '}
                     {this.props.isTokenLaunchPage ?
                         `${constants.MAINNET_NAME} (network Id: ${constants.MAINNET_NETWORK_ID}).` :
-                        `${constants.TESTNET_NAME} testnet (network Id: ${constants.TESTNET_NETWORK_ID}) or
-                         ${constants.MAINNET_NAME} (network Id: ${constants.MAINNET_NETWORK_ID}).`
+                        configs.IS_OTC_MAINNET_DEPLOYED ?
+                            `${constants.TESTNET_NAME} testnet (network Id: ${constants.TESTNET_NETWORK_ID}) or
+                            ${constants.MAINNET_NAME} (network Id: ${constants.MAINNET_NETWORK_ID}).` :
+                            `${constants.TESTNET_NAME} testnet (network Id: ${constants.TESTNET_NETWORK_ID})`
                     }
                 </div>
                 <h4>Metamask</h4>
@@ -149,10 +155,13 @@ export class BlockchainErrDialog extends React.Component<BlockchainErrDialogProp
                 <h4>Parity Signer</h4>
                 <div>
                     If using the <a href={constants.PARITY_CHROME_STORE_URL} target="_blank">Parity Signer
-                    Chrome extension</a>{' '}, make sure to start your local Parity node with `parity ui`
+                    Chrome extension</a>, make sure to start your local Parity node with{' '}
                     {this.props.isTokenLaunchPage ?
-                        'to connect to the mainnet.' :
-                        'or `parity --chain kovan ui` in order to connect to mainnet or Kovan respectively'
+                        '`parity ui` to connect to the mainnet.' :
+                        configs.IS_OTC_MAINNET_DEPLOYED ?
+                            '`parity ui` or `parity --chain Kovan ui` in order to connect to mainnet \
+                             or Kovan respectively.' :
+                            '`parity --chain kovan ui` to connect to the Kovan testnet.'
                     }
                 </div>
             </div>
