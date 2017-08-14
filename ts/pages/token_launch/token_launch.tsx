@@ -45,7 +45,7 @@ const BLOG_POSTS: BlogPost[] = [
     {
         image: '/images/blog/sale_registration_cutoff_blog_post.jpg',
         title: 'ZRX Token Sale Registration Cutoff',
-        description: 'Registration will now close at 10pm PST on August 11th',
+        description: 'Registration will now close at 10pm PT on August 11th',
         date: 'Aug 10th',
         url: 'https://blog.0xproject.com/zrx-token-sale-registration-cutoff-d2a34c609295',
     },
@@ -121,8 +121,8 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                             style={{fontSize: 18, color: '#B4B4B4'}}
                         >
                             {configs.IS_REGISTRATION_OPEN ?
-                                'Registration is now open. Sale begins August 15 8AM PST' :
-                                'Registration has ended. Sale begins August 15 8AM PST'
+                                'Registration is now open. Sale begins August 15 8AM PT' :
+                                'Registration has ended. Sale begins August 15 8AM PT'
                             }
                         </div>
                         <div className="mx-auto pb1">

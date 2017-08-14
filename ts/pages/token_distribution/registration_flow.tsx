@@ -262,7 +262,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
                 <div className="sm-px2 pb3" style={{color: CUSTOM_GRAY}}>
                     <div className="py2">
                         Thank you for taking the time to register for the 0x token sale. The contribution
-                        period will begin on the <span className="bold">15th of August at 8AM PST</span>.
+                        period will begin on the <span className="bold">15th of August at 8AM PT</span>.
                     </div>
                     <div className="mx-auto pt3">
                         <img
