@@ -664,13 +664,13 @@ export class Blockchain {
             // Since no public node for this network, all requests go to injectedWeb3 instance
             provider = injectedWeb3.currentProvider;
         } else {
-            // If no injectedWeb3 instance, all requests fallback to our public hosted kovan node
+            // If no injectedWeb3 instance, all requests fallback to our public hosted mainnet node
             // We do this so that users can still browse the OTC DApp even if they do not have web3
             // injected into their browser.
             provider = new ProviderEngine();
             provider.addProvider(new FilterSubprovider());
             provider.addProvider(new RedundantRPCSubprovider(
-                constants.PUBLIC_NODE_URLS_BY_NETWORK_ID[constants.TESTNET_NETWORK_ID],
+                constants.PUBLIC_NODE_URLS_BY_NETWORK_ID[constants.MAINNET_NETWORK_ID],
             ));
             provider.start();
         }
