@@ -55,12 +55,12 @@ export class Blockchain {
     private userAddress: string;
     private cachedProvider: Web3.Provider;
     private ledgerSubProvider: LedgerWalletSubprovider;
-    private isRegistrationFlow: boolean;
-    constructor(dispatcher: Dispatcher, isRegistrationFlow: boolean = false) {
+    private isSalePage: boolean;
+    constructor(dispatcher: Dispatcher, isSalePage: boolean = false) {
         this.dispatcher = dispatcher;
         this.userAddress = '';
         this.exchangeLogFillEvents = [];
-        this.isRegistrationFlow = isRegistrationFlow;
+        this.isSalePage = isSalePage;
         this.onPageLoadInitFireAndForgetAsync();
     }
     public async networkIdUpdatedFireAndForgetAsync(newNetworkId: number) {
@@ -72,18 +72,16 @@ export class Blockchain {
         } else if (this.networkId !== newNetworkId) {
             this.networkId = newNetworkId;
             this.dispatcher.encounteredBlockchainError('');
-            if (!this.isRegistrationFlow) {
-                await this.instantiateContractsAsync();
+            await this.instantiateContractsAsync();
+            if (!this.isSalePage) {
                 await this.rehydrateStoreWithContractEvents();
-            } else {
-                this.dispatcher.updateBlockchainIsLoaded(true);
             }
         }
     }
     public async userAddressUpdatedFireAndForgetAsync(newUserAddress: string) {
         if (this.userAddress !== newUserAddress) {
             this.userAddress = newUserAddress;
-            if (!this.isRegistrationFlow) {
+            if (!this.isSalePage) {
                 await this.rehydrateStoreWithContractEvents();
             }
         }
@@ -158,9 +156,7 @@ export class Blockchain {
                 throw utils.spawnSwitchErr('providerType', providerType);
         }
 
-        if (!this.isRegistrationFlow) {
-            await this.instantiateContractsAsync();
-        }
+        await this.instantiateContractsAsync();
     }
     public getTokenSaleAddress(): string {
       utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
@@ -697,20 +693,33 @@ export class Blockchain {
 
         this.dispatcher.updateBlockchainIsLoaded(false);
         try {
-            const contractsPromises = _.map(
-                [
-                  ExchangeArtifacts,
-                  TokenRegistryArtifacts,
-                  TokenTransferProxyArtifacts,
-                  TokenSaleArtifacts,
-                ],
-                (artifacts: any) => this.instantiateContractIfExistsAsync(artifacts),
-            );
-            const contracts = await Promise.all(contractsPromises);
-            this.exchange = contracts[0];
-            this.tokenRegistry = contracts[1];
-            this.tokenTransferProxy = contracts[2];
-            this.tokenSale = contracts[3];
+            if (!this.isSalePage) {
+                const contractsPromises = _.map(
+                    [
+                      ExchangeArtifacts,
+                      TokenRegistryArtifacts,
+                      TokenTransferProxyArtifacts,
+                      TokenSaleArtifacts,
+                    ],
+                    (artifacts: any) => this.instantiateContractIfExistsAsync(artifacts),
+                );
+                const contracts = await Promise.all(contractsPromises);
+                this.exchange = contracts[0];
+                this.tokenRegistry = contracts[1];
+                this.tokenTransferProxy = contracts[2];
+                this.tokenSale = contracts[3];
+            } else {
+                const contractsPromises = _.map(
+                    [
+                      ExchangeArtifacts,
+                      TokenSaleArtifacts,
+                    ],
+                    (artifacts: any) => this.instantiateContractIfExistsAsync(artifacts),
+                );
+                const contracts = await Promise.all(contractsPromises);
+                this.exchange = contracts[0];
+                this.tokenSale = contracts[1];
+            }
         } catch (err) {
             const errMsg = err + '';
             if (_.includes(errMsg, BlockchainCallErrs.CONTRACT_DOES_NOT_EXIST)) {
@@ -723,20 +732,22 @@ export class Blockchain {
                 return;
             }
         }
-        this.dispatcher.clearTokenByAddress();
-        const tokenArrays = await Promise.all([
-                this.getTokenRegistryTokensAsync(),
-                this.getCustomTokensAsync(),
-        ]);
-        const tokens = _.flatten(tokenArrays);
-        await this.updateTokenBalancesAndAllowancesAsync(tokens);
-        this.dispatcher.updateTokenByAddress(tokens);
-        const mostPopularTradingPairTokens: Token[] = [
-            _.find(tokens, {symbol: configs.mostPopularTradingPairSymbols[0]}),
-            _.find(tokens, {symbol: configs.mostPopularTradingPairSymbols[1]}),
-        ];
-        this.dispatcher.updateChosenAssetTokenAddress(Side.deposit, mostPopularTradingPairTokens[0].address);
-        this.dispatcher.updateChosenAssetTokenAddress(Side.receive, mostPopularTradingPairTokens[1].address);
+        if (!this.isSalePage) {
+            this.dispatcher.clearTokenByAddress();
+            const tokenArrays = await Promise.all([
+                    this.getTokenRegistryTokensAsync(),
+                    this.getCustomTokensAsync(),
+            ]);
+            const tokens = _.flatten(tokenArrays);
+            await this.updateTokenBalancesAndAllowancesAsync(tokens);
+            this.dispatcher.updateTokenByAddress(tokens);
+            const mostPopularTradingPairTokens: Token[] = [
+                _.find(tokens, {symbol: configs.mostPopularTradingPairSymbols[0]}),
+                _.find(tokens, {symbol: configs.mostPopularTradingPairSymbols[1]}),
+            ];
+            this.dispatcher.updateChosenAssetTokenAddress(Side.deposit, mostPopularTradingPairTokens[0].address);
+            this.dispatcher.updateChosenAssetTokenAddress(Side.receive, mostPopularTradingPairTokens[1].address);
+        }
         this.dispatcher.updateBlockchainIsLoaded(true);
     }
     private async instantiateContractIfExistsAsync(artifact: any, address?: string): Promise<ContractInstance> {

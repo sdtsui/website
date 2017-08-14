@@ -108,7 +108,8 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         this.props.dispatcher.resetState();
     }
     public componentWillMount() {
-        this.blockchain = new Blockchain(this.props.dispatcher);
+        const isSalePage = true;
+        this.blockchain = new Blockchain(this.props.dispatcher, isSalePage);
     }
     public componentWillReceiveProps(nextProps: ContributeProps) {
         if (nextProps.networkId !== this.state.prevNetworkId) {
