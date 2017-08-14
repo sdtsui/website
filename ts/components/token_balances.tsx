@@ -111,6 +111,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                   token balances in order to execute trades.<br> \
                                   Toggling permissions sets an allowance for the<br> \
                                   smart contract so you can start trading that token.';
+        const isFaucetAvailable = this.props.blockchain.networkId === constants.TESTNET_NETWORK_ID;
         return (
             <div className="lg-px4 md-px4 sm-px1 pb2">
                 <h3>Test ether</h3>
@@ -128,7 +129,10 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                             <TableHeaderColumn>Currency</TableHeaderColumn>
                             <TableHeaderColumn>Balance</TableHeaderColumn>
                             <TableHeaderColumn className="sm-hide xs-hide" />
-                            <TableHeaderColumn>Request{!isSmallScreen && ' from faucet'}</TableHeaderColumn>
+                            {
+                                isFaucetAvailable &&
+                                <TableHeaderColumn>Request{!isSmallScreen && ' from faucet'}</TableHeaderColumn>
+                            }
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false}>
@@ -148,14 +152,17 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                 }
                             </TableRowColumn>
                             <TableRowColumn className="sm-hide xs-hide" />
-                            <TableRowColumn>
-                                <LifeCycleRaisedButton
-                                    labelReady="Request"
-                                    labelLoading="Sending..."
-                                    labelComplete="Sent!"
-                                    onClickAsyncFn={this.requestEtherAsync.bind(this)}
-                                />
-                            </TableRowColumn>
+                            {
+                                isFaucetAvailable &&
+                                <TableRowColumn>
+                                    <LifeCycleRaisedButton
+                                        labelReady="Request"
+                                        labelLoading="Sending..."
+                                        labelComplete="Sent!"
+                                        onClickAsyncFn={this.requestEtherAsync.bind(this)}
+                                    />
+                                </TableRowColumn>
+                            }
                         </TableRow>
                     </TableBody>
                 </Table>
