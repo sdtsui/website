@@ -432,7 +432,19 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                 onClickAsyncFn={this.onPurchaseZRXClickAsync.bind(this)}
                             />
                             <div
-                                className="pt2 pb4 center"
+                                className="pt2 pb1 center"
+                                style={{color: 'gray', fontSize: 13}}
+                            >
+                                By clicking the button above, you are agreeing to the{' '}
+                                <a
+                                    target="_blank"
+                                    href="/pdfs/zeroEx_terms_and_conditions.pdf"
+                                >
+                                    Terms of Token Sale
+                                </a>.
+                            </div>
+                            <div
+                                className="pt1 pb4 center"
                                 style={{color: CUSTOM_LIGHT_GRAY, fontSize: 13}}
                             >
                                 To avoid issues and phishing scams we highly recommend
