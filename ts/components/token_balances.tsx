@@ -111,7 +111,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                   token balances in order to execute trades.<br> \
                                   Toggling permissions sets an allowance for the<br> \
                                   smart contract so you can start trading that token.';
-        const isFaucetAvailable = this.props.blockchain.networkId === constants.TESTNET_NETWORK_ID;
+        const isFaucetAvailable = this.props.networkId === constants.TESTNET_NETWORK_ID;
         return (
             <div className="lg-px4 md-px4 sm-px1 pb2">
                 <h3>Test ether</h3>

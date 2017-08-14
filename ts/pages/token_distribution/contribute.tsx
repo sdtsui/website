@@ -200,7 +200,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         );
     }
     private renderContributionForm() {
-        if (this.props.networkId === 42) {
+        if (this.props.networkId === constants.TESTNET_NETWORK_ID) {
             return (
                 <ContributionNotice>
                     <div className="center h2 sm-px2">
