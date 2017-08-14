@@ -36,6 +36,13 @@ const TOKEN_FACTS: Fact[] = [
 
 const BLOG_POSTS: BlogPost[] = [
     {
+        image: '/images/genesis.gif',
+        title: 'The Genesis Trade',
+        description: 'Distributing the ZRX token using 0x protocol, live on Ethereum mainnet',
+        date: 'Aug 14th',
+        url: 'https://blog.0xproject.com/the-genesis-trade-74d50c1e7f25',
+    },
+    {
         image: '/images/blog/sale_registration_cutoff_blog_post.jpg',
         title: 'ZRX Token Sale Registration Cutoff',
         description: 'Registration will now close at 10pm PST on August 11th',
