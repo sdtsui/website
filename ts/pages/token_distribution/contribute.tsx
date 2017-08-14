@@ -200,6 +200,19 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         );
     }
     private renderContributionForm() {
+        if (this.props.networkId === 42) {
+            return (
+                <ContributionNotice>
+                    <div className="center h2 sm-px2">
+                        You are connected to Kovan, not Mainnet
+                    </div>
+                    <div className="center pt2 mt1" style={{color: 'gray', width: 443}}>
+                        In order to buy ZRX tokens, you must connect to the Ethereum mainnet
+                        (network id: 1). Switch to mainnet and refresh this page.
+                    </div>
+                </ContributionNotice>
+            );
+        }
         if (!this.state.isInitialized || this.state.startTimeInSec.gt(moment().unix())) {
             const startDateMessage = this.state.isInitialized
                 ? `Start time: ${moment.unix(this.state.startTimeInSec.toNumber()).format('MMMM Do h:mm:ss a')}`
