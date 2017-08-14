@@ -25,6 +25,7 @@ export const constants = {
         [1]: [
             'https://mainnet.0xproject.com',
             'https://infura.io',
+            'https://api.myetherapi.com/eth',
         ],
         [42]: [
             'https://kovan.0xproject.com',
