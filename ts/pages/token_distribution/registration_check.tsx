@@ -46,7 +46,7 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
                         </div>
                         <IdenticonAddressInput
                             initialAddress={''}
-                            label={'Your address'}
+                            label={'Registration address'}
                             updateOrderAddress={this.updateOrderAddress.bind(this)}
                         />
                         <div style={{width: 100}} className="right">
@@ -84,8 +84,7 @@ export class RegistrationCheck extends React.Component<RegistrationCheckProps, R
         } else {
             return (
                 <div>
-                    Your address is not registered.{' '}
-                    <Link to="/registration" style={{textDecoration: 'underline'}}>Register it now!</Link>
+                    Your address is not registered.
                 </div>
             );
         }
