@@ -128,12 +128,12 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                             className="relative pt2 mx-auto sm-px3"
                             style={{maxWidth: 308, height: 145}}
                         >
-                            {configs.IS_REGISTRATION_OPEN ?
+                            {configs.IS_CONTRIBUTE_OPEN ?
                                 <div>
                                     <RaisedButton
-                                        label="Register for the sale"
+                                        label="Purchase ZRX tokens"
                                         primary={true}
-                                        onClick={this.onRegisterClick.bind(this)}
+                                        onClick={this.onContributeClick.bind(this)}
                                         buttonStyle={{paddingLeft: 22, paddingRight: 22}}
                                     />
                                     <div className="pt2" style={{fontSize: 13}}>
@@ -294,8 +294,8 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
         });
         return facts;
     }
-    private onRegisterClick() {
-        window.location.href = configs.QUEUE_IT_URL;
+    private onContributeClick() {
+        window.location.href = '/sale';
     }
     private updateScreenWidth() {
         const newScreenWidth = utils.getScreenWidth();
