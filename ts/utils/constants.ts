@@ -81,6 +81,10 @@ export const constants = {
         'SNGLS': '/images/token_icons/singularity.png',
         'EDG': '/images/token_icons/edgeless.png',
         '1ST': '/images/token_icons/firstblood.jpg',
+        'WINGS': '/images/token_icons/wings.png',
+        'BQX': '/images/token_icons/bitquence.png',
+        'LUN': '/images/token_icons/lunyr.png',
+        'RLC': '/images/token_icons/iexec.png',
     } as {[symbol: string]: string},
     exchangeContractErrToMsg: {
         [ExchangeContractErrs.ERROR_FILL_EXPIRED]: 'The order you attempted to fill is expired',
