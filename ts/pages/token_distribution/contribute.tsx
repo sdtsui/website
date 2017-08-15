@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as DocumentTitle from 'react-document-title';
+import * as accounting from 'accounting';
 import * as BigNumber from 'bignumber.js';
 import * as moment from 'moment';
 import ReactTooltip = require('react-tooltip');
@@ -390,7 +391,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                         className="col col-6 pl1"
                                         style={{color: CUSTOM_LIGHT_GRAY, paddingTop: 15}}
                                     >
-                                        = {ZRXAmountToReceive} ZRX
+                                        = {accounting.formatNumber(ZRXAmountToReceive)} ZRX
                                     </div>
                                 }
                             </div>
