@@ -1,6 +1,8 @@
 import {ExchangeContractErrs, PublicNodeUrlsByNetworkId} from 'ts/types';
 import * as BigNumber from 'bignumber.js';
 
+const INFURA_API_KEY = 'T5WSC8cautR4KXyYgsRs';
+
 export const constants = {
     STAGING_DOMAIN: 'staging-0xproject.s3-website-us-east-1.amazonaws.com',
     PRODUCTION_DOMAIN: '0xproject.com',
@@ -24,12 +26,12 @@ export const constants = {
     PUBLIC_NODE_URLS_BY_NETWORK_ID: {
         [1]: [
             'https://mainnet.0xproject.com',
-            'https://infura.io',
+            `https://mainnet.infura.io/${INFURA_API_KEY}`,
             'https://api.myetherapi.com/eth',
         ],
         [42]: [
             'https://kovan.0xproject.com',
-            'https://kovan.infura.io',
+            `https://kovan.infura.io/${INFURA_API_KEY}`,
         ],
     } as PublicNodeUrlsByNetworkId,
     PARITY_SIGNER_PROVIDER_NAME: 'Parity Signer',
