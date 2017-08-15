@@ -36,25 +36,18 @@ const TOKEN_FACTS: Fact[] = [
 
 const BLOG_POSTS: BlogPost[] = [
     {
+        image: '/images/blog/sale_instructions.png',
+        title: 'ZRX Token Sale Purchase Tutorial',
+        description: 'Instructions to purchase ZRX tokens starting August 15 at 8am PT',
+        date: 'Aug 15th',
+        url: 'https://blog.0xproject.com/zrx-token-sale-purchase-tutorial-612c2ffe1e0d',
+    },
+    {
         image: '/gifs/genesis.gif',
         title: 'The Genesis Trade',
         description: 'Distributing the ZRX token using 0x protocol, live on Ethereum mainnet',
         date: 'Aug 14th',
         url: 'https://blog.0xproject.com/the-genesis-trade-74d50c1e7f25',
-    },
-    {
-        image: '/images/blog/sale_registration_cutoff_blog_post.jpg',
-        title: 'ZRX Token Sale Registration Cutoff',
-        description: 'Registration will now close at 10pm PT on August 11th',
-        date: 'Aug 10th',
-        url: 'https://blog.0xproject.com/zrx-token-sale-registration-cutoff-d2a34c609295',
-    },
-    {
-        image: '/images/blog/tutorial_blog_post.png',
-        title: 'Tutorials for the 0x Token Sale Registration',
-        description: 'Detailed tutorials for registration using MetaMask, Parity Signer and Ledger',
-        date: 'Aug 9th',
-        url: 'https://blog.0xproject.com/tutorials-for-the-0x-token-sale-registration-766064955d12',
     },
     {
         image: '/images/blog/scams_blog_post.png',
@@ -250,7 +243,7 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                 >
                     <a href={post.url} target="_blank">
                         <div className="col lg-col-3 md-col-3 col-12">
-                            <img src={post.image} style={{width: 130}} />
+                            <img src={post.image} style={{width: 130, border: '1px solid lightgray'}} />
                         </div>
                         <div
                             className="col lg-col-9 md-col-9 col-12 sm-pr3 sm-pl4 left-align lg-pl2 md-pl2"
