@@ -739,7 +739,15 @@ export class Blockchain {
                     this.getCustomTokensAsync(),
             ]);
             const tokens = _.flatten(tokenArrays);
-            this.dispatcher.updateTokenByAddress(tokens);
+            // HACK: We need to fetch the userAddress here because otherwise we cannot fetch the token
+            // balances and allowances and we need to do this in order not to trigger the blockchain
+            // loading dialog to show up twice. First to load the contracts, and second to load the
+            // balances and allowances.
+            this.userAddress = await this.web3Wrapper.getFirstAccountIfExistsAsync();
+            if (!_.isEmpty(this.userAddress)) {
+                this.dispatcher.updateUserAddress(this.userAddress);
+            }
+            await this.updateTokenBalancesAndAllowancesAsync(tokens);
             const mostPopularTradingPairTokens: Token[] = [
                 _.find(tokens, {symbol: configs.mostPopularTradingPairSymbols[0]}),
                 _.find(tokens, {symbol: configs.mostPopularTradingPairSymbols[1]}),
