@@ -474,6 +474,9 @@ export class Blockchain {
     public updateWeb3WrapperPrevUserAddress(newUserAddress: string) {
         this.web3Wrapper.updatePrevUserAddress(newUserAddress);
     }
+    public destroy() {
+        this.web3Wrapper.destroy();
+    }
     private doesUserAddressExist(): boolean {
         return this.userAddress !== '';
     }

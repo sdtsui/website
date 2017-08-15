@@ -109,6 +109,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         }, VARIABLE_TOKEN_SALE_INFO_INTERVAL);
     }
     public componentWillUnmount() {
+        this.blockchain.destroy();
         window.removeEventListener('resize', this.throttledScreenWidthUpdate);
         clearInterval(this.updateVariableTokenSaleInfoIntervalId);
         clearInterval(this.txConfirmationIntervalId);

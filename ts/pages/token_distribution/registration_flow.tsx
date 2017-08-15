@@ -89,6 +89,7 @@ export class RegistrationFlow extends React.Component<RegistrationFlowProps, Reg
         this.blockchain = new Blockchain(this.props.dispatcher);
     }
     public componentWillUnmount() {
+        this.blockchain.destroy();
         // Reset the redux state so that if the user navigate to OTC or some other page, it can initialize
         // itself properly.
         this.props.dispatcher.resetState();
