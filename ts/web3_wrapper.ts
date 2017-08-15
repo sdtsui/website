@@ -146,7 +146,7 @@ export class Web3Wrapper {
                     await this.updateUserEtherBalanceAsync(this.prevUserAddress);
                 }
             }
-        }, 1000);
+        }, 3000);
     }
     private async updateUserEtherBalanceAsync(userAddress: string) {
         const balance = await this.getBalanceInEthAsync(userAddress);
