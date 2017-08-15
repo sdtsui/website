@@ -68,14 +68,14 @@ module.exports = {
         },
         disableHostCheck: true,
     },
-    externals: {
-        // "node/npm module name": "name of exported library variable"
-        "react": "React",
-        "react-dom": "ReactDOM"
-    },
     plugins: [
         // Since we do not use moment's locale feature, we exclude them from the bundle.
         // This reduces the bundle size by 0.4MB.
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        new webpack.DefinePlugin({
+            'process.env': {
+                'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+            }
+        }),
     ],
 };
