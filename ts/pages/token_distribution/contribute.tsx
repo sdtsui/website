@@ -18,6 +18,7 @@ import {FlashMessage} from 'ts/components/ui/flash_message';
 import {BlockchainErrDialog} from 'ts/components/blockchain_err_dialog';
 import {EthAmountInput} from 'ts/components/inputs/eth_amount_input';
 import {LedgerConfigDialog} from 'ts/components/ledger_config_dialog';
+import {PurchaseLoadingDialog} from 'ts/pages/token_distribution/purchase_loading_dialog';
 import {U2fNotSupportedDialog} from 'ts/components/u2f_not_supported_dialog';
 import {LabeledSwitcher} from 'ts/components/ui/labeled_switcher';
 import {Party} from 'ts/components/ui/party';
@@ -30,7 +31,8 @@ const CUSTOM_GRAY = '#464646';
 const CUSTOM_LIGHT_GRAY = '#BBBBBB';
 const ZRX_ETH_DECIMAL_PLACES = 18;
 const THROTTLE_TIMEOUT = 100;
-const VARIABLE_TOKEN_SALE_INFO_INTERVAL = 2000;
+const VARIABLE_TOKEN_SALE_INFO_INTERVAL = 3000;
+const TRANSACTION_MINED_CHECK_INTERVAL = 5000;
 
 export interface ContributeProps {
     location: Location;
@@ -67,12 +69,15 @@ interface ContributeState {
     didLoadConstantTokenSaleInfo: boolean;
     isInitialized?: boolean;
     isFinished?: boolean;
+    transactionHash: string;
+    isPurchaseLoadingDialogOpen: boolean;
 }
 
 export class Contribute extends React.Component<ContributeProps, ContributeState> {
     private blockchain: Blockchain;
     private throttledScreenWidthUpdate: () => void;
     private updateVariableTokenSaleInfoIntervalId: number;
+    private txConfirmationIntervalId: number;
     constructor(props: ContributeProps) {
         super(props);
         this.throttledScreenWidthUpdate = _.throttle(this.updateScreenWidth.bind(this), THROTTLE_TIMEOUT);
@@ -88,6 +93,8 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             totalZrxSupply: ZeroEx.toBaseUnitAmount(new BigNumber(500000000), 18),
             isAddressRegistered: false,
             didLoadConstantTokenSaleInfo: false,
+            transactionHash: '',
+            isPurchaseLoadingDialogOpen: false,
         };
     }
     public componentDidMount() {
@@ -102,6 +109,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
     public componentWillUnmount() {
         window.removeEventListener('resize', this.throttledScreenWidthUpdate);
         clearInterval(this.updateVariableTokenSaleInfoIntervalId);
+        clearInterval(this.txConfirmationIntervalId);
 
         // Reset the redux state so that if the user navigate to OTC or some other page, it can initialize
         // itself properly.
@@ -196,6 +204,11 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                 <U2fNotSupportedDialog
                     isOpen={this.state.isU2FDialogOpen}
                     onToggleDialog={this.onToggleU2FDialog.bind(this)}
+                />
+                <PurchaseLoadingDialog
+                    isOpen={this.state.isPurchaseLoadingDialogOpen}
+                    transactionHash={this.state.transactionHash}
+                    networkId={this.props.networkId}
                 />
             </div>
         );
@@ -497,8 +510,8 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
             </div>
         );
     }
-    private renderTransactionSuccessfulMsg(transactionHex: string) {
-        const etherscanLink = utils.getEtherScanLinkIfExists(transactionHex, this.props.networkId,
+    private renderTransactionSuccessfulMsg(transactionHash: string) {
+        const etherscanLink = utils.getEtherScanLinkIfExists(transactionHash, this.props.networkId,
                                                              EtherscanLinkSuffixes.tx);
         return (
             <div>
@@ -622,11 +635,14 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         }
 
         try {
-            const transactionHex = await this.blockchain.tokenSaleFillOrderWithEthAsync(
+            const transactionHash = await this.blockchain.tokenSaleFillOrderWithEthAsync(
                 this.state.contributionAmountInBaseUnits,
             );
-            const transactionSuccessMsg = this.renderTransactionSuccessfulMsg(transactionHex);
-            this.props.dispatcher.showFlashMessage(transactionSuccessMsg);
+            this.setState({
+                isPurchaseLoadingDialogOpen: true,
+                transactionHash,
+            });
+            this.startPollingForTxConfirmationFireAndForgetAsync(transactionHash);
             return true;
         } catch (err) {
             const errMsg = `${err}`;
@@ -642,8 +658,26 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                     'Failed to complete transaction. Please try again.',
                 );
             }
+            this.setState({
+                isPurchaseLoadingDialogOpen: false,
+                transactionHash: '',
+            });
             return false;
         }
+    }
+    private async startPollingForTxConfirmationFireAndForgetAsync(txHash: string) {
+        this.txConfirmationIntervalId = window.setInterval(async () => {
+            const txReceiptIfExists = await this.blockchain.getTransactionReceiptIfExistsAsync(txHash);
+            if (!_.isUndefined(txReceiptIfExists)) {
+                this.setState({
+                    isPurchaseLoadingDialogOpen: false,
+                    transactionHash: '',
+                });
+                const transactionSuccessMsg = this.renderTransactionSuccessfulMsg(txHash);
+                this.props.dispatcher.showFlashMessage(transactionSuccessMsg);
+                clearInterval(this.txConfirmationIntervalId);
+            }
+        }, TRANSACTION_MINED_CHECK_INTERVAL);
     }
     private isAmountBelowCurrentCap(): boolean {
         const nowTimestamp = moment().unix();

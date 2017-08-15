@@ -43,6 +43,13 @@ export class Web3Wrapper {
         const transactionHex = await promisify(this.web3.eth.sendTransaction)(txParams);
         return transactionHex;
     }
+    public async getTransactionReceiptIfExistsAsync(txHash: string): Promise<Web3.TransactionReceipt|undefined> {
+        const receiptIfExists = await promisify(this.web3.eth.getTransactionReceipt)(txHash);
+        if (_.isNull(receiptIfExists)) {
+            return undefined;
+        }
+        return receiptIfExists;
+    }
     public async estimateGasAsync(txParams: any): Promise<BigNumber.BigNumber> {
         const gasAmountOldBigNumber = await promisify(this.web3.eth.estimateGas)(txParams);
         const gasAmount = new BigNumber(gasAmountOldBigNumber);

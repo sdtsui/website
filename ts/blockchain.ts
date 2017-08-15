@@ -246,6 +246,10 @@ export class Blockchain {
 
         return transactionHash;
     }
+    public async getTransactionReceiptIfExistsAsync(txHash: string): Promise<Web3.TransactionReceipt|undefined> {
+        const receiptIfExists = await this.web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
+        return receiptIfExists;
+    }
     public async setProxyAllowanceAsync(token: Token, amountInBaseUnits: BigNumber.BigNumber): Promise<void> {
         utils.assert(this.isValidAddress(token.address), BlockchainCallErrs.TOKEN_ADDRESS_IS_INVALID);
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
