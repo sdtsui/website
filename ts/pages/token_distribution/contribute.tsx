@@ -271,7 +271,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         return (
             <div className="clearfix max-width-4 mx-auto" style={{paddingTop: 43, width: '100%'}}>
                 <div className="mx-auto sm-px2 relative" style={{maxWidth: 530}}>
-                    <div className="absolute" style={{right: 0, top: 28, width: 190}}>
+                    <div className="absolute" style={{right: 0, top: 28, width: 244}}>
                         <SaleStats
                             isLoading={!this.state.didLoadConstantTokenSaleInfo}
                             totalZrxSupply={this.state.totalZrxSupply}
