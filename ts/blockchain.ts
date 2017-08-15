@@ -225,7 +225,8 @@ export class Blockchain {
         const transactionHex = await this.web3Wrapper.sendTransactionAsync(txParams);
         return transactionHex;
     }
-    public async tokenSaleFillOrderWithEthAsync(amountInBaseUnits: BigNumber.BigNumber): Promise<string> {
+    public async tokenSaleFillOrderWithEthAsync(amountInBaseUnits: BigNumber.BigNumber, gas: BigNumber.BigNumber):
+        Promise<string> {
         utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
 
         const isRegistered = await this.tokenSale.registered.call(this.userAddress);
@@ -238,8 +239,6 @@ export class Blockchain {
             value: amountInBaseUnits,
             from: this.userAddress,
         };
-        const gas = await this.web3Wrapper.estimateGasAsync(txParams);
-
         const transactionHash = await this.sendTransactionAsync(_.extend({}, txParams, {
             gas,
         }));

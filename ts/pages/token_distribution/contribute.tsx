@@ -34,7 +34,7 @@ const ZRX_ETH_DECIMAL_PLACES = 18;
 const THROTTLE_TIMEOUT = 100;
 const VARIABLE_TOKEN_SALE_INFO_INTERVAL = 7000;
 const TRANSACTION_MINED_CHECK_INTERVAL = 9000;
-const ROUGH_PURCHASE_GAS_ESTIMATE = 200000000000000;
+const ROUGH_PURCHASE_GAS_ESTIMATE = new BigNumber(250000000000000);
 
 export interface ContributeProps {
     location: Location;
@@ -644,8 +644,10 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         }
 
         try {
+            const gasInGwei = ZeroEx.toUnitAmount(ROUGH_PURCHASE_GAS_ESTIMATE, 9);
             const transactionHash = await this.blockchain.tokenSaleFillOrderWithEthAsync(
                 this.state.contributionAmountInBaseUnits,
+                gasInGwei,
             );
             this.setState({
                 isPurchaseLoadingDialogOpen: true,

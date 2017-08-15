@@ -50,11 +50,6 @@ export class Web3Wrapper {
         }
         return receiptIfExists;
     }
-    public async estimateGasAsync(txParams: any): Promise<BigNumber.BigNumber> {
-        const gasAmountOldBigNumber = await promisify(this.web3.eth.estimateGas)(txParams);
-        const gasAmount = new BigNumber(gasAmountOldBigNumber);
-        return gasAmount;
-    }
     public async getNodeVersionAsync() {
         const nodeVersion = await promisify(this.web3.version.getNode)();
         return nodeVersion;
