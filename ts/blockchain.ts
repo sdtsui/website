@@ -221,6 +221,10 @@ export class Blockchain {
         const isSaleFinished = await this.tokenSale.isSaleFinished.call();
         return isSaleFinished;
     }
+    public async sendTransactionAsync(txParams: any) {
+        const transactionHex = await this.web3Wrapper.sendTransactionAsync(txParams);
+        return transactionHex;
+    }
     public async tokenSaleFillOrderWithEthAsync(amountInBaseUnits: BigNumber.BigNumber): Promise<string> {
         utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
 
@@ -229,16 +233,18 @@ export class Blockchain {
             throw new Error(TokenSaleErrs.ADDRESS_NOT_REGISTERED);
         }
 
-        const gas = await this.tokenSale.fillOrderWithEth.estimateGas({
+        const txParams = {
+            to: this.tokenSale.address,
             value: amountInBaseUnits,
             from: this.userAddress,
-        });
-        const response = await this.tokenSale.fillOrderWithEth({
-            value: amountInBaseUnits,
-            from: this.userAddress,
+        };
+        const gas = await this.web3Wrapper.estimateGasAsync(txParams);
+
+        const transactionHash = await this.sendTransactionAsync(_.extend({}, txParams, {
             gas,
-        });
-        return response.tx;
+        }));
+
+        return transactionHash;
     }
     public async setProxyAllowanceAsync(token: Token, amountInBaseUnits: BigNumber.BigNumber): Promise<void> {
         utils.assert(this.isValidAddress(token.address), BlockchainCallErrs.TOKEN_ADDRESS_IS_INVALID);

@@ -39,6 +39,15 @@ export class Web3Wrapper {
         }
         return (addresses as string[])[0];
     }
+    public async sendTransactionAsync(txParams: any): Promise<string> {
+        const transactionHex = await promisify(this.web3.eth.sendTransaction)(txParams);
+        return transactionHex;
+    }
+    public async estimateGasAsync(txParams: any): Promise<BigNumber.BigNumber> {
+        const gasAmountOldBigNumber = await promisify(this.web3.eth.estimateGas)(txParams);
+        const gasAmount = new BigNumber(gasAmountOldBigNumber);
+        return gasAmount;
+    }
     public async getNodeVersionAsync() {
         const nodeVersion = await promisify(this.web3.version.getNode)();
         return nodeVersion;
