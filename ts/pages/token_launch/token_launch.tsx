@@ -134,7 +134,7 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                                         label="Purchase ZRX tokens"
                                         primary={true}
                                         onClick={this.onContributeClick.bind(this)}
-                                        buttonStyle={{paddingLeft: 22, paddingRight: 22}}
+                                        overlayStyle={{paddingLeft: 22, paddingRight: 22}}
                                     />
                                     <div className="pt2" style={{fontSize: 13}}>
                                         Registration is required to purchase ZRX
