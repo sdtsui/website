@@ -36,7 +36,7 @@ const TOKEN_FACTS: Fact[] = [
 
 const BLOG_POSTS: BlogPost[] = [
     {
-        image: '/images/genesis.gif',
+        image: '/gifs/genesis.gif',
         title: 'The Genesis Trade',
         description: 'Distributing the ZRX token using 0x protocol, live on Ethereum mainnet',
         date: 'Aug 14th',
