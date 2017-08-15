@@ -34,6 +34,7 @@ const ZRX_ETH_DECIMAL_PLACES = 18;
 const THROTTLE_TIMEOUT = 100;
 const VARIABLE_TOKEN_SALE_INFO_INTERVAL = 3000;
 const TRANSACTION_MINED_CHECK_INTERVAL = 5000;
+const ROUGH_PURCHASE_GAS_ESTIMATE = 200000000000000;
 
 export interface ContributeProps {
     location: Location;
@@ -193,7 +194,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                     dispatcher={this.props.dispatcher}
                     flashMessage={this.props.flashMessage}
                     showDurationMs={13000}
-                    bodyStyle={{backgroundColor: constants.CUSTOM_BLUE}}
+                    bodyStyle={{backgroundColor: constants.CUSTOM_BLUE, textAlign: 'center'}}
                 />
                 <LedgerConfigDialog
                     networkId={this.props.networkId}
@@ -284,7 +285,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                             {this.renderStepNumber(1)}
                         </div>
                         <div className="col col-11">
-                            <div className="h4">Select your wallet:</div>
+                            <div className="h4">Select your wallet</div>
                             <div className="pt2 pb3">
                                 <LabeledSwitcher
                                     labelLeft={labelLeft}
@@ -374,7 +375,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                             {this.renderStepNumber(2)}
                         </div>
                         <div className="col col-11">
-                            <div className="h4">Choose an amount:</div>
+                            <div className="h4">Choose an amount</div>
                             <div className="clearfix">
                                 <div className="col col-6" style={{maxWidth: 235}}>
                                     <EthAmountInput
@@ -397,7 +398,13 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                             </div>
                             <div style={{fontSize: 13}}>
                                 <div>
-                                    <div>
+                                    <div
+                                        style={{color: '#4291ea', fontSize: 13, cursor: 'pointer'}}
+                                        onClick={this.setContributionAmountToMax.bind(this)}
+                                    >
+                                        Purchase max amount
+                                    </div>
+                                    <div className="pt1">
                                         <span style={{color: CUSTOM_LIGHT_GRAY}}>
                                             Current purchase limit:{' '}
                                         </span>
@@ -711,5 +718,29 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
     private updateScreenWidth() {
         const newScreenWidth = utils.getScreenWidth();
         this.props.dispatcher.updateScreenWidth(newScreenWidth);
+    }
+    private setContributionAmountToMax() {
+        if (_.isEmpty(this.props.userAddress)) {
+            return;
+        }
+
+        const contributedWei = this.state.ethContributedAmount;
+        const nowTimestamp = moment().unix();
+        const ethCapPerAddress = this.getEthCapPerAddressAtTimestamp(nowTimestamp);
+
+        const maxContributionAmount = ethCapPerAddress.minus(contributedWei);
+        const balanceWei = ZeroEx.toBaseUnitAmount(this.props.userEtherBalance, 18);
+
+        let finalMax;
+        if (balanceWei.gte(maxContributionAmount.add(ROUGH_PURCHASE_GAS_ESTIMATE))) {
+            finalMax = maxContributionAmount;
+        } else if (balanceWei.gte(maxContributionAmount)) {
+            finalMax = maxContributionAmount.minus(ROUGH_PURCHASE_GAS_ESTIMATE);
+        } else {
+            finalMax = balanceWei.minus(ROUGH_PURCHASE_GAS_ESTIMATE);
+        }
+        this.setState({
+            contributionAmountInBaseUnits: finalMax,
+        });
     }
 }
