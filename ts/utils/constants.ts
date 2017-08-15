@@ -25,8 +25,8 @@ export const constants = {
     // The order matters. We first try first node and only then fall back to others.
     PUBLIC_NODE_URLS_BY_NETWORK_ID: {
         [1]: [
-            'https://mainnet.0xproject.com',
             `https://mainnet.infura.io/${INFURA_API_KEY}`,
+            'https://mainnet.0xproject.com',
             'https://api.myetherapi.com/eth',
         ],
         [42]: [
