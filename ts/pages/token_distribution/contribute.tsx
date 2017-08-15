@@ -192,7 +192,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                 <FlashMessage
                     dispatcher={this.props.dispatcher}
                     flashMessage={this.props.flashMessage}
-                    showDurationMs={10000}
+                    showDurationMs={13000}
                     bodyStyle={{backgroundColor: constants.CUSTOM_BLUE}}
                 />
                 <LedgerConfigDialog
