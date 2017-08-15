@@ -117,18 +117,19 @@ export class Web3Wrapper {
         let prevNodeVersion: string;
         this.prevUserEtherBalanceInEth = new BigNumber(0);
         this.dispatcher.updateNetworkId(this.prevNetworkId);
-        // Check for node version changes
-        const currentNodeVersion = await this.getNodeVersionAsync();
-        if (currentNodeVersion !== prevNodeVersion) {
-            prevNodeVersion = currentNodeVersion;
-            this.dispatcher.updateNodeVersion(currentNodeVersion);
-        }
         this.watchNetworkAndBalanceIntervalId = window.setInterval(async () => {
             // Check for network state changes
             const currentNetworkId = await this.getNetworkIdIfExists();
             if (currentNetworkId !== this.prevNetworkId) {
                 this.prevNetworkId = currentNetworkId;
                 this.dispatcher.updateNetworkId(currentNetworkId);
+            }
+
+            // Check for node version changes
+            const currentNodeVersion = await this.getNodeVersionAsync();
+            if (currentNodeVersion !== prevNodeVersion) {
+                prevNodeVersion = currentNodeVersion;
+                this.dispatcher.updateNodeVersion(currentNodeVersion);
             }
 
             if (this.shouldPollUserAddress) {
