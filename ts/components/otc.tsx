@@ -122,8 +122,7 @@ export class OTC extends React.Component<OTCAllProps, OTCAllState> {
         }
         if (nextProps.userAddress !== this.state.prevUserAddress) {
             this.blockchain.userAddressUpdatedFireAndForgetAsync(nextProps.userAddress);
-            if (!_.isEmpty(nextProps.userAddress) && !_.isEmpty(this.state.prevUserAddress) &&
-                nextProps.blockchainIsLoaded) {
+            if (!_.isEmpty(nextProps.userAddress) && nextProps.blockchainIsLoaded) {
                 const tokens = _.values(nextProps.tokenByAddress);
                 this.updateBalanceAndAllowanceWithLoadingScreenAsync(tokens);
             }

@@ -739,7 +739,6 @@ export class Blockchain {
                     this.getCustomTokensAsync(),
             ]);
             const tokens = _.flatten(tokenArrays);
-            await this.updateTokenBalancesAndAllowancesAsync(tokens);
             this.dispatcher.updateTokenByAddress(tokens);
             const mostPopularTradingPairTokens: Token[] = [
                 _.find(tokens, {symbol: configs.mostPopularTradingPairSymbols[0]}),
