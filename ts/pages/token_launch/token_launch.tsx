@@ -113,45 +113,13 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                             className="pt1 pb4"
                             style={{fontSize: 18, color: '#B4B4B4'}}
                         >
-                            {configs.IS_REGISTRATION_OPEN ?
-                                'Registration is now open. Sale begins August 15 8AM PT' :
-                                'Registration has ended. Sale begins August 15 8AM PT'
-                            }
+                            ZRX sale has officially ended
                         </div>
-                        <div className="mx-auto pb1">
+                        <div className="mx-auto pb3">
                             <img
                                 src="/images/zrx_token.png"
                                 style={{width: 150}}
                             />
-                        </div>
-                        <div
-                            className="relative pt2 mx-auto sm-px3"
-                            style={{maxWidth: 308, height: 145}}
-                        >
-                            {configs.IS_CONTRIBUTE_OPEN ?
-                                <div>
-                                    <RaisedButton
-                                        label="Purchase ZRX tokens"
-                                        primary={true}
-                                        onClick={this.onContributeClick.bind(this)}
-                                        overlayStyle={{paddingLeft: 22, paddingRight: 22}}
-                                    />
-                                    <div className="pt2" style={{fontSize: 13}}>
-                                        Registration is required to purchase ZRX
-                                    </div>
-                                </div> :
-                                <div className="absolute" style={{maxWidth: 308}}>
-                                    <div style={{textAlign: 'left', fontSize: 14}}>
-                                        Receive notifications about the launch
-                                    </div>
-                                    <div className="pt1">
-                                        <NewsletterInput
-                                            buttonBackgroundColor={CUSTOM_DARK_GRAY}
-                                            buttonLabelColor="white"
-                                        />
-                                    </div>
-                                </div>
-                            }
                         </div>
                     </div>
                     <KeyDates

@@ -37,7 +37,7 @@ export class KeyDates extends React.Component<KeyDatesProps, KeyDatesState> {
         const steps = _.map(keyDates, keyDate => {
             return (
                 <Step key={keyDate.date}>
-                    <StepLabel>
+                    <StepLabel completed={true}>
                         <div>
                             <div className="bold" style={{color: 'white'}}>{keyDate.date}</div>
                             <div style={{fontSize: 14, color: '#cecece'}}>
