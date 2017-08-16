@@ -8,13 +8,13 @@ import 'react-html5video/dist/styles.css';
 import {Footer} from 'ts/components/footer';
 import {TopBar} from 'ts/components/top_bar';
 
-interface OTCDownNoticeProps {
+interface SaleOverProps {
     location: Location;
 }
 
-interface OTCDownNoticeState {}
+interface SaleOverState {}
 
-export class OTCDownNotice extends React.Component<OTCDownNoticeProps, OTCDownNoticeState> {
+export class SaleOver extends React.Component<SaleOverProps, SaleOverState> {
     public render() {
         const contributeStyle: React.CSSProperties = {
             minHeight: '100vh',
@@ -32,10 +32,9 @@ export class OTCDownNotice extends React.Component<OTCDownNoticeProps, OTCDownNo
                 />
                 <div className="pt4 sm-px2 sm-pt2 sm-m1" style={{height: 500}}>
                     <Paper className="mx-auto pt2 pb3" style={{maxWidth: 600}}>
-                        <h1 className="center">OTC Temporarily Unavailable</h1>
+                        <h1 className="center">0x Token Sale Over</h1>
                         <div className="center pt2" style={{paddingBottom: 11}}>
-                            Due to the high load expected during our token sale, OTC is currently unavailable.{' '}
-                            Sorry for the inconvenience.
+                            All of the ZRX tokens have been sold and the sale is now over.
                         </div>
                     </Paper>
                 </div>

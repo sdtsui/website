@@ -15,7 +15,7 @@ import {Contribute} from 'ts/containers/contribute';
 import {TokenLaunch} from 'ts/pages/token_launch/token_launch';
 import {RegistrationCheck} from 'ts/pages/token_distribution/registration_check';
 import {NotFound} from 'ts/pages/not_found';
-import {OTCDownNotice} from 'ts/components/otc_down_notice';
+import {SaleOver} from 'ts/components/sale_over';
 import {LazyComponent, createLazyComponent} from 'ts/lazy_component';
 import {State, reducer} from 'ts/redux/reducer';
 import {colors, getMuiTheme, MuiThemeProvider} from 'material-ui/styles';
@@ -95,7 +95,7 @@ render(
                     <div>
                         <Switch>
                             <Route exact={true} path="/" component={Home as any} />
-                            <Route path="/otc" component={OTCDownNotice as any} />
+                            <Route path="/otc" component={LazyOTC} />
                             <Route path="/token" component={TokenLaunch as any} />
                             <Route path="/faq" component={FAQ as any} />
                             {configs.IS_REGISTRATION_OPEN &&
@@ -103,7 +103,7 @@ render(
                             }
                             <Redirect path="/contribute" to="/sale" />
                             {configs.IS_CONTRIBUTE_OPEN &&
-                                <Route path="/sale" component={LazyContribute} />
+                                <Route path="/sale" component={SaleOver as any} />
                             }
                             <Route path="/registration_check" component={RegistrationCheck as any} />
                             <Route path="/docs/0xjs/:version?" component={LazyZeroExJSDocumentation} />
