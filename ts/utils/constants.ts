@@ -1,6 +1,8 @@
 import {ExchangeContractErrs, PublicNodeUrlsByNetworkId} from 'ts/types';
 import * as BigNumber from 'bignumber.js';
 
+const INFURA_API_KEY = 'T5WSC8cautR4KXyYgsRs';
+
 export const constants = {
     STAGING_DOMAIN: 'staging-0xproject.s3-website-us-east-1.amazonaws.com',
     PRODUCTION_DOMAIN: '0xproject.com',
@@ -24,12 +26,13 @@ export const constants = {
     // The order matters. We first try first node and only then fall back to others.
     PUBLIC_NODE_URLS_BY_NETWORK_ID: {
         [1]: [
+            `https://mainnet.infura.io/${INFURA_API_KEY}`,
             'https://mainnet.0xproject.com',
-            'https://infura.io',
+            'https://api.myetherapi.com/eth',
         ],
         [42]: [
             'https://kovan.0xproject.com',
-            'https://kovan.infura.io',
+            `https://kovan.infura.io/${INFURA_API_KEY}`,
         ],
     } as PublicNodeUrlsByNetworkId,
     PARITY_SIGNER_PROVIDER_NAME: 'Parity Signer',
@@ -58,13 +61,34 @@ export const constants = {
     WEB3_DOCS_URL: 'https://github.com/ethereum/wiki/wiki/JavaScript-API',
     WEB3_PROVIDER_DOCS_URL: 'https://github.com/ethereum/wiki/wiki/JavaScript-API#example-7',
     iconUrlBySymbol: {
-        REP: '/images/token_icons/augur.png',
-        DGD: '/images/token_icons/digixdao.png',
-        WETH: '/images/token_icons/ether_erc20.png',
-        MLN: '/images/token_icons/melon.png',
-        GNT: '/images/token_icons/golem.png',
-        MKR: '/images/token_icons/makerdao.png',
-        ZRX: '/images/token_icons/zero_ex.png',
+        'REP': '/images/token_icons/augur.png',
+        'DGD': '/images/token_icons/digixdao.png',
+        'WETH': '/images/token_icons/ether_erc20.png',
+        'MLN': '/images/token_icons/melon.png',
+        'GNT': '/images/token_icons/golem.png',
+        'MKR': '/images/token_icons/makerdao.png',
+        'ZRX': '/images/token_icons/zero_ex.png',
+        'ANT': '/images/token_icons/aragon.png',
+        'BNT': '/images/token_icons/bancor.png',
+        'BAT': '/images/token_icons/basicattentiontoken.png',
+        'CVC': '/images/token_icons/civic.png',
+        'EOS': '/images/token_icons/eos.png',
+        'FUN': '/images/token_icons/funfair.png',
+        'GNO': '/images/token_icons/gnosis.png',
+        'ICN': '/images/token_icons/iconomi.png',
+        'OMG': '/images/token_icons/omisego.png',
+        'SNT': '/images/token_icons/status.png',
+        'STORJ': '/images/token_icons/storjcoinx.png',
+        'PAY': '/images/token_icons/tenx.png',
+        'QTUM': '/images/token_icons/qtum.png',
+        'DNT': '/images/token_icons/district0x.png',
+        'SNGLS': '/images/token_icons/singularity.png',
+        'EDG': '/images/token_icons/edgeless.png',
+        '1ST': '/images/token_icons/firstblood.jpg',
+        'WINGS': '/images/token_icons/wings.png',
+        'BQX': '/images/token_icons/bitquence.png',
+        'LUN': '/images/token_icons/lunyr.png',
+        'RLC': '/images/token_icons/iexec.png',
     } as {[symbol: string]: string},
     exchangeContractErrToMsg: {
         [ExchangeContractErrs.ERROR_FILL_EXPIRED]: 'The order you attempted to fill is expired',

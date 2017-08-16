@@ -36,18 +36,18 @@ const TOKEN_FACTS: Fact[] = [
 
 const BLOG_POSTS: BlogPost[] = [
     {
-        image: '/images/blog/sale_registration_cutoff_blog_post.jpg',
-        title: 'ZRX Token Sale Registration Cutoff',
-        description: 'Registration will now close at 10pm PST on August 11th',
-        date: 'Aug 10th',
-        url: 'https://blog.0xproject.com/zrx-token-sale-registration-cutoff-d2a34c609295',
+        image: '/images/blog/sale_instructions.png',
+        title: 'ZRX Token Sale Purchase Tutorial',
+        description: 'Instructions to purchase ZRX tokens starting August 15 at 8am PT',
+        date: 'Aug 15th',
+        url: 'https://blog.0xproject.com/zrx-token-sale-purchase-tutorial-612c2ffe1e0d',
     },
     {
-        image: '/images/blog/tutorial_blog_post.png',
-        title: 'Tutorials for the 0x Token Sale Registration',
-        description: 'Detailed tutorials for registration using MetaMask, Parity Signer and Ledger',
-        date: 'Aug 9th',
-        url: 'https://blog.0xproject.com/tutorials-for-the-0x-token-sale-registration-766064955d12',
+        image: '/gifs/genesis.gif',
+        title: 'The Genesis Trade',
+        description: 'Distributing the ZRX token using 0x protocol, live on Ethereum mainnet',
+        date: 'Aug 14th',
+        url: 'https://blog.0xproject.com/the-genesis-trade-74d50c1e7f25',
     },
     {
         image: '/images/blog/scams_blog_post.png',
@@ -113,42 +113,13 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                             className="pt1 pb4"
                             style={{fontSize: 18, color: '#B4B4B4'}}
                         >
-                            Registration is now open. Sale begins August 15 8AM PST
+                            ZRX sale has officially ended
                         </div>
-                        <div className="mx-auto pb1">
+                        <div className="mx-auto pb3">
                             <img
                                 src="/images/zrx_token.png"
                                 style={{width: 150}}
                             />
-                        </div>
-                        <div
-                            className="relative pt2 mx-auto sm-px3"
-                            style={{maxWidth: 308, height: 145}}
-                        >
-                            {configs.IS_REGISTRATION_OPEN ?
-                                <div>
-                                    <RaisedButton
-                                        label="Register for the sale"
-                                        primary={true}
-                                        onClick={this.onRegisterClick.bind(this)}
-                                        buttonStyle={{paddingLeft: 22, paddingRight: 22}}
-                                    />
-                                    <div className="pt2" style={{fontSize: 13}}>
-                                        Registration is required to purchase ZRX
-                                    </div>
-                                </div> :
-                                <div className="absolute" style={{maxWidth: 308}}>
-                                    <div style={{textAlign: 'left', fontSize: 14}}>
-                                        Receive notifications about registration & launch
-                                    </div>
-                                    <div className="pt1">
-                                        <NewsletterInput
-                                            buttonBackgroundColor={CUSTOM_DARK_GRAY}
-                                            buttonLabelColor="white"
-                                        />
-                                    </div>
-                                </div>
-                            }
                         </div>
                     </div>
                     <KeyDates
@@ -240,7 +211,7 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
                 >
                     <a href={post.url} target="_blank">
                         <div className="col lg-col-3 md-col-3 col-12">
-                            <img src={post.image} style={{width: 130}} />
+                            <img src={post.image} style={{width: 130, border: '1px solid lightgray'}} />
                         </div>
                         <div
                             className="col lg-col-9 md-col-9 col-12 sm-pr3 sm-pl4 left-align lg-pl2 md-pl2"
@@ -291,8 +262,8 @@ export class TokenLaunch extends React.Component<TokenLaunchProps, TokenLaunchSt
         });
         return facts;
     }
-    private onRegisterClick() {
-        window.location.href = configs.QUEUE_IT_URL;
+    private onContributeClick() {
+        window.location.href = '/sale';
     }
     private updateScreenWidth() {
         const newScreenWidth = utils.getScreenWidth();

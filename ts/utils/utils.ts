@@ -177,8 +177,10 @@ export const utils = {
     didUserDenyWeb3Request(errMsg: string) {
         const metamaskDenialErrMsg = 'User denied message';
         const paritySignerDenialErrMsg = 'Request has been rejected';
+        const ledgerDenialErrMsg = 'Invalid status 6985';
         const isUserDeniedErrMsg = _.includes(errMsg, metamaskDenialErrMsg) ||
-                                   _.includes(errMsg, paritySignerDenialErrMsg);
+                                   _.includes(errMsg, paritySignerDenialErrMsg) ||
+                                   _.includes(errMsg, ledgerDenialErrMsg);
         return isUserDeniedErrMsg;
     },
     getCurrentEnvironment() {

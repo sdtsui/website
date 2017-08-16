@@ -36,7 +36,7 @@ export class Footer extends React.Component<FooterProps, FooterState> {
                         className="sm-col sm-col-4 pt1 sm-center md-left-align lg-left-align sm-pb2"
                         style={{...styles.text}}
                     >
-                        Copyright © 0xProject
+                        Copyright © ZeroEx, Intl.
                     </div>
                     <div className="sm-col sm-col-4 clearfix sm-pb2">
                         <div className="mx-auto" style={{width: 145}}>
@@ -56,7 +56,7 @@ export class Footer extends React.Component<FooterProps, FooterState> {
                                 </a>
                             </div>
                             <div className="col col-3 pt1">
-                                <a href="https://0xproject.slack.com/" target="_blank">
+                                <a href="https://slack.0xproject.com/" target="_blank">
                                     <div className="rounded" style={{...styles.slackIcon}}>
                                         <img src="/images/slack_icon.png" style={{width: 13}} />
                                     </div>

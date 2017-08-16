@@ -135,13 +135,18 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                   token balances in order to execute trades.<br> \
                                   Toggling permissions sets an allowance for the<br> \
                                   smart contract so you can start trading that token.';
+        const isTestNetwork = this.props.networkId === constants.TESTNET_NETWORK_ID;
         return (
             <div className="lg-px4 md-px4 sm-px1 pb2">
-                <h3>Test ether</h3>
+                <h3>{isTestNetwork ? 'Test ether' : 'Ether'}</h3>
                 <Divider />
                 <div className="pt2 pb2">
-                    In order to try out the 0x OTC Dapp, request some test ether to pay for
-                    gas costs. It might take a bit of time for the test ether to show up.
+                    {isTestNetwork ?
+                        'In order to try out the 0x OTC Dapp, request some test ether to pay for \
+                        gas costs. It might take a bit of time for the test ether to show up.' :
+                        'Ether must be converted to Ether Tokens in order to be tradable via 0x. \
+                         You can convert between Ether and Ether Tokens by clicking the "convert" button below.'
+                    }
                 </div>
                 <Table
                     selectable={false}
@@ -155,20 +160,22 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                 className="sm-hide xs-hide"
                                 style={stubColumnStyle}
                             />
-                            <TableHeaderColumn
-                                style={{paddingLeft: 3}}
-                            >
-                                {isSmallScreen ? 'Faucet' : 'Request from faucet'}
-                            </TableHeaderColumn>
-                            <TableHeaderColumn
-                                style={dharmaButtonColumnStyle}
-                            >
-                                {isSmallScreen ? 'Loan' : 'Request Dharma loan'}
-                                <HelpTooltip
-                                    style={{paddingLeft: 4}}
-                                    explanation={dharmaLoanExplanation}
-                                />
-                            </TableHeaderColumn>
+                            {
+                                isTestNetwork &&
+                                <TableHeaderColumn>Request{!isSmallScreen && ' from faucet'}</TableHeaderColumn>
+                            }
+                            {
+                                isTestNetwork &&
+                                <TableHeaderColumn
+                                    style={dharmaButtonColumnStyle}
+                                >
+                                    {isSmallScreen ? 'Loan' : 'Request Dharma loan'}
+                                    <HelpTooltip
+                                        style={{paddingLeft: 4}}
+                                        explanation={dharmaLoanExplanation}
+                                    />
+                                </TableHeaderColumn>
+                            }
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false}>
@@ -187,6 +194,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                     </span>
                                 }
                             </TableRowColumn>
+<<<<<<< HEAD
                             <TableRowColumn
                                 className="sm-hide xs-hide"
                                 style={stubColumnStyle}
@@ -206,13 +214,30 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                     onTouchTap={this.onDharmaDialogToggle.bind(this)}
                                 />
                             </TableRowColumn>
+=======
+                            <TableRowColumn className="sm-hide xs-hide" />
+                            {
+                                isTestNetwork &&
+                                <TableRowColumn>
+                                    <LifeCycleRaisedButton
+                                        labelReady="Request"
+                                        labelLoading="Sending..."
+                                        labelComplete="Sent!"
+                                        onClickAsyncFn={this.requestEtherAsync.bind(this)}
+                                    />
+                                </TableRowColumn>
+                            }
+>>>>>>> masterCrowdsale
                         </TableRow>
                     </TableBody>
                 </Table>
-                <h3 className="pt2">Test tokens</h3>
+                <h3 className="pt2">{isTestNetwork ? 'Test tokens' : 'Tokens'}</h3>
                 <Divider />
                 <div className="pt2 pb2">
-                    Mint some test tokens you'd like to use to generate or fill an order using 0x.
+                    {isTestNetwork ?
+                        'Mint some test tokens you\'d like to use to generate or fill an order using 0x.' :
+                        'Tokens supported by OTC are pulled from the 0x token registry smart contract.'
+                    }
                 </div>
                 <Table
                     selectable={false}
@@ -234,7 +259,11 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                     explanation={allowanceExplanation}
                                 />
                             </TableHeaderColumn>
-                            <TableHeaderColumn>Mint{!isSmallScreen && ' test tokens'}</TableHeaderColumn>
+                            <TableHeaderColumn>
+                                {isTestNetwork &&
+                                    `Mint${!isSmallScreen ? ' test tokens' : ''}`
+                                }
+                            </TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false}>

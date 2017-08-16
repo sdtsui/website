@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import {configs} from 'ts/utils/configs';
 import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
 import {utils} from 'ts/utils/utils';
 import {ScreenWidths} from 'ts/types';
@@ -36,7 +37,7 @@ export class KeyDates extends React.Component<KeyDatesProps, KeyDatesState> {
         const steps = _.map(keyDates, keyDate => {
             return (
                 <Step key={keyDate.date}>
-                    <StepLabel>
+                    <StepLabel completed={true}>
                         <div>
                             <div className="bold" style={{color: 'white'}}>{keyDate.date}</div>
                             <div style={{fontSize: 14, color: '#cecece'}}>
@@ -55,7 +56,7 @@ export class KeyDates extends React.Component<KeyDatesProps, KeyDatesState> {
                     <div className="sm-px4 sm-mx2">
                         <Stepper
                             orientation={orientation}
-                            activeStep={1}
+                            activeStep={3}
                         >
                             {steps}
                         </Stepper>

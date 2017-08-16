@@ -106,6 +106,7 @@ export class OTC extends React.Component<OTCAllProps, OTCAllState> {
         this.blockchain = new Blockchain(this.props.dispatcher);
     }
     public componentWillUnmount() {
+        this.blockchain.destroy();
         window.removeEventListener('resize', this.throttledScreenWidthUpdate);
         // We re-set the entire redux state when the OTC is unmounted so that when it is re-rendered
         // the initialization process always occurs from the same base state. This helps avoid

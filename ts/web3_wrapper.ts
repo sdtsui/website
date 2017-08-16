@@ -39,6 +39,17 @@ export class Web3Wrapper {
         }
         return (addresses as string[])[0];
     }
+    public async sendTransactionAsync(txParams: any): Promise<string> {
+        const transactionHex = await promisify(this.web3.eth.sendTransaction)(txParams);
+        return transactionHex;
+    }
+    public async getTransactionReceiptIfExistsAsync(txHash: string): Promise<Web3.TransactionReceipt|undefined> {
+        const receiptIfExists = await promisify(this.web3.eth.getTransactionReceipt)(txHash);
+        if (_.isNull(receiptIfExists)) {
+            return undefined;
+        }
+        return receiptIfExists;
+    }
     public async getNodeVersionAsync() {
         const nodeVersion = await promisify(this.web3.version.getNode)();
         return nodeVersion;
@@ -79,6 +90,11 @@ export class Web3Wrapper {
     }
     public destroy() {
         this.stopEmittingNetworkConnectionAndUserBalanceStateAsync();
+        // HACK: stop() is only available on providerEngine instances
+        const providerStopFnIfExists = (this.web3.currentProvider as any).stop.bind(this.web3.currentProvider);
+        if (!_.isUndefined(providerStopFnIfExists)) {
+            providerStopFnIfExists();
+        }
     }
     // This should only be called from the LedgerConfigDialog
     public updatePrevUserAddress(userAddress: string) {
@@ -130,7 +146,7 @@ export class Web3Wrapper {
                     await this.updateUserEtherBalanceAsync(this.prevUserAddress);
                 }
             }
-        }, 1000);
+        }, 5000);
     }
     private async updateUserEtherBalanceAsync(userAddress: string) {
         const balance = await this.getBalanceInEthAsync(userAddress);
