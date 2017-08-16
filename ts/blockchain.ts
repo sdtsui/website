@@ -11,7 +11,7 @@ import ProviderEngine = require('web3-provider-engine');
 import FilterSubprovider = require('web3-provider-engine/subproviders/filters');
 import {RedundantRPCSubprovider} from 'ts/subproviders/redundant_rpc_subprovider';
 import {InjectedWeb3SubProvider} from 'ts/subproviders/injected_web3_subprovider';
-import {ledgerWalletSubproviderFactory, LedgerWallet} from 'ts/subproviders/ledger_wallet_subprovider_factory';
+import {ledgerWalletSubproviderFactory} from 'ts/subproviders/ledger_wallet_subprovider_factory';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
@@ -26,7 +26,6 @@ import {
     ContractInstance,
     ProviderType,
     LedgerWalletSubprovider,
-    TokenSaleErrs,
 } from 'ts/types';
 import {Web3Wrapper} from 'ts/web3_wrapper';
 import {errorReporter} from 'ts/utils/error_reporter';
@@ -38,7 +37,6 @@ import * as TokenRegistryArtifacts from '../contracts/TokenRegistry.json';
 import * as TokenArtifacts from '../contracts/Token.json';
 import * as MintableArtifacts from '../contracts/Mintable.json';
 import * as EtherTokenArtifacts from '../contracts/EtherToken.json';
-import * as TokenSaleArtifacts from '../contracts/TokenSale.json';
 
 const ALLOWANCE_TO_ZERO_GAS_AMOUNT = 45730;
 

@@ -3,8 +3,6 @@ import Web3 = require('web3');
 import * as BigNumber from 'bignumber.js';
 import promisify = require('es6-promisify');
 import {Dispatcher} from 'ts/redux/dispatcher';
-import {utils} from 'ts/utils/utils';
-import {constants} from 'ts/utils/constants';
 
 export class Web3Wrapper {
     private dispatcher: Dispatcher;
