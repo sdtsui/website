@@ -91,9 +91,9 @@ export class Web3Wrapper {
     public destroy() {
         this.stopEmittingNetworkConnectionAndUserBalanceStateAsync();
         // HACK: stop() is only available on providerEngine instances
-        const providerStopFnIfExists = (this.web3.currentProvider as any).stop.bind(this.web3.currentProvider);
-        if (!_.isUndefined(providerStopFnIfExists)) {
-            providerStopFnIfExists();
+        const provider = this.web3.currentProvider;
+        if (!_.isUndefined((provider as any).stop)) {
+            (provider as any).stop();
         }
     }
     // This should only be called from the LedgerConfigDialog
