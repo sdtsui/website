@@ -711,7 +711,6 @@ export class Blockchain {
                       ExchangeArtifacts,
                       TokenRegistryArtifacts,
                       TokenTransferProxyArtifacts,
-                      TokenSaleArtifacts,
                     ],
                     (artifacts: any) => this.instantiateContractIfExistsAsync(artifacts),
                 );
@@ -719,7 +718,6 @@ export class Blockchain {
                 this.exchange = contracts[0];
                 this.tokenRegistry = contracts[1];
                 this.tokenTransferProxy = contracts[2];
-                this.tokenSale = contracts[3];
             } else {
                 const contractsPromises = _.map(
                     [
