@@ -56,7 +56,7 @@ export class KeyDates extends React.Component<KeyDatesProps, KeyDatesState> {
                     <div className="sm-px4 sm-mx2">
                         <Stepper
                             orientation={orientation}
-                            activeStep={configs.IS_REGISTRATION_OPEN ? 1 : 2}
+                            activeStep={3}
                         >
                             {steps}
                         </Stepper>
