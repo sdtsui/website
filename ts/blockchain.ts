@@ -47,7 +47,6 @@ export class Blockchain {
     public nodeVersion: string;
     private dispatcher: Dispatcher;
     private web3Wrapper: Web3Wrapper;
-    private tokenSale: ContractInstance;
     private exchange: ContractInstance;
     private exchangeLogFillEvents: any[];
     private tokenTransferProxy: ContractInstance;
@@ -55,12 +54,10 @@ export class Blockchain {
     private userAddress: string;
     private cachedProvider: Web3.Provider;
     private ledgerSubProvider: LedgerWalletSubprovider;
-    private isSalePage: boolean;
     constructor(dispatcher: Dispatcher, isSalePage: boolean = false) {
         this.dispatcher = dispatcher;
         this.userAddress = '';
         this.exchangeLogFillEvents = [];
-        this.isSalePage = isSalePage;
         this.onPageLoadInitFireAndForgetAsync();
     }
     public async networkIdUpdatedFireAndForgetAsync(newNetworkId: number) {
@@ -73,17 +70,13 @@ export class Blockchain {
             this.networkId = newNetworkId;
             this.dispatcher.encounteredBlockchainError('');
             await this.instantiateContractsAsync();
-            if (!this.isSalePage) {
-                await this.rehydrateStoreWithContractEvents();
-            }
+            await this.rehydrateStoreWithContractEvents();
         }
     }
     public async userAddressUpdatedFireAndForgetAsync(newUserAddress: string) {
         if (this.userAddress !== newUserAddress) {
             this.userAddress = newUserAddress;
-            if (!this.isSalePage) {
-                await this.rehydrateStoreWithContractEvents();
-            }
+            await this.rehydrateStoreWithContractEvents();
         }
     }
     public async nodeVersionUpdatedFireAndForgetAsync(nodeVersion: string) {
@@ -157,97 +150,6 @@ export class Blockchain {
         }
 
         await this.instantiateContractsAsync();
-    }
-    public getTokenSaleAddress(): string {
-      utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
-
-      return this.tokenSale.address;
-    }
-    public async getTokenSaleOrderHashAsync(): Promise<string> {
-      utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
-
-      const orderHash = await this.tokenSale.getOrderHash.call();
-      return orderHash;
-    }
-    public async getTokenSaleExchangeRateAsync(): Promise<BigNumber.BigNumber> {
-        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
-
-        const makerTokenAmount = await this.tokenSale.getOrderMakerTokenAmount.call();
-        const takerTokenAmount = await this.tokenSale.getOrderTakerTokenAmount.call();
-        const zrxToEthExchangeRate = makerTokenAmount.div(takerTokenAmount);
-        return zrxToEthExchangeRate;
-    }
-    public async getTokenSaleTotalSupplyAsync(): Promise<BigNumber.BigNumber> {
-        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
-
-        const makerTokenAmount = await this.tokenSale.getOrderMakerTokenAmount.call();
-        return new BigNumber(makerTokenAmount);
-    }
-    public async getTokenSaleBaseEthCapPerAddressAsync(): Promise<BigNumber.BigNumber> {
-        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
-
-        const baseEthCapPerAddress = await this.tokenSale.baseEthCapPerAddress.call();
-        return new BigNumber(baseEthCapPerAddress);
-    }
-    public async getTokenSaleStartTimeInSecAsync(): Promise<BigNumber.BigNumber> {
-        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
-
-        const startTimeInSec = await this.tokenSale.startTimeInSec.call();
-        return new BigNumber(startTimeInSec);
-    }
-    public async getTokenSaleContributionAmountAsync(): Promise<BigNumber.BigNumber> {
-        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
-        utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
-
-        const contributionAmount = await this.tokenSale.contributed.call(this.userAddress);
-        return new BigNumber(contributionAmount);
-    }
-    public async getTokenSaleIsUserAddressRegisteredAsync(): Promise<boolean> {
-        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
-        utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
-
-        const isRegistered = await this.tokenSale.registered.call(this.userAddress);
-        return isRegistered;
-    }
-    public async getIsTokenSaleInitialized(): Promise<boolean> {
-        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
-
-        const isSaleInitialized = await this.tokenSale.isSaleInitialized.call();
-        return isSaleInitialized;
-    }
-    public async getIsTokenSaleFinished(): Promise<boolean> {
-        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
-
-        const isSaleFinished = await this.tokenSale.isSaleFinished.call();
-        return isSaleFinished;
-    }
-    public async sendTransactionAsync(txParams: any) {
-        const transactionHex = await this.web3Wrapper.sendTransactionAsync(txParams);
-        return transactionHex;
-    }
-    public async tokenSaleFillOrderWithEthAsync(amountInBaseUnits: BigNumber.BigNumber, gas: BigNumber.BigNumber):
-        Promise<string> {
-        utils.assert(!_.isUndefined(this.tokenSale), 'TokenSale contract instance has not been instantiated yet');
-
-        const isRegistered = await this.tokenSale.registered.call(this.userAddress);
-        if (!isRegistered) {
-            throw new Error(TokenSaleErrs.ADDRESS_NOT_REGISTERED);
-        }
-
-        const txParams = {
-            to: this.tokenSale.address,
-            value: amountInBaseUnits,
-            from: this.userAddress,
-        };
-        const transactionHash = await this.sendTransactionAsync(_.extend({}, txParams, {
-            gas,
-        }));
-
-        return transactionHash;
-    }
-    public async getTransactionReceiptIfExistsAsync(txHash: string): Promise<Web3.TransactionReceipt|undefined> {
-        const receiptIfExists = await this.web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
-        return receiptIfExists;
     }
     public async setProxyAllowanceAsync(token: Token, amountInBaseUnits: BigNumber.BigNumber): Promise<void> {
         utils.assert(this.isValidAddress(token.address), BlockchainCallErrs.TOKEN_ADDRESS_IS_INVALID);
@@ -705,31 +607,18 @@ export class Blockchain {
 
         this.dispatcher.updateBlockchainIsLoaded(false);
         try {
-            if (!this.isSalePage) {
-                const contractsPromises = _.map(
-                    [
-                      ExchangeArtifacts,
-                      TokenRegistryArtifacts,
-                      TokenTransferProxyArtifacts,
-                    ],
-                    (artifacts: any) => this.instantiateContractIfExistsAsync(artifacts),
-                );
-                const contracts = await Promise.all(contractsPromises);
-                this.exchange = contracts[0];
-                this.tokenRegistry = contracts[1];
-                this.tokenTransferProxy = contracts[2];
-            } else {
-                const contractsPromises = _.map(
-                    [
-                      ExchangeArtifacts,
-                      TokenSaleArtifacts,
-                    ],
-                    (artifacts: any) => this.instantiateContractIfExistsAsync(artifacts),
-                );
-                const contracts = await Promise.all(contractsPromises);
-                this.exchange = contracts[0];
-                this.tokenSale = contracts[1];
-            }
+            const contractsPromises = _.map(
+                [
+                  ExchangeArtifacts,
+                  TokenRegistryArtifacts,
+                  TokenTransferProxyArtifacts,
+                ],
+                (artifacts: any) => this.instantiateContractIfExistsAsync(artifacts),
+            );
+            const contracts = await Promise.all(contractsPromises);
+            this.exchange = contracts[0];
+            this.tokenRegistry = contracts[1];
+            this.tokenTransferProxy = contracts[2];
         } catch (err) {
             const errMsg = err + '';
             if (_.includes(errMsg, BlockchainCallErrs.CONTRACT_DOES_NOT_EXIST)) {
@@ -742,29 +631,27 @@ export class Blockchain {
                 return;
             }
         }
-        if (!this.isSalePage) {
-            this.dispatcher.clearTokenByAddress();
-            const tokenArrays = await Promise.all([
-                    this.getTokenRegistryTokensAsync(),
-                    this.getCustomTokensAsync(),
-            ]);
-            const tokens = _.flatten(tokenArrays);
-            // HACK: We need to fetch the userAddress here because otherwise we cannot fetch the token
-            // balances and allowances and we need to do this in order not to trigger the blockchain
-            // loading dialog to show up twice. First to load the contracts, and second to load the
-            // balances and allowances.
-            this.userAddress = await this.web3Wrapper.getFirstAccountIfExistsAsync();
-            if (!_.isEmpty(this.userAddress)) {
-                this.dispatcher.updateUserAddress(this.userAddress);
-            }
-            await this.updateTokenBalancesAndAllowancesAsync(tokens);
-            const mostPopularTradingPairTokens: Token[] = [
-                _.find(tokens, {symbol: configs.mostPopularTradingPairSymbols[0]}),
-                _.find(tokens, {symbol: configs.mostPopularTradingPairSymbols[1]}),
-            ];
-            this.dispatcher.updateChosenAssetTokenAddress(Side.deposit, mostPopularTradingPairTokens[0].address);
-            this.dispatcher.updateChosenAssetTokenAddress(Side.receive, mostPopularTradingPairTokens[1].address);
+        this.dispatcher.clearTokenByAddress();
+        const tokenArrays = await Promise.all([
+                this.getTokenRegistryTokensAsync(),
+                this.getCustomTokensAsync(),
+        ]);
+        const tokens = _.flatten(tokenArrays);
+        // HACK: We need to fetch the userAddress here because otherwise we cannot fetch the token
+        // balances and allowances and we need to do this in order not to trigger the blockchain
+        // loading dialog to show up twice. First to load the contracts, and second to load the
+        // balances and allowances.
+        this.userAddress = await this.web3Wrapper.getFirstAccountIfExistsAsync();
+        if (!_.isEmpty(this.userAddress)) {
+            this.dispatcher.updateUserAddress(this.userAddress);
         }
+        await this.updateTokenBalancesAndAllowancesAsync(tokens);
+        const mostPopularTradingPairTokens: Token[] = [
+            _.find(tokens, {symbol: configs.mostPopularTradingPairSymbols[0]}),
+            _.find(tokens, {symbol: configs.mostPopularTradingPairSymbols[1]}),
+        ];
+        this.dispatcher.updateChosenAssetTokenAddress(Side.deposit, mostPopularTradingPairTokens[0].address);
+        this.dispatcher.updateChosenAssetTokenAddress(Side.receive, mostPopularTradingPairTokens[1].address);
         this.dispatcher.updateBlockchainIsLoaded(true);
     }
     private async instantiateContractIfExistsAsync(artifact: any, address?: string): Promise<ContractInstance> {
