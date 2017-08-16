@@ -34,7 +34,7 @@ const ZRX_ETH_DECIMAL_PLACES = 18;
 const THROTTLE_TIMEOUT = 100;
 const VARIABLE_TOKEN_SALE_INFO_INTERVAL = 7000;
 const TRANSACTION_MINED_CHECK_INTERVAL = 9000;
-const ROUGH_PURCHASE_GAS_ESTIMATE = new BigNumber(250000000000000);
+const ROUGH_PURCHASE_GAS_ESTIMATE_WEI = new BigNumber(250000000000000);
 
 export interface ContributeProps {
     location: Location;
@@ -270,6 +270,8 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                                                            this.props.networkId,
                                                                            EtherscanLinkSuffixes.address);
         const userEtherBalanceInWei = ZeroEx.toBaseUnitAmount(this.props.userEtherBalance, 18);
+        const userBalanceMinusGasInWei = userEtherBalanceInWei.minus(ROUGH_PURCHASE_GAS_ESTIMATE_WEI);
+        const userBalanceMinusGasInEth = ZeroEx.toUnitAmount(userBalanceMinusGasInWei, 18);
         return (
             <div className="clearfix max-width-4 mx-auto" style={{paddingTop: 43, width: '100%'}}>
                 <div className="mx-auto sm-px2 relative" style={{maxWidth: 530}}>
@@ -381,7 +383,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
                                 <div className="col col-6" style={{maxWidth: 235}}>
                                     <EthAmountInput
                                         amount={this.state.contributionAmountInBaseUnits}
-                                        balance={this.props.userEtherBalance}
+                                        balance={userBalanceMinusGasInEth}
                                         shouldCheckBalance={true}
                                         shouldShowIncompleteErrs={false}
                                         onChange={this.onContributionAmountChanged.bind(this)}
@@ -644,7 +646,7 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         }
 
         try {
-            const gasInGwei = ZeroEx.toUnitAmount(ROUGH_PURCHASE_GAS_ESTIMATE, 9);
+            const gasInGwei = ZeroEx.toUnitAmount(ROUGH_PURCHASE_GAS_ESTIMATE_WEI, 9);
             const transactionHash = await this.blockchain.tokenSaleFillOrderWithEthAsync(
                 this.state.contributionAmountInBaseUnits,
                 gasInGwei,
@@ -735,12 +737,12 @@ export class Contribute extends React.Component<ContributeProps, ContributeState
         const balanceWei = ZeroEx.toBaseUnitAmount(this.props.userEtherBalance, 18);
 
         let finalMax;
-        if (balanceWei.gte(maxContributionAmount.add(ROUGH_PURCHASE_GAS_ESTIMATE))) {
+        if (balanceWei.gte(maxContributionAmount.add(ROUGH_PURCHASE_GAS_ESTIMATE_WEI))) {
             finalMax = maxContributionAmount;
         } else if (balanceWei.gte(maxContributionAmount)) {
-            finalMax = maxContributionAmount.minus(ROUGH_PURCHASE_GAS_ESTIMATE);
+            finalMax = maxContributionAmount.minus(ROUGH_PURCHASE_GAS_ESTIMATE_WEI);
         } else {
-            finalMax = balanceWei.minus(ROUGH_PURCHASE_GAS_ESTIMATE);
+            finalMax = balanceWei.minus(ROUGH_PURCHASE_GAS_ESTIMATE_WEI);
         }
         this.setState({
             contributionAmountInBaseUnits: finalMax,
