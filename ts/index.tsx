@@ -12,7 +12,6 @@ import {Home} from 'ts/pages/home/home';
 import {FAQ} from 'ts/pages/faq/faq';
 import {TokenLaunch} from 'ts/pages/token_launch/token_launch';
 import {NotFound} from 'ts/pages/not_found';
-import {SaleOver} from 'ts/components/sale_over';
 import {LazyComponent, createLazyComponent} from 'ts/lazy_component';
 import {State, reducer} from 'ts/redux/reducer';
 import {colors, getMuiTheme, MuiThemeProvider} from 'material-ui/styles';
