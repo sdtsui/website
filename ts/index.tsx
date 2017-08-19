@@ -6,17 +6,12 @@ import {render} from 'react-dom';
 import {Provider} from 'react-redux';
 import {createStore, Store as ReduxStore} from 'redux';
 import * as BigNumber from 'bignumber.js';
-import {configs} from 'ts/utils/configs';
 import {constants} from 'ts/utils/constants';
 import {Home} from 'ts/pages/home/home';
 import {FAQ} from 'ts/pages/faq/faq';
-import {RegistrationFlow} from 'ts/containers/registration_flow';
-import {Contribute} from 'ts/containers/contribute';
 import {TokenLaunch} from 'ts/pages/token_launch/token_launch';
-import {RegistrationCheck} from 'ts/pages/token_distribution/registration_check';
 import {NotFound} from 'ts/pages/not_found';
-import {SaleOver} from 'ts/components/sale_over';
-import {LazyComponent, createLazyComponent} from 'ts/lazy_component';
+import {createLazyComponent} from 'ts/lazy_component';
 import {State, reducer} from 'ts/redux/reducer';
 import {colors, getMuiTheme, MuiThemeProvider} from 'material-ui/styles';
 import {Switch, BrowserRouter as Router, Route, Link, Redirect} from 'react-router-dom';
@@ -82,9 +77,6 @@ const LazyZeroExJSDocumentation = createLazyComponent(
     'ZeroExJSDocumentation',
     () => System.import<any>(/* webpackChunkName: "docs" */'ts/containers/zero_ex_js_documentation'),
 );
-const LazyContribute = createLazyComponent('Contribute', () => System.import<any>(
-    /* webpackChunkName: "contribute" */'ts/containers/contribute',
-));
 
 const store: ReduxStore<State> = createStore(reducer);
 render(
@@ -98,14 +90,6 @@ render(
                             <Route path="/otc" component={LazyOTC} />
                             <Route path="/token" component={TokenLaunch as any} />
                             <Route path="/faq" component={FAQ as any} />
-                            {configs.IS_REGISTRATION_OPEN &&
-                                <Route path="/registration" component={RegistrationFlow as any} />
-                            }
-                            <Redirect path="/contribute" to="/sale" />
-                            {configs.IS_CONTRIBUTE_OPEN &&
-                                <Route path="/sale" component={SaleOver as any} />
-                            }
-                            <Route path="/registration_check" component={RegistrationCheck as any} />
                             <Route path="/docs/0xjs/:version?" component={LazyZeroExJSDocumentation} />
                             <Route component={NotFound as any} />
                         </Switch>

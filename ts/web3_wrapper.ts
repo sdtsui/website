@@ -3,8 +3,6 @@ import Web3 = require('web3');
 import * as BigNumber from 'bignumber.js';
 import promisify = require('es6-promisify');
 import {Dispatcher} from 'ts/redux/dispatcher';
-import {utils} from 'ts/utils/utils';
-import {constants} from 'ts/utils/constants';
 
 export class Web3Wrapper {
     private dispatcher: Dispatcher;
@@ -91,9 +89,9 @@ export class Web3Wrapper {
     public destroy() {
         this.stopEmittingNetworkConnectionAndUserBalanceStateAsync();
         // HACK: stop() is only available on providerEngine instances
-        const providerStopFnIfExists = (this.web3.currentProvider as any).stop.bind(this.web3.currentProvider);
-        if (!_.isUndefined(providerStopFnIfExists)) {
-            providerStopFnIfExists();
+        const provider = this.web3.currentProvider;
+        if (!_.isUndefined((provider as any).stop)) {
+            (provider as any).stop();
         }
     }
     // This should only be called from the LedgerConfigDialog
