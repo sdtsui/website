@@ -194,28 +194,10 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                     </span>
                                 }
                             </TableRowColumn>
-<<<<<<< HEAD
                             <TableRowColumn
                                 className="sm-hide xs-hide"
                                 style={stubColumnStyle}
                             />
-                            <TableRowColumn style={{paddingLeft: 3}}>
-                                <LifeCycleRaisedButton
-                                    labelReady="Request"
-                                    labelLoading="Sending..."
-                                    labelComplete="Sent!"
-                                    onClickAsyncFn={this.requestEtherAsync.bind(this)}
-                                />
-                            </TableRowColumn>
-                            <TableRowColumn style={dharmaButtonColumnStyle}>
-                                <RaisedButton
-                                    label="Request"
-                                    style={{width: '100%'}}
-                                    onTouchTap={this.onDharmaDialogToggle.bind(this)}
-                                />
-                            </TableRowColumn>
-=======
-                            <TableRowColumn className="sm-hide xs-hide" />
                             {
                                 isTestNetwork &&
                                 <TableRowColumn>
@@ -227,7 +209,13 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                     />
                                 </TableRowColumn>
                             }
->>>>>>> masterCrowdsale
+                            <TableRowColumn style={dharmaButtonColumnStyle}>
+                                <RaisedButton
+                                    label="Request"
+                                    style={{width: '100%'}}
+                                    onTouchTap={this.onDharmaDialogToggle.bind(this)}
+                                />
+                            </TableRowColumn>
                         </TableRow>
                     </TableBody>
                 </Table>
