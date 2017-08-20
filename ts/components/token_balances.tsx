@@ -113,13 +113,13 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                 onTouchTap={this.onDharmaDialogToggle.bind(this, false)}
             />,
         ];
-        const isOnTestnet = this.props.blockchain.isOnTestnet();
+        const isTestNetwork = this.props.networkId === constants.TESTNET_NETWORK_ID;
         const dharmaButtonColumnStyle = {
             paddingLeft: 3,
-            display: isOnTestnet ? 'table-cell' : 'none',
+            display: isTestNetwork ? 'table-cell' : 'none',
         };
         const stubColumnStyle = {
-            display: isOnTestnet ? 'none' : 'table-cell',
+            display: isTestNetwork ? 'none' : 'table-cell',
         };
         const allTokenRowHeight = _.size(this.props.tokenByAddress) * TOKEN_TABLE_ROW_HEIGHT;
         const tokenTableHeight = allTokenRowHeight < MAX_TOKEN_TABLE_HEIGHT ?
@@ -135,7 +135,6 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                   token balances in order to execute trades.<br> \
                                   Toggling permissions sets an allowance for the<br> \
                                   smart contract so you can start trading that token.';
-        const isTestNetwork = this.props.networkId === constants.TESTNET_NETWORK_ID;
         return (
             <div className="lg-px4 md-px4 sm-px1 pb2">
                 <h3>{isTestNetwork ? 'Test ether' : 'Ether'}</h3>
@@ -161,23 +160,11 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                 style={stubColumnStyle}
                             />
                             {
-                                isOnTestnet &&
+                                isTestNetwork &&
                                 <TableHeaderColumn
                                     style={{paddingLeft: 3}}
                                 >
                                     {isSmallScreen ? 'Faucet' : 'Request from faucet'}
-                                </TableHeaderColumn>
-                            }
-                            {
-                                isOnTestnet &&
-                                <TableHeaderColumn
-                                    style={dharmaButtonColumnStyle}
-                                >
-                                    {isSmallScreen ? 'Loan' : 'Request Dharma loan'}
-                                    <HelpTooltip
-                                        style={{paddingLeft: 4}}
-                                        explanation={dharmaLoanExplanation}
-                                    />
                                 </TableHeaderColumn>
                             }
                             {
@@ -215,7 +202,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                 style={stubColumnStyle}
                             />
                             {
-                                isOnTestnet &&
+                                isTestNetwork &&
                                 <TableRowColumn style={{paddingLeft: 3}}>
                                     <LifeCycleRaisedButton
                                         labelReady="Request"
@@ -226,7 +213,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                 </TableRowColumn>
                             }
                             {
-                                isOnTestnet &&
+                                isTestNetwork &&
                                 <TableRowColumn style={dharmaButtonColumnStyle}>
                                     <RaisedButton
                                         label="Request"
