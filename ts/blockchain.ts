@@ -479,6 +479,9 @@ export class Blockchain {
     public destroy() {
         this.web3Wrapper.destroy();
     }
+    public isOnTestnet() {
+        return this.networkId === constants.TESTNET_NETWORK_ID;
+    }
     private doesUserAddressExist(): boolean {
         return this.userAddress !== '';
     }

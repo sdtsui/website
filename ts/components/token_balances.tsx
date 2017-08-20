@@ -161,8 +161,24 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                 style={stubColumnStyle}
                             />
                             {
-                                isTestNetwork &&
-                                <TableHeaderColumn>Request{!isSmallScreen && ' from faucet'}</TableHeaderColumn>
+                                isOnTestnet &&
+                                <TableHeaderColumn
+                                    style={{paddingLeft: 3}}
+                                >
+                                    {isSmallScreen ? 'Faucet' : 'Request from faucet'}
+                                </TableHeaderColumn>
+                            }
+                            {
+                                isOnTestnet &&
+                                <TableHeaderColumn
+                                    style={dharmaButtonColumnStyle}
+                                >
+                                    {isSmallScreen ? 'Loan' : 'Request Dharma loan'}
+                                    <HelpTooltip
+                                        style={{paddingLeft: 4}}
+                                        explanation={dharmaLoanExplanation}
+                                    />
+                                </TableHeaderColumn>
                             }
                             {
                                 isTestNetwork &&
@@ -199,8 +215,8 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                 style={stubColumnStyle}
                             />
                             {
-                                isTestNetwork &&
-                                <TableRowColumn>
+                                isOnTestnet &&
+                                <TableRowColumn style={{paddingLeft: 3}}>
                                     <LifeCycleRaisedButton
                                         labelReady="Request"
                                         labelLoading="Sending..."
@@ -209,13 +225,16 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                     />
                                 </TableRowColumn>
                             }
-                            <TableRowColumn style={dharmaButtonColumnStyle}>
-                                <RaisedButton
-                                    label="Request"
-                                    style={{width: '100%'}}
-                                    onTouchTap={this.onDharmaDialogToggle.bind(this)}
-                                />
-                            </TableRowColumn>
+                            {
+                                isOnTestnet &&
+                                <TableRowColumn style={dharmaButtonColumnStyle}>
+                                    <RaisedButton
+                                        label="Request"
+                                        style={{width: '100%'}}
+                                        onTouchTap={this.onDharmaDialogToggle.bind(this)}
+                                    />
+                                </TableRowColumn>
+                            }
                         </TableRow>
                     </TableBody>
                 </Table>

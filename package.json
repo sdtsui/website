@@ -29,7 +29,7 @@
     "compare-versions": "^3.0.1",
     "dateformat": "^2.0.0",
     "deep-equal": "^1.0.1",
-    "dharma-loan-frame": "file:../../dharma-loan-frame",
+    "dharma-loan-frame": "^0.0.12",
     "es6-promisify": "^5.0.0",
     "ethereum-address": "^0.0.4",
     "ethereumjs-abi": "^0.6.4",
