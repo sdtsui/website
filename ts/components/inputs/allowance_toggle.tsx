@@ -9,7 +9,7 @@ import {Token, BalanceErrs} from 'ts/types';
 import {utils} from 'ts/utils/utils';
 import {errorReporter} from 'ts/utils/error_reporter';
 
-const DEFAULT_ALLOWANCE_AMOUNT_IN_UNITS = 1000000000;
+const DEFAULT_ALLOWANCE_AMOUNT_IN_BASE_UNITS = new BigNumber(2).pow(256).minus(1);
 
 interface AllowanceToggleProps {
     blockchain: Blockchain;
@@ -68,14 +68,12 @@ export class AllowanceToggle extends React.Component<AllowanceToggleProps, Allow
             isSpinnerVisible: true,
         });
 
-        let newAllowanceAmountInUnits = 0;
+        let newAllowanceAmountInBaseUnits = new BigNumber(0);
         if (!this.isAllowanceSet()) {
-            newAllowanceAmountInUnits = DEFAULT_ALLOWANCE_AMOUNT_IN_UNITS;
+            newAllowanceAmountInBaseUnits = DEFAULT_ALLOWANCE_AMOUNT_IN_BASE_UNITS;
         }
         try {
-            const allowanceInUnits = new BigNumber(newAllowanceAmountInUnits);
-            const amountInBaseUnits = ZeroEx.toBaseUnitAmount(allowanceInUnits, this.props.token.decimals);
-            await this.props.blockchain.setProxyAllowanceAsync(this.props.token, amountInBaseUnits);
+            await this.props.blockchain.setProxyAllowanceAsync(this.props.token, newAllowanceAmountInBaseUnits);
         } catch (err) {
             this.setState({
                 isSpinnerVisible: false,
@@ -92,7 +90,6 @@ export class AllowanceToggle extends React.Component<AllowanceToggleProps, Allow
     }
     private isAllowanceSet() {
         const token = this.props.token;
-        const allowanceInUnits = ZeroEx.toUnitAmount(token.allowance, token.decimals);
-        return !allowanceInUnits.eq(0);
+        return !token.allowance.eq(0);
     }
 }
