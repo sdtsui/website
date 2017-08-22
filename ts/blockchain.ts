@@ -186,21 +186,6 @@ export class Blockchain {
         const allowance = amountInBaseUnits;
         this.dispatcher.replaceTokenAllowanceByAddress(token.address, allowance);
     }
-    public async isValidSignatureAsync(maker: string, signatureData: SignatureData) {
-        utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
-
-        const isValidSignature = await this.exchange.isValidSignature.call(
-            maker,
-            signatureData.hash,
-            signatureData.v,
-            signatureData.r,
-            signatureData.s,
-            {
-                from: this.userAddress,
-            },
-        );
-        return isValidSignature;
-    }
     public async fillOrderAsync(maker: string, taker: string, makerTokenAddress: string,
                                 takerTokenAddress: string, makerTokenAmount: BigNumber.BigNumber,
                                 takerTokenAmount: BigNumber.BigNumber, makerFee: BigNumber.BigNumber,

@@ -358,13 +358,8 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         const takerAddress = this.props.userAddress;
         const takerToken = this.props.tokenByAddress[takerTokenAddress];
         let isValidSignature = false;
-        if (this.props.userAddress === '') {
-            const signatureData = parsedOrder.signature;
-            isValidSignature = ZeroEx.isValidSignature(signatureData.hash, signatureData, parsedOrder.maker.address);
-        } else {
-            isValidSignature = await this.props.blockchain.isValidSignatureAsync(parsedOrder.maker.address,
-                                                              parsedOrder.signature);
-        }
+        const signatureData = parsedOrder.signature;
+        isValidSignature = ZeroEx.isValidSignature(signatureData.hash, signatureData, parsedOrder.maker.address);
 
         if (_.isUndefined(takerAddress)) {
             this.props.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
