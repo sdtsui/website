@@ -43,6 +43,7 @@ const ALLOWANCE_TO_ZERO_GAS_AMOUNT = 45730;
 export class Blockchain {
     public networkId: number;
     public nodeVersion: string;
+    private zeroEx: ZeroEx;
     private dispatcher: Dispatcher;
     private web3Wrapper: Web3Wrapper;
     private exchange: ContractInstance;
@@ -138,6 +139,7 @@ export class Blockchain {
                 this.web3Wrapper.destroy();
                 const shouldPollUserAddress = false;
                 this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, this.networkId, shouldPollUserAddress);
+                this.zeroEx.setProviderAsync(provider);
                 break;
             }
 
@@ -148,6 +150,7 @@ export class Blockchain {
                 provider = this.cachedProvider;
                 const shouldPollUserAddress = true;
                 this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, this.networkId, shouldPollUserAddress);
+                this.zeroEx.setProviderAsync(provider);
                 delete this.ledgerSubProvider;
                 delete this.cachedProvider;
                 break;
@@ -549,6 +552,7 @@ export class Blockchain {
         await this.updateProviderName(injectedWeb3);
         const shouldPollUserAddress = true;
         this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, networkId, shouldPollUserAddress);
+        this.zeroEx = new ZeroEx(provider);
     }
     private updateProviderName(injectedWeb3: Web3) {
         const doesInjectedWeb3Exist = !_.isUndefined(injectedWeb3);
