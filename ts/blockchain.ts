@@ -214,12 +214,9 @@ export class Blockchain {
         };
         const shouldThrowOnInsufficientBalanceOrAllowance = true;
 
-        console.log('signedOrder', signedOrder);
-        console.log('this.userAddress', this.userAddress);
         const amountFilledInTakerTokens = await this.zeroEx.exchange.fillOrderAsync(
             signedOrder, fillTakerTokenAmount, shouldThrowOnInsufficientBalanceOrAllowance, this.userAddress,
         );
-        console.log('got here');
         return amountFilledInTakerTokens;
     }
     public async getFillAmountAsync(orderHash: string): Promise<BigNumber.BigNumber> {
