@@ -128,6 +128,8 @@ export const constants = {
         'LogCancelArgs',
         'LogFillArgs',
         'LogErrorContractEventArgs',
+        'LogFillContractEventArgs',
+        'LogCancelContractEventArgs',
         'TokenEvents',
         'ExchangeContractEventArgs',
         'TransferContractEventArgs',
