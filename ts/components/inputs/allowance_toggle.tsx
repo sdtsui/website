@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import * as React from 'react';
-import {ZeroEx} from '0x.js';
 import * as BigNumber from 'bignumber.js';
 import Toggle from 'material-ui/Toggle';
 import {Blockchain} from 'ts/blockchain';
