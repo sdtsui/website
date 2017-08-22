@@ -291,7 +291,7 @@ export class GenerateOrderForm extends React.Component<GenerateOrderFormProps, a
 
         let globalErrMsg = '';
         try {
-            const signatureData = await this.props.blockchain.sendSignRequestAsync(orderHash);
+            const signatureData = await this.props.blockchain.signOrderHashAsync(orderHash);
             const order = utils.generateOrder(this.props.networkId, exchangeContractAddr, this.props.sideToAssetToken,
                                               hashData.orderExpiryTimestamp, this.props.orderTakerAddress,
                                               this.props.userAddress, hashData.makerFee, hashData.takerFee,

@@ -42,6 +42,7 @@ import {EthWethConversionButton} from 'ts/components/eth_weth_conversion_button'
 
 const ETHER_ICON_PATH = '/images/ether.png';
 const ETHER_TOKEN_SYMBOL = 'WETH';
+const ZRX_TOKEN_SYMBOL = 'ZRX';
 
 const PRECISION = 5;
 const ICON_DIMENSION = 40;
@@ -297,6 +298,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
         const tokens = _.values(this.props.tokenByAddress);
         const tokensStartingWithEtherToken = tokens.sort(
             firstBy((t: Token) => (t.symbol !== ETHER_TOKEN_SYMBOL))
+            .thenBy((t: Token) => (t.symbol !== ZRX_TOKEN_SYMBOL))
             .thenBy('address'),
         );
         const tableRows = _.map(

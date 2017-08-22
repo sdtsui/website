@@ -37,17 +37,6 @@ export class Web3Wrapper {
         }
         return (addresses as string[])[0];
     }
-    public async sendTransactionAsync(txParams: any): Promise<string> {
-        const transactionHex = await promisify(this.web3.eth.sendTransaction)(txParams);
-        return transactionHex;
-    }
-    public async getTransactionReceiptIfExistsAsync(txHash: string): Promise<Web3.TransactionReceipt|undefined> {
-        const receiptIfExists = await promisify(this.web3.eth.getTransactionReceipt)(txHash);
-        if (_.isNull(receiptIfExists)) {
-            return undefined;
-        }
-        return receiptIfExists;
-    }
     public async getNodeVersionAsync() {
         const nodeVersion = await promisify(this.web3.version.getNode)();
         return nodeVersion;
@@ -76,8 +65,6 @@ export class Web3Wrapper {
         const didFindCode = _.isNull(code.match(zeroHexAddressRegex));
         return didFindCode;
     }
-    // Note: since `sign` is overloaded to be both a sync and async method, it doesn't play nice
-    // with our callAsync method. We therefore handle it here as a special case.
     public async signTransactionAsync(address: string, message: string): Promise<string> {
         const signData = await promisify(this.web3.eth.sign)(address, message);
         return signData;

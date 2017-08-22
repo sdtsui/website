@@ -43,6 +43,7 @@ const ALLOWANCE_TO_ZERO_GAS_AMOUNT = 45730;
 export class Blockchain {
     public networkId: number;
     public nodeVersion: string;
+    private zeroEx: ZeroEx;
     private dispatcher: Dispatcher;
     private web3Wrapper: Web3Wrapper;
     private exchange: ContractInstance;
@@ -81,6 +82,16 @@ export class Blockchain {
         if (this.nodeVersion !== nodeVersion) {
             this.nodeVersion = nodeVersion;
         }
+    }
+    public async isAddressInTokenRegistryAsync(tokenAddress: string): Promise<boolean> {
+        utils.assert(!_.isUndefined(this.tokenRegistry), 'TokenRegistry must be instantiated');
+        const tokenMetadata = await this.tokenRegistry.getTokenMetaData.call(tokenAddress);
+        return tokenMetadata[0] !== constants.NULL_ADDRESS;
+    }
+    public async isSymbolInTokenRegistryAsync(symbol: string): Promise<boolean> {
+        utils.assert(!_.isUndefined(this.tokenRegistry), 'TokenRegistry must be instantiated');
+        const tokenMetadata = await this.tokenRegistry.getTokenBySymbol.call(symbol);
+        return tokenMetadata[0] !== constants.NULL_ADDRESS;
     }
     public getLedgerDerivationPathIfExists(): string {
         if (_.isUndefined(this.ledgerSubProvider)) {
@@ -128,6 +139,7 @@ export class Blockchain {
                 this.web3Wrapper.destroy();
                 const shouldPollUserAddress = false;
                 this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, this.networkId, shouldPollUserAddress);
+                this.zeroEx.setProviderAsync(provider);
                 break;
             }
 
@@ -138,6 +150,7 @@ export class Blockchain {
                 provider = this.cachedProvider;
                 const shouldPollUserAddress = true;
                 this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, this.networkId, shouldPollUserAddress);
+                this.zeroEx.setProviderAsync(provider);
                 delete this.ledgerSubProvider;
                 delete this.cachedProvider;
                 break;
@@ -157,12 +170,15 @@ export class Blockchain {
         // Hack: for some reason default estimated gas amount causes `base fee exceeds gas limit` exception
         // on testrpc. Probably related to https://github.com/ethereumjs/testrpc/issues/294
         // TODO: Debug issue in testrpc and submit a PR, then remove this hack
-        const estimatedGas = await tokenContract.approve.estimateGas(this.tokenTransferProxy.address,
-                                                                      amountInBaseUnits, {
-                                                                        from: this.userAddress,
-                                                                        gas: ALLOWANCE_TO_ZERO_GAS_AMOUNT,
-        });
-        const gas = this.networkId === constants.TESTRPC_NETWORK_ID ? ALLOWANCE_TO_ZERO_GAS_AMOUNT : estimatedGas;
+        const estimatedGas = await tokenContract.approve.estimateGas(
+            this.tokenTransferProxy.address, amountInBaseUnits,
+            {
+                from: this.userAddress,
+            },
+        );
+        const gas = this.networkId === constants.TESTRPC_NETWORK_ID && amountInBaseUnits.eq(0) ?
+                    ALLOWANCE_TO_ZERO_GAS_AMOUNT :
+                    estimatedGas;
         await tokenContract.approve(this.tokenTransferProxy.address, amountInBaseUnits, {
             from: this.userAddress,
             gas,
@@ -242,57 +258,19 @@ export class Blockchain {
         const lowercaseAddress = address.toLowerCase();
         return this.web3Wrapper.isAddress(lowercaseAddress);
     }
-    public getPersonalMessageHashHex(dataHashHex: string): string {
-        const dataHashBuff = ethUtil.toBuffer(dataHashHex);
-        const msgHashBuff = ethUtil.hashPersonalMessage(dataHashBuff);
-        const msgHashHex = ethUtil.bufferToHex(msgHashBuff);
-        return msgHashHex;
-    }
-    public getSignRequestMessage(dataHashHex: string): string {
-        const isParityNode = _.includes(this.nodeVersion, 'Parity');
-        const isTestRpc = _.includes(this.nodeVersion, 'TestRPC');
-        if (isParityNode || isTestRpc) {
-            // Parity and TestRpc nodes add the personalMessage prefix itself
-            return dataHashHex;
-        } else {
-            const msgHashHex = this.getPersonalMessageHashHex(dataHashHex);
-            return msgHashHex;
-        }
-    }
-    public async sendSignRequestAsync(dataHashHex: string): Promise<SignatureData> {
-        const msgHashHex = this.getSignRequestMessage(dataHashHex);
+    public async signOrderHashAsync(orderHash: string): Promise<SignatureData> {
         const makerAddress = this.userAddress;
         // If makerAddress is undefined, this means they have a web3 instance injected into their browser
         // but no account addresses associated with it.
         if (_.isUndefined(makerAddress)) {
             throw new Error('Tried to send a sign request but user has no associated addresses');
         }
-        const signature = await this.web3Wrapper.signTransactionAsync(makerAddress, msgHashHex);
-
-        // HACK: There is no consensus on whether the signatureHex string should be formatted as
-        // v + r + s OR r + s + v, and different clients (even different versions of the same client)
-        // return the signature params in different orders. In order to support all client implementations,
-        // we parse the signature in both ways, and evaluate if either one is a valid signature.
-        const validVParamValues = [27, 28];
-        const signatureDataVRS = this.parseSignatureHexAsVRS(dataHashHex, signature);
-        if (_.includes(validVParamValues, signatureDataVRS.v)) {
-            const isValidVRSSignature = ZeroEx.isValidSignature(dataHashHex, signatureDataVRS, makerAddress);
-            if (isValidVRSSignature) {
-                this.dispatcher.updateSignatureData(signatureDataVRS);
-                return signatureDataVRS;
-            }
-        }
-
-        const signatureDataRSV = this.parseSignatureHexAsRSV(dataHashHex, signature);
-        if (_.includes(validVParamValues, signatureDataRSV.v)) {
-            const isValidRSVSignature = ZeroEx.isValidSignature(dataHashHex, signatureDataRSV, makerAddress);
-            if (isValidRSVSignature) {
-                this.dispatcher.updateSignatureData(signatureDataRSV);
-                return signatureDataRSV;
-            }
-        }
-
-        throw new Error(BlockchainCallErrs.INVALID_SIGNATURE);
+        const ecSignature = await this.zeroEx.signOrderHashAsync(orderHash, makerAddress);
+        const signatureData = _.extend({}, ecSignature, {
+            hash: orderHash,
+        });
+        this.dispatcher.updateSignatureData(signatureData);
+        return signatureData;
     }
     public async mintTestTokensAsync(token: Token) {
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
@@ -536,6 +514,7 @@ export class Blockchain {
         await this.updateProviderName(injectedWeb3);
         const shouldPollUserAddress = true;
         this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, networkId, shouldPollUserAddress);
+        this.zeroEx = new ZeroEx(provider);
     }
     private updateProviderName(injectedWeb3: Web3) {
         const doesInjectedWeb3Exist = !_.isUndefined(injectedWeb3);
@@ -699,31 +678,5 @@ export class Blockchain {
         return new Promise((resolve, reject) => {
             window.onload = resolve;
         });
-    }
-    private parseSignatureHexAsVRS(orderHashHex: string, signatureHex: string): SignatureData {
-        const signatureBuffer = ethUtil.toBuffer(signatureHex);
-        let v = signatureBuffer[0];
-        if (v < 27) {
-            v += 27;
-        }
-        const r = signatureBuffer.slice(1, 33);
-        const s = signatureBuffer.slice(33, 65);
-        const signatureData: SignatureData = {
-            v,
-            r: ethUtil.bufferToHex(r),
-            s: ethUtil.bufferToHex(s),
-            hash: orderHashHex,
-        };
-        return signatureData;
-    }
-    private parseSignatureHexAsRSV(orderHashHex: string, signatureHex: string): SignatureData {
-        const {v, r, s} = ethUtil.fromRpcSig(signatureHex);
-        const signatureData: SignatureData = {
-            v,
-            r: ethUtil.bufferToHex(r),
-            s: ethUtil.bufferToHex(s),
-            hash: orderHashHex,
-        };
-        return signatureData;
     }
 }

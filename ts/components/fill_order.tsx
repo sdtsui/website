@@ -298,6 +298,27 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             const orderHash = parsedOrder.signature.hash;
             amountAlreadyFilled = await this.props.blockchain.getFillAmountAsync(orderHash);
         }
+
+        const makerTokenSymbol = this.removeSymbolFlourishIfExists(parsedOrder.maker.token.symbol);
+        const isMakerTokenSymbolInTokenRegistry = await this.props.blockchain.isSymbolInTokenRegistryAsync(
+            makerTokenSymbol,
+        );
+        const isMakerTokenAddressInRegistry = await this.props.blockchain.isAddressInTokenRegistryAsync(
+            parsedOrder.maker.token.address,
+        );
+        const takerTokenSymbol = this.removeSymbolFlourishIfExists(parsedOrder.taker.token.symbol);
+        const isTakerTokenSymbolInTokenRegistry = await this.props.blockchain.isSymbolInTokenRegistryAsync(
+            takerTokenSymbol,
+        );
+        const isTakerTokenAddressInRegistry = await this.props.blockchain.isAddressInTokenRegistryAsync(
+            parsedOrder.taker.token.address,
+        );
+        if (isMakerTokenSymbolInTokenRegistry && !isMakerTokenAddressInRegistry || isTakerTokenSymbolInTokenRegistry &&
+            !isTakerTokenAddressInRegistry) {
+            orderJSONErrMsg = 'This order is invalid. Contact the 0x team if you think this is an accident.';
+            parsedOrder = undefined;
+        }
+
         this.setState({
             orderJSON,
             orderJSONErrMsg,
@@ -457,7 +478,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
 
         const isUniqueSymbol = _.isUndefined(_.find(existingTokens, {symbol: orderToken.symbol}));
         if (!isUniqueSymbol) {
-            orderToken.symbol = `*${orderToken.symbol}*`;
+            orderToken.symbol = this.addSymbolFlourish(orderToken.symbol);
         }
 
         // Add default token icon url
@@ -474,5 +495,16 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
 
         // FireAndForget update balance & allowance
         this.props.blockchain.updateTokenBalancesAndAllowancesAsync([token]);
+    }
+    private addSymbolFlourish(symbol: string) {
+        return `*${symbol}*`;
+    }
+    private removeSymbolFlourishIfExists(symbol: string) {
+        if (symbol[0] === '*' && symbol[symbol.length - 1] === '*') {
+            const unflourishedSymbol = symbol.slice(1, -1);
+            return unflourishedSymbol;
+        } else {
+            return symbol;
+        }
     }
 }
