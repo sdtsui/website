@@ -405,7 +405,8 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         const parsedMakerFee = new BigNumber(parsedOrder.maker.feeAmount);
         const parsedTakerFee = new BigNumber(parsedOrder.taker.feeAmount);
         try {
-            const response: ContractResponse = await this.props.blockchain.fillOrderAsync(parsedOrder.maker.address,
+            const orderFilledAmount: BigNumber.BigNumber = await this.props.blockchain.fillOrderAsync(
+                                                       parsedOrder.maker.address,
                                                        parsedOrder.taker.address,
                                                        this.props.tokenByAddress[makerTokenAddress].address,
                                                        this.props.tokenByAddress[takerTokenAddress].address,
@@ -423,7 +424,6 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             const makerToken = this.props.tokenByAddress[makerTokenAddress];
             const tokens = [makerToken, takerToken];
             await this.props.blockchain.updateTokenBalancesAndAllowancesAsync(tokens);
-            const orderFilledAmount = response.logs[0].args.filledTakerTokenAmount;
             this.setState({
                 didFillOrderSucceed: true,
                 globalErrMsg: '',
@@ -435,12 +435,9 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             if (_.includes(errMsg, 'User denied transaction signature')) {
                 return false;
             }
-            const fillTruncationErrMsg = constants.exchangeContractErrToMsg[
-                ExchangeContractErrs.ERROR_FILL_TRUNCATION
-            ];
             globalErrMsg = 'Failed to fill order, please refresh and try again';
-            if (_.includes(errMsg, fillTruncationErrMsg)) {
-                globalErrMsg = fillTruncationErrMsg;
+            if (_.includes(errMsg, ExchangeContractErrs.OrderFillRoundingError)) {
+                globalErrMsg = 'The rounding error was too large when filling this order';
             }
             utils.consoleLog(`${err}`);
             await errorReporter.reportAsync(err);
