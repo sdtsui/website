@@ -50,7 +50,7 @@ interface FillOrderState {
     orderJSONErrMsg: string;
     parsedOrder: Order;
     didFillOrderSucceed: boolean;
-    amountAlreadyFilled: BigNumber.BigNumber;
+    unavailableTakerAmount: BigNumber.BigNumber;
 }
 
 export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
@@ -64,7 +64,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             orderJSON: _.isUndefined(this.props.initialOrder) ? '' : JSON.stringify(this.props.initialOrder),
             orderJSONErrMsg: '',
             parsedOrder: this.props.initialOrder,
-            amountAlreadyFilled: new BigNumber(0),
+            unavailableTakerAmount: new BigNumber(0),
         };
         this.validator = new SchemaValidator();
     }
@@ -140,7 +140,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         const orderTakerAmount = new BigNumber(this.state.parsedOrder.taker.amount);
         const orderMakerAmount = new BigNumber(this.state.parsedOrder.maker.amount);
         const takerAssetToken = {
-            amount: orderTakerAmount.minus(this.state.amountAlreadyFilled),
+            amount: orderTakerAmount.minus(this.state.unavailableTakerAmount),
             symbol: takerToken.symbol,
         };
         const fillToken = this.props.tokenByAddress[takerToken.address];
@@ -290,13 +290,13 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             return;
         }
 
-        let amountAlreadyFilled = new BigNumber(0);
+        let unavailableTakerAmount = new BigNumber(0);
         if (orderJSONErrMsg !== '') {
             // Clear cache entry if user updates orderJSON to invalid entry
             this.props.dispatcher.updateUserSuppliedOrderCache(undefined);
         } else {
             const orderHash = parsedOrder.signature.hash;
-            amountAlreadyFilled = await this.props.blockchain.getFillAmountAsync(orderHash);
+            unavailableTakerAmount = await this.props.blockchain.getUnavailableTakerAmountAsync(orderHash);
         }
 
         const makerTokenSymbol = this.removeSymbolFlourishIfExists(parsedOrder.maker.token.symbol);
@@ -323,7 +323,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             orderJSON,
             orderJSONErrMsg,
             parsedOrder,
-            amountAlreadyFilled,
+            unavailableTakerAmount,
         });
     }
 
@@ -350,8 +350,8 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         };
         const parsedOrderExpiration = new BigNumber(this.state.parsedOrder.expiration);
         const orderHash = parsedOrder.signature.hash;
-        const amountAlreadyFilled = await this.props.blockchain.getFillAmountAsync(orderHash);
-        const amountLeftToFill = receiveAssetToken.amount.minus(amountAlreadyFilled);
+        const unavailableTakerAmount = await this.props.blockchain.getUnavailableTakerAmountAsync(orderHash);
+        const amountLeftToFill = receiveAssetToken.amount.minus(unavailableTakerAmount);
         const specifiedTakerAddressIfExists = parsedOrder.taker.address.toLowerCase();
         const takerFillAmount = this.props.orderFillAmount;
         const makerFillAmount = takerFillAmount.times(depositAssetToken.amount).div(receiveAssetToken.amount);
@@ -427,7 +427,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             this.setState({
                 didFillOrderSucceed: true,
                 globalErrMsg: '',
-                amountAlreadyFilled: this.state.amountAlreadyFilled.plus(orderFilledAmount),
+                unavailableTakerAmount: this.state.unavailableTakerAmount.plus(orderFilledAmount),
             });
             return true;
         } catch (err) {
