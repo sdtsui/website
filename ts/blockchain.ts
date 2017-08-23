@@ -322,8 +322,8 @@ export class Blockchain {
         this.dispatcher.updateTokenByAddress(updatedTokens);
     }
     public async getUserAccountsAsync() {
-        const userAddressIfExists = await this.zeroEx.getAvailableAddressesAsync();
-        return userAddressIfExists;
+        const userAccountsIfExists = await this.zeroEx.getAvailableAddressesAsync();
+        return userAccountsIfExists;
     }
     // HACK: When a user is using a Ledger, we simply dispatch the selected userAddress, which
     // by-passes the web3Wrapper logic for updating the prevUserAddress. We therefore need to
