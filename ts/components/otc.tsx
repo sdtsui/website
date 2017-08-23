@@ -5,6 +5,8 @@ import {Switch, Route} from 'react-router-dom';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {State} from 'ts/redux/reducer';
 import {utils} from 'ts/utils/utils';
+import {configs} from 'ts/utils/configs';
+import {constants} from 'ts/utils/constants';
 import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton';
 import {colors} from 'material-ui/styles';
@@ -155,27 +157,48 @@ export class OTC extends React.Component<OTCAllProps, OTCAllState> {
                 />
                 <div id="otc" className="mx-auto max-width-4 pt4" style={{width: '100%'}}>
                     <Paper className="mb3 mt2">
-                        <div className="mx-auto flex">
-                            <div
-                                className="col col-2 pr2 pt1 sm-hide xs-hide"
-                                style={{overflow: 'hidden', backgroundColor: 'rgb(39, 39, 39)', color: 'white'}}
-                            >
-                                <OTCMenu menuItemStyle={{color: 'white'}} />
-                            </div>
-                            <div className="col col-12 lg-col-10 md-col-10 sm-col sm-col-12">
-                                <div className="py2" style={{backgroundColor: colors.grey50}}>
-                                    {this.props.blockchainIsLoaded ?
-                                        <Switch>
-                                            <Route path="/otc/fill" render={this.renderFillOrder.bind(this)} />
-                                            <Route path="/otc/balances" render={this.renderTokenBalances.bind(this)} />
-                                            <Route path="/otc/trades" component={this.renderTradeHistory.bind(this)} />
-                                            <Route path="/" render={this.renderGenerateOrderForm.bind(this)} />
-                                        </Switch> :
-                                        <Loading />
-                                    }
+                        {!configs.isMainnetEnabled && this.props.networkId === constants.MAINNET_NETWORK_ID  ?
+                            <div className="p3 center">
+                                <div className="h2 py2">Mainnet unavailable</div>
+                                <div className="mx-auto pb2 pt2">
+                                    <img
+                                        src="/images/zrx_token.png"
+                                        style={{width: 150}}
+                                    />
+                                </div>
+                                <div>
+                                    0x OTC is currently unavailable on the Ethereum mainnet.
+                                    <div>
+                                        To try it out, switch to the Kovan test network
+                                        (networkId: 42).
+                                    </div>
+                                    <div className="py2">
+                                        Check back soon!
+                                    </div>
+                                </div>
+                            </div> :
+                            <div className="mx-auto flex">
+                                <div
+                                    className="col col-2 pr2 pt1 sm-hide xs-hide"
+                                    style={{overflow: 'hidden', backgroundColor: 'rgb(39, 39, 39)', color: 'white'}}
+                                >
+                                    <OTCMenu menuItemStyle={{color: 'white'}} />
+                                </div>
+                                <div className="col col-12 lg-col-10 md-col-10 sm-col sm-col-12">
+                                    <div className="py2" style={{backgroundColor: colors.grey50}}>
+                                        {this.props.blockchainIsLoaded ?
+                                            <Switch>
+                                                <Route path="/otc/fill" render={this.renderFillOrder.bind(this)} />
+                                                <Route path="/otc/balances" render={this.renderTokenBalances.bind(this)} />
+                                                <Route path="/otc/trades" component={this.renderTradeHistory.bind(this)} />
+                                                <Route path="/" render={this.renderGenerateOrderForm.bind(this)} />
+                                            </Switch> :
+                                            <Loading />
+                                        }
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     </Paper>
                     <BlockchainErrDialog
                         blockchain={this.blockchain}
@@ -183,6 +206,7 @@ export class OTC extends React.Component<OTCAllProps, OTCAllState> {
                         isOpen={this.props.shouldBlockchainErrDialogBeOpen}
                         userAddress={this.props.userAddress}
                         toggleDialogFn={updateShouldBlockchainErrDialogBeOpen}
+                        networkId={this.props.networkId}
                     />
                     <FlashMessage
                         dispatcher={this.props.dispatcher}

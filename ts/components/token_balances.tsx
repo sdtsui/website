@@ -231,7 +231,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                 <div className="pt2 pb2">
                     {isTestNetwork ?
                         'Mint some test tokens you\'d like to use to generate or fill an order using 0x.' :
-                        'Tokens supported by OTC are pulled from the 0x token registry smart contract.'
+                        'Set trading permissions for a token you\'d like to start trading.'
                     }
                 </div>
                 <Table
