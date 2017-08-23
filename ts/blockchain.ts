@@ -7,6 +7,7 @@ import {
     ContractEvent,
     ContractEventEmitter,
     LogFillContractEventArgs,
+    Token as ZeroExToken,
 } from '0x.js';
 import * as BigNumber from 'bignumber.js';
 import Web3 = require('web3');
@@ -422,47 +423,34 @@ export class Blockchain {
         }
     }
     private async getTokenRegistryTokensAsync(): Promise<Token[]> {
-        if (this.tokenRegistry) {
-            const addresses = await this.tokenRegistry.getTokenAddresses.call();
-            const tokenPromises: Array<Promise<Token>> = _.map(
-                addresses,
-                (address: string) => (this.getTokenRegistryTokenAsync(address)),
-            );
-            const tokensPromise: Promise<Token[]> = Promise.all(tokenPromises);
-            return tokensPromise;
-        } else {
-            return [];
-        }
-    }
-    private async getTokenRegistryTokenAsync(address: string): Promise<Token> {
-        const tokenDataPromises = [
-            this.getTokenBalanceAndAllowanceAsync(this.userAddress, address),
-            this.tokenRegistry.getTokenMetaData.call(address),
-        ];
-        const tokenData = await Promise.all(tokenDataPromises);
-        const [
-            balance,
-            allowance,
-        ] = tokenData[0];
-        const [
-            tokenAddress,
-            name,
-            symbol,
-            decimals,
-        ] = tokenData[1];
-        // HACK: For now we have a hard-coded list of iconUrls for the dummyTokens
-        // TODO: Refactor this out and pull the iconUrl directly from the TokenRegistry
-        const iconUrl = constants.iconUrlBySymbol[symbol];
-        const token: Token = {
-            iconUrl: !_.isUndefined(iconUrl) ? iconUrl : constants.DEFAULT_TOKEN_ICON_URL,
-            address,
-            allowance,
-            balance,
-            name,
-            symbol,
-            decimals: decimals.toNumber(),
-        };
-        return token;
+        const tokenRegistryTokens = await this.zeroEx.tokenRegistry.getTokensAsync();
+
+        const tokenBalanceAllowancePromises: Array<Promise<BigNumber.BigNumber[]>> = _.map(
+            tokenRegistryTokens,
+            (token: ZeroExToken) => (this.getTokenBalanceAndAllowanceAsync(this.userAddress, token.address)),
+        );
+        const balancesAndAllowances = await Promise.all(tokenBalanceAllowancePromises);
+
+        const tokens = _.map(tokenRegistryTokens, (t: ZeroExToken, i: number) => {
+            const [
+                balance,
+                allowance,
+            ] = balancesAndAllowances[i];
+            // HACK: For now we have a hard-coded list of iconUrls for the dummyTokens
+            // TODO: Refactor this out and pull the iconUrl directly from the TokenRegistry
+            const iconUrl = constants.iconUrlBySymbol[t.symbol];
+            const token: Token = {
+                iconUrl: !_.isUndefined(iconUrl) ? iconUrl : constants.DEFAULT_TOKEN_ICON_URL,
+                address: t.address,
+                balance,
+                allowance,
+                name: t.name,
+                symbol: t.symbol,
+                decimals: t.decimals,
+            };
+            return token;
+        });
+        return tokens;
     }
     private async getCustomTokensAsync() {
         const customTokens = customTokenStorage.getCustomTokens(this.networkId);
