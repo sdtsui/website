@@ -149,7 +149,7 @@ export class BlockchainErrDialog extends React.Component<BlockchainErrDialogProp
                     {configs.isMainnetEnabled ?
                         '`parity ui` or `parity --chain Kovan ui` in order to connect to mainnet \
                          or Kovan respectively.' :
-                         '`parity --chain kovan ui` in order to connect ot Kovan.'
+                         '`parity --chain kovan ui` in order to connect to Kovan.'
                     }
                 </div>
             </div>
