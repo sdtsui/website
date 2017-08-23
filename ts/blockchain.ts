@@ -5,6 +5,7 @@ import {
     SubscriptionOpts,
     IndexedFilterValues,
     ContractEvent,
+    ContractEventEmitter,
     LogFillContractEventArgs,
 } from '0x.js';
 import * as BigNumber from 'bignumber.js';
@@ -54,7 +55,7 @@ export class Blockchain {
     private dispatcher: Dispatcher;
     private web3Wrapper: Web3Wrapper;
     private exchange: ContractInstance;
-    private exchangeLogFillEventEmitters: any[];
+    private exchangeLogFillEventEmitters: ContractEventEmitter[];
     private tokenTransferProxy: ContractInstance;
     private tokenRegistry: ContractInstance;
     private userAddress: string;
@@ -354,7 +355,7 @@ export class Blockchain {
             await this.startListeningForExchangeLogFillEventsAsync(filterIndexObj);
         }
     }
-    private async startListeningForExchangeLogFillEventsAsync(indexFilterValues: IndexedFilterValues) {
+    private async startListeningForExchangeLogFillEventsAsync(indexFilterValues: IndexedFilterValues): Promise<void> {
         utils.assert(!_.isUndefined(this.exchange), 'Exchange contract must be instantiated.');
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
