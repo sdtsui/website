@@ -41,7 +41,6 @@ import {errorReporter} from 'ts/utils/error_reporter';
 import {tradeHistoryStorage} from 'ts/local_storage/trade_history_storage';
 import {customTokenStorage} from 'ts/local_storage/custom_token_storage';
 import * as TokenTransferProxyArtifacts from '../contracts/TokenTransferProxy.json';
-import * as ExchangeArtifacts from '../contracts/Exchange.json';
 import * as TokenRegistryArtifacts from '../contracts/TokenRegistry.json';
 import * as TokenArtifacts from '../contracts/Token.json';
 import * as MintableArtifacts from '../contracts/Mintable.json';
@@ -55,7 +54,6 @@ export class Blockchain {
     private zeroEx: ZeroEx;
     private dispatcher: Dispatcher;
     private web3Wrapper: Web3Wrapper;
-    private exchange: ContractInstance;
     private exchangeAddress: string;
     private exchangeLogFillEventEmitters: ContractEventEmitter[];
     private tokenTransferProxy: ContractInstance;
@@ -352,7 +350,7 @@ export class Blockchain {
             return; // short-circuit
         }
 
-        if (!_.isUndefined(this.exchange)) {
+        if (!_.isUndefined(this.zeroEx)) {
             // Since we do not have an index on the `taker` address and want to show
             // transactions where an account is either the `maker` or `taker`, we loop
             // through all fill events, and filter/cache them client-side.
@@ -361,7 +359,6 @@ export class Blockchain {
         }
     }
     private async startListeningForExchangeLogFillEventsAsync(indexFilterValues: IndexedFilterValues): Promise<void> {
-        utils.assert(!_.isUndefined(this.exchange), 'Exchange contract must be instantiated.');
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
         const fromBlock = tradeHistoryStorage.getFillsLatestBlock(this.userAddress, this.networkId);
@@ -570,16 +567,14 @@ export class Blockchain {
         try {
             const contractsPromises = _.map(
                 [
-                  ExchangeArtifacts,
                   TokenRegistryArtifacts,
                   TokenTransferProxyArtifacts,
                 ],
                 (artifacts: any) => this.instantiateContractIfExistsAsync(artifacts),
             );
             const contracts = await Promise.all(contractsPromises);
-            this.exchange = contracts[0];
-            this.tokenRegistry = contracts[1];
-            this.tokenTransferProxy = contracts[2];
+            this.tokenRegistry = contracts[0];
+            this.tokenTransferProxy = contracts[1];
         } catch (err) {
             const errMsg = err + '';
             if (_.includes(errMsg, BlockchainCallErrs.CONTRACT_DOES_NOT_EXIST)) {
