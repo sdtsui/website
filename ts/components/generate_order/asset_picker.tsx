@@ -82,24 +82,26 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
                 cursor: 'pointer',
                 opacity: isHovered ? 0.6 : 1,
             };
-            gridTiles.push((
-                <div
-                    key={otherTokenKey}
-                    style={{width: TILE_DIMENSION, height: TILE_DIMENSION, ...tileStyles}}
-                    className="p2 mx-auto"
-                    onClick={this.props.onCustomAssetChosen.bind(this)}
-                    onMouseEnter={this.onToggleHover.bind(this, otherTokenKey, true)}
-                    onMouseLeave={this.onToggleHover.bind(this, otherTokenKey, false)}
-                >
-                    <div className="p1 center">
-                        <i
-                            style={{fontSize: 105, paddingLeft: 1, paddingRight: 1}}
-                            className="zmdi zmdi-plus-circle"
-                        />
-                    </div>
-                    <div className="center">Other ERC20 Token</div>
-                </div>
-            ));
+            // We have temporarily disabled adding custom tokens to OTC until the UI
+            // for filling orders can more adequately warn users of the dangers of malicious tokens
+            // gridTiles.push((
+            //     <div
+            //         key={otherTokenKey}
+            //         style={{width: TILE_DIMENSION, height: TILE_DIMENSION, ...tileStyles}}
+            //         className="p2 mx-auto"
+            //         onClick={this.props.onCustomAssetChosen.bind(this)}
+            //         onMouseEnter={this.onToggleHover.bind(this, otherTokenKey, true)}
+            //         onMouseLeave={this.onToggleHover.bind(this, otherTokenKey, false)}
+            //     >
+            //         <div className="p1 center">
+            //             <i
+            //                 style={{fontSize: 105, paddingLeft: 1, paddingRight: 1}}
+            //                 className="zmdi zmdi-plus-circle"
+            //             />
+            //         </div>
+            //         <div className="center">Other ERC20 Token</div>
+            //     </div>
+            // ));
         }
         return gridTiles;
     }
