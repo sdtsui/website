@@ -7,6 +7,7 @@ import {
     ContractEvent,
     ContractEventEmitter,
     LogFillContractEventArgs,
+    Token as ZeroExToken,
 } from '0x.js';
 import * as BigNumber from 'bignumber.js';
 import Web3 = require('web3');
@@ -40,7 +41,6 @@ import {errorReporter} from 'ts/utils/error_reporter';
 import {tradeHistoryStorage} from 'ts/local_storage/trade_history_storage';
 import {customTokenStorage} from 'ts/local_storage/custom_token_storage';
 import * as TokenTransferProxyArtifacts from '../contracts/TokenTransferProxy.json';
-import * as ExchangeArtifacts from '../contracts/Exchange.json';
 import * as TokenRegistryArtifacts from '../contracts/TokenRegistry.json';
 import * as TokenArtifacts from '../contracts/Token.json';
 import * as MintableArtifacts from '../contracts/Mintable.json';
@@ -54,7 +54,7 @@ export class Blockchain {
     private zeroEx: ZeroEx;
     private dispatcher: Dispatcher;
     private web3Wrapper: Web3Wrapper;
-    private exchange: ContractInstance;
+    private exchangeAddress: string;
     private exchangeLogFillEventEmitters: ContractEventEmitter[];
     private tokenTransferProxy: ContractInstance;
     private tokenRegistry: ContractInstance;
@@ -96,11 +96,6 @@ export class Blockchain {
         const tokenMetadata = await this.tokenRegistry.getTokenMetaData.call(tokenAddress);
         return tokenMetadata[0] !== constants.NULL_ADDRESS;
     }
-    public async isSymbolInTokenRegistryAsync(symbol: string): Promise<boolean> {
-        utils.assert(!_.isUndefined(this.tokenRegistry), 'TokenRegistry must be instantiated');
-        const tokenMetadata = await this.tokenRegistry.getTokenBySymbol.call(symbol);
-        return tokenMetadata[0] !== constants.NULL_ADDRESS;
-    }
     public getLedgerDerivationPathIfExists(): string {
         if (_.isUndefined(this.ledgerSubProvider)) {
             return undefined;
@@ -121,6 +116,7 @@ export class Blockchain {
         this.ledgerSubProvider.setPathIndex(pathIndex);
     }
     public async providerTypeUpdatedFireAndForgetAsync(providerType: ProviderType) {
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         // Should actually be Web3.Provider|ProviderEngine union type but it causes issues
         // later on in the logic.
         let provider;
@@ -147,7 +143,8 @@ export class Blockchain {
                 this.web3Wrapper.destroy();
                 const shouldPollUserAddress = false;
                 this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, this.networkId, shouldPollUserAddress);
-                this.zeroEx.setProviderAsync(provider);
+                await this.zeroEx.setProviderAsync(provider);
+                await this.postInstantiationOrUpdatingProviderZeroExAsync();
                 break;
             }
 
@@ -158,7 +155,8 @@ export class Blockchain {
                 provider = this.cachedProvider;
                 const shouldPollUserAddress = true;
                 this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, this.networkId, shouldPollUserAddress);
-                this.zeroEx.setProviderAsync(provider);
+                await this.zeroEx.setProviderAsync(provider);
+                await this.postInstantiationOrUpdatingProviderZeroExAsync();
                 delete this.ledgerSubProvider;
                 delete this.cachedProvider;
                 break;
@@ -205,9 +203,10 @@ export class Blockchain {
         taker = taker === '' ? constants.NULL_ADDRESS : taker;
         const ecSignature = signatureData;
         delete ecSignature.hash;
+        const exchangeContractAddress = this.getExchangeContractAddressIfExists();
         const signedOrder = {
             ecSignature,
-            exchangeContractAddress: this.exchange.address,
+            exchangeContractAddress,
             expirationUnixTimestampSec,
             feeRecipient,
             maker,
@@ -233,13 +232,14 @@ export class Blockchain {
         return unavailableTakerAmount;
     }
     public getExchangeContractAddressIfExists() {
-        return this.exchange ? this.exchange.address : undefined;
+        return this.exchangeAddress;
     }
     public isValidAddress(address: string): boolean {
         const lowercaseAddress = address.toLowerCase();
         return this.web3Wrapper.isAddress(lowercaseAddress);
     }
     public async signOrderHashAsync(orderHash: string): Promise<SignatureData> {
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         const makerAddress = this.userAddress;
         // If makerAddress is undefined, this means they have a web3 instance injected into their browser
         // but no account addresses associated with it.
@@ -323,6 +323,7 @@ export class Blockchain {
         this.dispatcher.updateTokenByAddress(updatedTokens);
     }
     public async getUserAccountsAsync() {
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         const userAccountsIfExists = await this.zeroEx.getAvailableAddressesAsync();
         return userAccountsIfExists;
     }
@@ -347,7 +348,7 @@ export class Blockchain {
             return; // short-circuit
         }
 
-        if (!_.isUndefined(this.exchange)) {
+        if (!_.isUndefined(this.zeroEx)) {
             // Since we do not have an index on the `taker` address and want to show
             // transactions where an account is either the `maker` or `taker`, we loop
             // through all fill events, and filter/cache them client-side.
@@ -356,7 +357,7 @@ export class Blockchain {
         }
     }
     private async startListeningForExchangeLogFillEventsAsync(indexFilterValues: IndexedFilterValues): Promise<void> {
-        utils.assert(!_.isUndefined(this.exchange), 'Exchange contract must be instantiated.');
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
         const fromBlock = tradeHistoryStorage.getFillsLatestBlock(this.userAddress, this.networkId);
@@ -364,8 +365,9 @@ export class Blockchain {
             fromBlock,
             toBlock: 'latest',
         };
+        const exchangeAddress = this.getExchangeContractAddressIfExists();
         const exchangeLogFillEventEmitter = await this.zeroEx.exchange.subscribeAsync(
-            ExchangeEvents.LogFill, subscriptionOpts, indexFilterValues, this.exchange.address,
+            ExchangeEvents.LogFill, subscriptionOpts, indexFilterValues, exchangeAddress,
         );
         this.exchangeLogFillEventEmitters.push(exchangeLogFillEventEmitter);
         exchangeLogFillEventEmitter.watch(async (err: Error, event: ContractEvent) => {
@@ -422,47 +424,35 @@ export class Blockchain {
         }
     }
     private async getTokenRegistryTokensAsync(): Promise<Token[]> {
-        if (this.tokenRegistry) {
-            const addresses = await this.tokenRegistry.getTokenAddresses.call();
-            const tokenPromises: Array<Promise<Token>> = _.map(
-                addresses,
-                (address: string) => (this.getTokenRegistryTokenAsync(address)),
-            );
-            const tokensPromise: Promise<Token[]> = Promise.all(tokenPromises);
-            return tokensPromise;
-        } else {
-            return [];
-        }
-    }
-    private async getTokenRegistryTokenAsync(address: string): Promise<Token> {
-        const tokenDataPromises = [
-            this.getTokenBalanceAndAllowanceAsync(this.userAddress, address),
-            this.tokenRegistry.getTokenMetaData.call(address),
-        ];
-        const tokenData = await Promise.all(tokenDataPromises);
-        const [
-            balance,
-            allowance,
-        ] = tokenData[0];
-        const [
-            tokenAddress,
-            name,
-            symbol,
-            decimals,
-        ] = tokenData[1];
-        // HACK: For now we have a hard-coded list of iconUrls for the dummyTokens
-        // TODO: Refactor this out and pull the iconUrl directly from the TokenRegistry
-        const iconUrl = constants.iconUrlBySymbol[symbol];
-        const token: Token = {
-            iconUrl: !_.isUndefined(iconUrl) ? iconUrl : constants.DEFAULT_TOKEN_ICON_URL,
-            address,
-            allowance,
-            balance,
-            name,
-            symbol,
-            decimals: decimals.toNumber(),
-        };
-        return token;
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
+        const tokenRegistryTokens = await this.zeroEx.tokenRegistry.getTokensAsync();
+
+        const tokenBalanceAllowancePromises: Array<Promise<BigNumber.BigNumber[]>> = _.map(
+            tokenRegistryTokens,
+            (token: ZeroExToken) => (this.getTokenBalanceAndAllowanceAsync(this.userAddress, token.address)),
+        );
+        const balancesAndAllowances = await Promise.all(tokenBalanceAllowancePromises);
+
+        const tokens = _.map(tokenRegistryTokens, (t: ZeroExToken, i: number) => {
+            const [
+                balance,
+                allowance,
+            ] = balancesAndAllowances[i];
+            // HACK: For now we have a hard-coded list of iconUrls for the dummyTokens
+            // TODO: Refactor this out and pull the iconUrl directly from the TokenRegistry
+            const iconUrl = constants.iconUrlBySymbol[t.symbol];
+            const token: Token = {
+                iconUrl: !_.isUndefined(iconUrl) ? iconUrl : constants.DEFAULT_TOKEN_ICON_URL,
+                address: t.address,
+                balance,
+                allowance,
+                name: t.name,
+                symbol: t.symbol,
+                decimals: t.decimals,
+            };
+            return token;
+        });
+        return tokens;
     }
     private async getCustomTokensAsync() {
         const customTokens = customTokenStorage.getCustomTokens(this.networkId);
@@ -500,6 +490,13 @@ export class Blockchain {
         const shouldPollUserAddress = true;
         this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, networkId, shouldPollUserAddress);
         this.zeroEx = new ZeroEx(provider);
+        await this.postInstantiationOrUpdatingProviderZeroExAsync();
+    }
+    // This method should always be run after instantiating or updating the provider
+    // of the ZeroEx instance.
+    private async postInstantiationOrUpdatingProviderZeroExAsync() {
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
+        this.exchangeAddress = await this.zeroEx.exchange.getContractAddressAsync();
     }
     private updateProviderName(injectedWeb3: Web3) {
         const doesInjectedWeb3Exist = !_.isUndefined(injectedWeb3);
@@ -571,16 +568,14 @@ export class Blockchain {
         try {
             const contractsPromises = _.map(
                 [
-                  ExchangeArtifacts,
                   TokenRegistryArtifacts,
                   TokenTransferProxyArtifacts,
                 ],
                 (artifacts: any) => this.instantiateContractIfExistsAsync(artifacts),
             );
             const contracts = await Promise.all(contractsPromises);
-            this.exchange = contracts[0];
-            this.tokenRegistry = contracts[1];
-            this.tokenTransferProxy = contracts[2];
+            this.tokenRegistry = contracts[0];
+            this.tokenTransferProxy = contracts[1];
         } catch (err) {
             const errMsg = err + '';
             if (_.includes(errMsg, BlockchainCallErrs.CONTRACT_DOES_NOT_EXIST)) {
