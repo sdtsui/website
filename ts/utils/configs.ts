@@ -13,4 +13,5 @@ export const configs = {
     symbolsOfMintableTokens: ['MKR', 'MLN', 'GNT', 'DGD', 'REP'],
     mostPopularTradingPairSymbols: ['WETH', 'ZRX'],
     lastLocalStorageFillClearanceDate: '2017-07-07',
+    isMainnetEnabled: false,
 };

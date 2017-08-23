@@ -136,8 +136,11 @@ export class Blockchain {
                 this.ledgerSubProvider = ledgerWalletSubproviderFactory(this.getBlockchainNetworkId.bind(this));
                 provider.addProvider(this.ledgerSubProvider);
                 provider.addProvider(new FilterSubprovider());
+                const networkId = configs.isMainnetEnabled ?
+                    constants.MAINNET_NETWORK_ID :
+                    constants.TESTNET_NETWORK_ID;
                 provider.addProvider(new RedundantRPCSubprovider(
-                    constants.PUBLIC_NODE_URLS_BY_NETWORK_ID[constants.MAINNET_NETWORK_ID],
+                    constants.PUBLIC_NODE_URLS_BY_NETWORK_ID[networkId],
                 ));
                 provider.start();
                 this.web3Wrapper.destroy();
@@ -533,13 +536,16 @@ export class Blockchain {
             // Since no public node for this network, all requests go to injectedWeb3 instance
             provider = injectedWeb3.currentProvider;
         } else {
-            // If no injectedWeb3 instance, all requests fallback to our public hosted mainnet node
+            // If no injectedWeb3 instance, all requests fallback to our public hosted mainnet/testnet node
             // We do this so that users can still browse the OTC DApp even if they do not have web3
             // injected into their browser.
             provider = new ProviderEngine();
             provider.addProvider(new FilterSubprovider());
+            const networkId = configs.isMainnetEnabled ?
+                constants.MAINNET_NETWORK_ID :
+                constants.TESTNET_NETWORK_ID;
             provider.addProvider(new RedundantRPCSubprovider(
-                constants.PUBLIC_NODE_URLS_BY_NETWORK_ID[constants.MAINNET_NETWORK_ID],
+                constants.PUBLIC_NODE_URLS_BY_NETWORK_ID[networkId],
             ));
             provider.start();
         }
