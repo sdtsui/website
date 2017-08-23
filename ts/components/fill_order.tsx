@@ -299,23 +299,16 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             amountAlreadyFilled = await this.props.blockchain.getFillAmountAsync(orderHash);
         }
 
-        const makerTokenSymbol = this.removeSymbolFlourishIfExists(parsedOrder.maker.token.symbol);
-        const isMakerTokenSymbolInTokenRegistry = await this.props.blockchain.isSymbolInTokenRegistryAsync(
-            makerTokenSymbol,
-        );
         const isMakerTokenAddressInRegistry = await this.props.blockchain.isAddressInTokenRegistryAsync(
             parsedOrder.maker.token.address,
-        );
-        const takerTokenSymbol = this.removeSymbolFlourishIfExists(parsedOrder.taker.token.symbol);
-        const isTakerTokenSymbolInTokenRegistry = await this.props.blockchain.isSymbolInTokenRegistryAsync(
-            takerTokenSymbol,
         );
         const isTakerTokenAddressInRegistry = await this.props.blockchain.isAddressInTokenRegistryAsync(
             parsedOrder.taker.token.address,
         );
-        if (isMakerTokenSymbolInTokenRegistry && !isMakerTokenAddressInRegistry || isTakerTokenSymbolInTokenRegistry &&
-            !isTakerTokenAddressInRegistry) {
-            orderJSONErrMsg = 'This order is invalid. Contact the 0x team if you think this is an accident.';
+        if (!isMakerTokenAddressInRegistry || !isTakerTokenAddressInRegistry) {
+            orderJSONErrMsg = 'Trading of tokens not whitelisted in 0x Token Registry is \
+                               temporarily disabled due to a high number of malicious token scams. \
+                               We hope to address this issue shortly.';
             parsedOrder = undefined;
         }
 
