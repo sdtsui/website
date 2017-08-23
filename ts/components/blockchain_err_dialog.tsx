@@ -124,13 +124,11 @@ export class BlockchainErrDialog extends React.Component<BlockchainErrDialogProp
             <div>
                 <div>
                     The 0x smart contracts are not deployed on the Ethereum network you are
-                    {' '}currently connected to (network Id: {this.props.blockchain.networkId}).
+                    {' '}currently connected to (network Id: {this.props.networkId}).
                     {' '}In order to use the OTC dApp,
-                    {' '}please connect to the{' '}
-                    {
-                        `${constants.TESTNET_NAME} testnet (network Id: ${constants.TESTNET_NETWORK_ID}) or
-                         ${constants.MAINNET_NAME} (network Id: ${constants.MAINNET_NETWORK_ID}).`
-                    }
+                    {' '}please connect to the
+                    {' '}{constants.TESTNET_NAME} testnet (network Id: {constants.TESTNET_NETWORK_ID}) or
+                    {' '}{constants.MAINNET_NAME} (network Id: {constants.MAINNET_NETWORK_ID}).
                 </div>
                 <h4>Metamask</h4>
                 <div>
