@@ -56,6 +56,7 @@ export class Blockchain {
     private dispatcher: Dispatcher;
     private web3Wrapper: Web3Wrapper;
     private exchange: ContractInstance;
+    private exchangeAddress: string;
     private exchangeLogFillEventEmitters: ContractEventEmitter[];
     private tokenTransferProxy: ContractInstance;
     private tokenRegistry: ContractInstance;
@@ -148,7 +149,8 @@ export class Blockchain {
                 this.web3Wrapper.destroy();
                 const shouldPollUserAddress = false;
                 this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, this.networkId, shouldPollUserAddress);
-                this.zeroEx.setProviderAsync(provider);
+                await this.zeroEx.setProviderAsync(provider);
+                await this.postInstantiationOrUpdatingProviderZeroExAsync();
                 break;
             }
 
@@ -159,7 +161,8 @@ export class Blockchain {
                 provider = this.cachedProvider;
                 const shouldPollUserAddress = true;
                 this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, this.networkId, shouldPollUserAddress);
-                this.zeroEx.setProviderAsync(provider);
+                await this.zeroEx.setProviderAsync(provider);
+                await this.postInstantiationOrUpdatingProviderZeroExAsync();
                 delete this.ledgerSubProvider;
                 delete this.cachedProvider;
                 break;
@@ -206,9 +209,10 @@ export class Blockchain {
         taker = taker === '' ? constants.NULL_ADDRESS : taker;
         const ecSignature = signatureData;
         delete ecSignature.hash;
+        const exchangeContractAddress = this.getExchangeContractAddressIfExists();
         const signedOrder = {
             ecSignature,
-            exchangeContractAddress: this.exchange.address,
+            exchangeContractAddress,
             expirationUnixTimestampSec,
             feeRecipient,
             maker,
@@ -234,7 +238,7 @@ export class Blockchain {
         return unavailableTakerAmount;
     }
     public getExchangeContractAddressIfExists() {
-        return this.exchange ? this.exchange.address : undefined;
+        return this.exchangeAddress;
     }
     public isValidAddress(address: string): boolean {
         const lowercaseAddress = address.toLowerCase();
@@ -365,8 +369,9 @@ export class Blockchain {
             fromBlock,
             toBlock: 'latest',
         };
+        const exchangeAddress = this.getExchangeContractAddressIfExists();
         const exchangeLogFillEventEmitter = await this.zeroEx.exchange.subscribeAsync(
-            ExchangeEvents.LogFill, subscriptionOpts, indexFilterValues, this.exchange.address,
+            ExchangeEvents.LogFill, subscriptionOpts, indexFilterValues, exchangeAddress,
         );
         this.exchangeLogFillEventEmitters.push(exchangeLogFillEventEmitter);
         exchangeLogFillEventEmitter.watch(async (err: Error, event: ContractEvent) => {
@@ -488,6 +493,12 @@ export class Blockchain {
         const shouldPollUserAddress = true;
         this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, networkId, shouldPollUserAddress);
         this.zeroEx = new ZeroEx(provider);
+        await this.postInstantiationOrUpdatingProviderZeroExAsync();
+    }
+    // This method should always be run after instantiating or updating the provider
+    // of the ZeroEx instance.
+    private async postInstantiationOrUpdatingProviderZeroExAsync() {
+        this.exchangeAddress = await this.zeroEx.exchange.getContractAddressAsync();
     }
     private updateProviderName(injectedWeb3: Web3) {
         const doesInjectedWeb3Exist = !_.isUndefined(injectedWeb3);
