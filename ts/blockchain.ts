@@ -96,11 +96,6 @@ export class Blockchain {
         const tokenMetadata = await this.tokenRegistry.getTokenMetaData.call(tokenAddress);
         return tokenMetadata[0] !== constants.NULL_ADDRESS;
     }
-    public async isSymbolInTokenRegistryAsync(symbol: string): Promise<boolean> {
-        utils.assert(!_.isUndefined(this.tokenRegistry), 'TokenRegistry must be instantiated');
-        const tokenMetadata = await this.tokenRegistry.getTokenBySymbol.call(symbol);
-        return tokenMetadata[0] !== constants.NULL_ADDRESS;
-    }
     public getLedgerDerivationPathIfExists(): string {
         if (_.isUndefined(this.ledgerSubProvider)) {
             return undefined;
