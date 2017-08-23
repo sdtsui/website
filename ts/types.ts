@@ -225,13 +225,18 @@ export const SolidityTypes = strEnum([
 export type SolidityTypes = keyof typeof SolidityTypes;
 
 export enum ExchangeContractErrs {
-  ERROR_FILL_EXPIRED, // Order has already expired
-  ERROR_FILL_NO_VALUE, // Order has already been fully filled or cancelled
-  ERROR_FILL_TRUNCATION, // Rounding error too large
-  ERROR_FILL_BALANCE_ALLOWANCE, // Insufficient balance or allowance for token transfer
-  ERROR_CANCEL_EXPIRED, // Order has already expired
-  ERROR_CANCEL_NO_VALUE, // Order has already been fully filled or cancelled
-};
+    OrderFillExpired = 'ORDER_FILL_EXPIRED',
+    OrderAlreadyCancelledOrFilled = 'ORDER_ALREADY_CANCELLED_OR_FILLED',
+    OrderRemainingFillAmountZero = 'ORDER_REMAINING_FILL_AMOUNT_ZERO',
+    OrderFillRoundingError = 'ORDER_FILL_ROUNDING_ERROR',
+    FillBalanceAllowanceError = 'FILL_BALANCE_ALLOWANCE_ERROR',
+    InsufficientTakerBalance = 'INSUFFICIENT_TAKER_BALANCE',
+    InsufficientTakerAllowance = 'INSUFFICIENT_TAKER_ALLOWANCE',
+    InsufficientMakerBalance = 'INSUFFICIENT_MAKER_BALANCE',
+    InsufficientMakerAllowance = 'INSUFFICIENT_MAKER_ALLOWANCE',
+    TransactionSenderIsNotFillOrderTaker = 'TRANSACTION_SENDER_IS_NOT_FILL_ORDER_TAKER',
+    InsufficientRemainingFillAmount = 'INSUFFICIENT_REMAINING_FILL_AMOUNT',
+}
 
 export interface ContractResponse {
     logs: ContractEvent[];

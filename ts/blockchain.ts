@@ -186,70 +186,43 @@ export class Blockchain {
         const allowance = amountInBaseUnits;
         this.dispatcher.replaceTokenAllowanceByAddress(token.address, allowance);
     }
-    public async isValidSignatureAsync(maker: string, signatureData: SignatureData) {
-        utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
-
-        const isValidSignature = await this.exchange.isValidSignature.call(
-            maker,
-            signatureData.hash,
-            signatureData.v,
-            signatureData.r,
-            signatureData.s,
-            {
-                from: this.userAddress,
-            },
-        );
-        return isValidSignature;
-    }
     public async fillOrderAsync(maker: string, taker: string, makerTokenAddress: string,
                                 takerTokenAddress: string, makerTokenAmount: BigNumber.BigNumber,
                                 takerTokenAmount: BigNumber.BigNumber, makerFee: BigNumber.BigNumber,
                                 takerFee: BigNumber.BigNumber, expirationUnixTimestampSec: BigNumber.BigNumber,
-                                feeRecipient: string, fillAmount: BigNumber.BigNumber,
-                                signatureData: SignatureData, salt: BigNumber.BigNumber) {
+                                feeRecipient: string, fillTakerTokenAmount: BigNumber.BigNumber,
+                                signatureData: SignatureData, salt: BigNumber.BigNumber): Promise<BigNumber.BigNumber> {
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
         taker = taker === '' ? constants.NULL_ADDRESS : taker;
-        const shouldThrowOnInsufficientBalanceOrAllowance = true;
-        const orderAddresses = [
-            maker,
-            taker,
-            makerTokenAddress,
-            takerTokenAddress,
-            feeRecipient,
-        ];
-        const orderValues = [
-            makerTokenAmount,
-            takerTokenAmount,
-            makerFee,
-            takerFee,
+        const ecSignature = signatureData;
+        delete ecSignature.hash;
+        const signedOrder = {
+            ecSignature,
+            exchangeContractAddress: this.exchange.address,
             expirationUnixTimestampSec,
-            salt.toString(),
-        ];
-        const fillTakerTokenAmount = fillAmount.toString();
-        const response: ContractResponse = await this.exchange.fillOrder(
-                                 orderAddresses,
-                                 orderValues,
-                                 fillTakerTokenAmount,
-                                 shouldThrowOnInsufficientBalanceOrAllowance,
-                                 signatureData.v,
-                                 signatureData.r,
-                                 signatureData.s, {
-                                      from: this.userAddress,
-                                  });
-        const errEvent = _.find(response.logs, {event: 'LogError'});
-        if (!_.isUndefined(errEvent)) {
-            const errCode = errEvent.args.errorId.toNumber();
-            const humanReadableErrMessage = constants.exchangeContractErrToMsg[errCode];
-            throw new Error(humanReadableErrMessage);
-        }
-        return response;
+            feeRecipient,
+            maker,
+            makerFee,
+            makerTokenAddress,
+            makerTokenAmount,
+            salt,
+            taker,
+            takerFee,
+            takerTokenAddress,
+            takerTokenAmount,
+        };
+        const shouldThrowOnInsufficientBalanceOrAllowance = true;
+
+        const amountFilledInTakerTokens = await this.zeroEx.exchange.fillOrderAsync(
+            signedOrder, fillTakerTokenAmount, shouldThrowOnInsufficientBalanceOrAllowance, this.userAddress,
+        );
+        return amountFilledInTakerTokens;
     }
-    public async getFillAmountAsync(orderHash: string): Promise<BigNumber.BigNumber> {
+    public async getUnavailableTakerAmountAsync(orderHash: string): Promise<BigNumber.BigNumber> {
         utils.assert(ZeroEx.isValidOrderHash(orderHash), 'Must be valid orderHash');
-        const fillAmountOldBigNumber = await this.exchange.getUnavailableTakerTokenAmount.call(orderHash);
-        const fillAmount = new BigNumber(fillAmountOldBigNumber);
-        return fillAmount;
+        const unavailableTakerAmount = await this.zeroEx.exchange.getUnavailableTakerAmountAsync(orderHash);
+        return unavailableTakerAmount;
     }
     public getExchangeContractAddressIfExists() {
         return this.exchange ? this.exchange.address : undefined;
@@ -342,7 +315,7 @@ export class Blockchain {
         this.dispatcher.updateTokenByAddress(updatedTokens);
     }
     public async getUserAccountsAsync() {
-        const userAddressIfExists = await this.web3Wrapper.getAccountsAsync();
+        const userAddressIfExists = await this.zeroEx.getAvailableAddressesAsync();
         return userAddressIfExists;
     }
     // HACK: When a user is using a Ledger, we simply dispatch the selected userAddress, which

@@ -50,7 +50,7 @@ interface FillOrderState {
     orderJSONErrMsg: string;
     parsedOrder: Order;
     didFillOrderSucceed: boolean;
-    amountAlreadyFilled: BigNumber.BigNumber;
+    unavailableTakerAmount: BigNumber.BigNumber;
 }
 
 export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
@@ -64,7 +64,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             orderJSON: _.isUndefined(this.props.initialOrder) ? '' : JSON.stringify(this.props.initialOrder),
             orderJSONErrMsg: '',
             parsedOrder: this.props.initialOrder,
-            amountAlreadyFilled: new BigNumber(0),
+            unavailableTakerAmount: new BigNumber(0),
         };
         this.validator = new SchemaValidator();
     }
@@ -140,7 +140,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         const orderTakerAmount = new BigNumber(this.state.parsedOrder.taker.amount);
         const orderMakerAmount = new BigNumber(this.state.parsedOrder.maker.amount);
         const takerAssetToken = {
-            amount: orderTakerAmount.minus(this.state.amountAlreadyFilled),
+            amount: orderTakerAmount.minus(this.state.unavailableTakerAmount),
             symbol: takerToken.symbol,
         };
         const fillToken = this.props.tokenByAddress[takerToken.address];
@@ -290,13 +290,13 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             return;
         }
 
-        let amountAlreadyFilled = new BigNumber(0);
+        let unavailableTakerAmount = new BigNumber(0);
         if (orderJSONErrMsg !== '') {
             // Clear cache entry if user updates orderJSON to invalid entry
             this.props.dispatcher.updateUserSuppliedOrderCache(undefined);
         } else {
             const orderHash = parsedOrder.signature.hash;
-            amountAlreadyFilled = await this.props.blockchain.getFillAmountAsync(orderHash);
+            unavailableTakerAmount = await this.props.blockchain.getUnavailableTakerAmountAsync(orderHash);
         }
 
         const isMakerTokenAddressInRegistry = await this.props.blockchain.isAddressInTokenRegistryAsync(
@@ -316,7 +316,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             orderJSON,
             orderJSONErrMsg,
             parsedOrder,
-            amountAlreadyFilled,
+            unavailableTakerAmount,
         });
     }
 
@@ -343,21 +343,16 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         };
         const parsedOrderExpiration = new BigNumber(this.state.parsedOrder.expiration);
         const orderHash = parsedOrder.signature.hash;
-        const amountAlreadyFilled = await this.props.blockchain.getFillAmountAsync(orderHash);
-        const amountLeftToFill = receiveAssetToken.amount.minus(amountAlreadyFilled);
+        const unavailableTakerAmount = await this.props.blockchain.getUnavailableTakerAmountAsync(orderHash);
+        const amountLeftToFill = receiveAssetToken.amount.minus(unavailableTakerAmount);
         const specifiedTakerAddressIfExists = parsedOrder.taker.address.toLowerCase();
         const takerFillAmount = this.props.orderFillAmount;
         const makerFillAmount = takerFillAmount.times(depositAssetToken.amount).div(receiveAssetToken.amount);
         const takerAddress = this.props.userAddress;
         const takerToken = this.props.tokenByAddress[takerTokenAddress];
         let isValidSignature = false;
-        if (this.props.userAddress === '') {
-            const signatureData = parsedOrder.signature;
-            isValidSignature = ZeroEx.isValidSignature(signatureData.hash, signatureData, parsedOrder.maker.address);
-        } else {
-            isValidSignature = await this.props.blockchain.isValidSignatureAsync(parsedOrder.maker.address,
-                                                              parsedOrder.signature);
-        }
+        const signatureData = parsedOrder.signature;
+        isValidSignature = ZeroEx.isValidSignature(signatureData.hash, signatureData, parsedOrder.maker.address);
 
         if (_.isUndefined(takerAddress)) {
             this.props.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
@@ -403,7 +398,8 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         const parsedMakerFee = new BigNumber(parsedOrder.maker.feeAmount);
         const parsedTakerFee = new BigNumber(parsedOrder.taker.feeAmount);
         try {
-            const response: ContractResponse = await this.props.blockchain.fillOrderAsync(parsedOrder.maker.address,
+            const orderFilledAmount: BigNumber.BigNumber = await this.props.blockchain.fillOrderAsync(
+                                                       parsedOrder.maker.address,
                                                        parsedOrder.taker.address,
                                                        this.props.tokenByAddress[makerTokenAddress].address,
                                                        this.props.tokenByAddress[takerTokenAddress].address,
@@ -421,11 +417,10 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             const makerToken = this.props.tokenByAddress[makerTokenAddress];
             const tokens = [makerToken, takerToken];
             await this.props.blockchain.updateTokenBalancesAndAllowancesAsync(tokens);
-            const orderFilledAmount = response.logs[0].args.filledTakerTokenAmount;
             this.setState({
                 didFillOrderSucceed: true,
                 globalErrMsg: '',
-                amountAlreadyFilled: this.state.amountAlreadyFilled.plus(orderFilledAmount),
+                unavailableTakerAmount: this.state.unavailableTakerAmount.plus(orderFilledAmount),
             });
             return true;
         } catch (err) {
@@ -433,12 +428,9 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             if (_.includes(errMsg, 'User denied transaction signature')) {
                 return false;
             }
-            const fillTruncationErrMsg = constants.exchangeContractErrToMsg[
-                ExchangeContractErrs.ERROR_FILL_TRUNCATION
-            ];
             globalErrMsg = 'Failed to fill order, please refresh and try again';
-            if (_.includes(errMsg, fillTruncationErrMsg)) {
-                globalErrMsg = fillTruncationErrMsg;
+            if (_.includes(errMsg, ExchangeContractErrs.OrderFillRoundingError)) {
+                globalErrMsg = 'The rounding error was too large when filling this order';
             }
             utils.consoleLog(`${err}`);
             await errorReporter.reportAsync(err);
