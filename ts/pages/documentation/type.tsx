@@ -22,6 +22,7 @@ const typeToSection: {[typeName: string]: string} = {
     TokenRegistryWrapper: 'tokenRegistry',
     EtherTokenWrapper: 'etherToken',
     ProxyWrapper: 'proxy',
+    TokenTransferProxyWrapper: 'proxy',
 };
 
 interface TypeProps {

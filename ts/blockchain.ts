@@ -1,5 +1,13 @@
 import * as _ from 'lodash';
-import {ZeroEx} from '0x.js';
+import {
+    ZeroEx,
+    ExchangeEvents,
+    SubscriptionOpts,
+    IndexedFilterValues,
+    ContractEvent,
+    ContractEventEmitter,
+    LogFillContractEventArgs,
+} from '0x.js';
 import * as BigNumber from 'bignumber.js';
 import Web3 = require('web3');
 import promisify = require('es6-promisify');
@@ -47,7 +55,7 @@ export class Blockchain {
     private dispatcher: Dispatcher;
     private web3Wrapper: Web3Wrapper;
     private exchange: ContractInstance;
-    private exchangeLogFillEvents: any[];
+    private exchangeLogFillEventEmitters: ContractEventEmitter[];
     private tokenTransferProxy: ContractInstance;
     private tokenRegistry: ContractInstance;
     private userAddress: string;
@@ -56,7 +64,7 @@ export class Blockchain {
     constructor(dispatcher: Dispatcher, isSalePage: boolean = false) {
         this.dispatcher = dispatcher;
         this.userAddress = '';
-        this.exchangeLogFillEvents = [];
+        this.exchangeLogFillEventEmitters = [];
         this.onPageLoadInitFireAndForgetAsync();
     }
     public async networkIdUpdatedFireAndForgetAsync(newNetworkId: number) {
@@ -186,70 +194,43 @@ export class Blockchain {
         const allowance = amountInBaseUnits;
         this.dispatcher.replaceTokenAllowanceByAddress(token.address, allowance);
     }
-    public async isValidSignatureAsync(maker: string, signatureData: SignatureData) {
-        utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
-
-        const isValidSignature = await this.exchange.isValidSignature.call(
-            maker,
-            signatureData.hash,
-            signatureData.v,
-            signatureData.r,
-            signatureData.s,
-            {
-                from: this.userAddress,
-            },
-        );
-        return isValidSignature;
-    }
     public async fillOrderAsync(maker: string, taker: string, makerTokenAddress: string,
                                 takerTokenAddress: string, makerTokenAmount: BigNumber.BigNumber,
                                 takerTokenAmount: BigNumber.BigNumber, makerFee: BigNumber.BigNumber,
                                 takerFee: BigNumber.BigNumber, expirationUnixTimestampSec: BigNumber.BigNumber,
-                                feeRecipient: string, fillAmount: BigNumber.BigNumber,
-                                signatureData: SignatureData, salt: BigNumber.BigNumber) {
+                                feeRecipient: string, fillTakerTokenAmount: BigNumber.BigNumber,
+                                signatureData: SignatureData, salt: BigNumber.BigNumber): Promise<BigNumber.BigNumber> {
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
         taker = taker === '' ? constants.NULL_ADDRESS : taker;
-        const shouldThrowOnInsufficientBalanceOrAllowance = true;
-        const orderAddresses = [
-            maker,
-            taker,
-            makerTokenAddress,
-            takerTokenAddress,
-            feeRecipient,
-        ];
-        const orderValues = [
-            makerTokenAmount,
-            takerTokenAmount,
-            makerFee,
-            takerFee,
+        const ecSignature = signatureData;
+        delete ecSignature.hash;
+        const signedOrder = {
+            ecSignature,
+            exchangeContractAddress: this.exchange.address,
             expirationUnixTimestampSec,
-            salt.toString(),
-        ];
-        const fillTakerTokenAmount = fillAmount.toString();
-        const response: ContractResponse = await this.exchange.fillOrder(
-                                 orderAddresses,
-                                 orderValues,
-                                 fillTakerTokenAmount,
-                                 shouldThrowOnInsufficientBalanceOrAllowance,
-                                 signatureData.v,
-                                 signatureData.r,
-                                 signatureData.s, {
-                                      from: this.userAddress,
-                                  });
-        const errEvent = _.find(response.logs, {event: 'LogError'});
-        if (!_.isUndefined(errEvent)) {
-            const errCode = errEvent.args.errorId.toNumber();
-            const humanReadableErrMessage = constants.exchangeContractErrToMsg[errCode];
-            throw new Error(humanReadableErrMessage);
-        }
-        return response;
+            feeRecipient,
+            maker,
+            makerFee,
+            makerTokenAddress,
+            makerTokenAmount,
+            salt,
+            taker,
+            takerFee,
+            takerTokenAddress,
+            takerTokenAmount,
+        };
+        const shouldThrowOnInsufficientBalanceOrAllowance = true;
+
+        const amountFilledInTakerTokens = await this.zeroEx.exchange.fillOrderAsync(
+            signedOrder, fillTakerTokenAmount, shouldThrowOnInsufficientBalanceOrAllowance, this.userAddress,
+        );
+        return amountFilledInTakerTokens;
     }
-    public async getFillAmountAsync(orderHash: string): Promise<BigNumber.BigNumber> {
+    public async getUnavailableTakerAmountAsync(orderHash: string): Promise<BigNumber.BigNumber> {
         utils.assert(ZeroEx.isValidOrderHash(orderHash), 'Must be valid orderHash');
-        const fillAmountOldBigNumber = await this.exchange.getUnavailableTakerTokenAmount.call(orderHash);
-        const fillAmount = new BigNumber(fillAmountOldBigNumber);
-        return fillAmount;
+        const unavailableTakerAmount = await this.zeroEx.exchange.getUnavailableTakerAmountAsync(orderHash);
+        return unavailableTakerAmount;
     }
     public getExchangeContractAddressIfExists() {
         return this.exchange ? this.exchange.address : undefined;
@@ -342,8 +323,8 @@ export class Blockchain {
         this.dispatcher.updateTokenByAddress(updatedTokens);
     }
     public async getUserAccountsAsync() {
-        const userAddressIfExists = await this.web3Wrapper.getAccountsAsync();
-        return userAddressIfExists;
+        const userAccountsIfExists = await this.zeroEx.getAvailableAddressesAsync();
+        return userAccountsIfExists;
     }
     // HACK: When a user is using a Ledger, we simply dispatch the selected userAddress, which
     // by-passes the web3Wrapper logic for updating the prevUserAddress. We therefore need to
@@ -353,6 +334,7 @@ export class Blockchain {
     }
     public destroy() {
         this.web3Wrapper.destroy();
+        this.stopWatchingExchangeLogFillEventsAsync(); // fire and forget
     }
     private doesUserAddressExist(): boolean {
         return this.userAddress !== '';
@@ -370,19 +352,23 @@ export class Blockchain {
             // transactions where an account is either the `maker` or `taker`, we loop
             // through all fill events, and filter/cache them client-side.
             const filterIndexObj = {};
-            this.startListeningForExchangeLogFillEvents(filterIndexObj);
+            await this.startListeningForExchangeLogFillEventsAsync(filterIndexObj);
         }
     }
-    private startListeningForExchangeLogFillEvents(filterIndexObj: object) {
+    private async startListeningForExchangeLogFillEventsAsync(indexFilterValues: IndexedFilterValues): Promise<void> {
         utils.assert(!_.isUndefined(this.exchange), 'Exchange contract must be instantiated.');
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
         const fromBlock = tradeHistoryStorage.getFillsLatestBlock(this.userAddress, this.networkId);
-        const exchangeLogFillEvent = this.exchange.LogFill(filterIndexObj, {
+        const subscriptionOpts: SubscriptionOpts = {
             fromBlock,
             toBlock: 'latest',
-        });
-        exchangeLogFillEvent.watch(async (err: Error, result: any) => {
+        };
+        const exchangeLogFillEventEmitter = await this.zeroEx.exchange.subscribeAsync(
+            ExchangeEvents.LogFill, subscriptionOpts, indexFilterValues, this.exchange.address,
+        );
+        this.exchangeLogFillEventEmitters.push(exchangeLogFillEventEmitter);
+        exchangeLogFillEventEmitter.watch(async (err: Error, event: ContractEvent) => {
             if (err) {
                 // Note: it's not entirely clear from the documentation which
                 // errors will be thrown by `watch`. For now, let's log the error
@@ -391,8 +377,8 @@ export class Blockchain {
                 this.stopWatchingExchangeLogFillEventsAsync(); // fire and forget
                 return;
             } else {
-                const args = result.args;
-                const isBlockPending = _.isNull(args.blockNumber);
+                const args = event.args as LogFillContractEventArgs;
+                const isBlockPending = _.isNull(event.blockNumber);
                 if (!isBlockPending) {
                     // Hack: I've observed the behavior where a client won't register certain fill events
                     // and lowering the cache blockNumber fixes the issue. As a quick fix for now, simply
@@ -400,7 +386,7 @@ export class Blockchain {
                     // would still attempt to re-fetch events from the previous 50 blocks, but won't need to
                     // re-fetch all events in all blocks.
                     // TODO: Debug if this is a race condition, and apply a more precise fix
-                    const blockNumberToSet = result.blockNumber - 50 < 0 ? 0 : result.blockNumber - 50;
+                    const blockNumberToSet = event.blockNumber - 50 < 0 ? 0 : event.blockNumber - 50;
                     tradeHistoryStorage.setFillsLatestBlock(this.userAddress, this.networkId, blockNumberToSet);
                 }
                 const isUserMakerOrTaker = args.maker === this.userAddress ||
@@ -408,11 +394,11 @@ export class Blockchain {
                 if (!isUserMakerOrTaker) {
                     return; // We aren't interested in the fill event
                 }
-                const blockTimestamp = await this.web3Wrapper.getBlockTimestampAsync(result.blockHash);
+                const blockTimestamp = await this.web3Wrapper.getBlockTimestampAsync(event.blockHash);
                 const fill = {
                     filledTakerTokenAmount: args.filledTakerTokenAmount,
                     filledMakerTokenAmount: args.filledMakerTokenAmount,
-                    logIndex: result.logIndex,
+                    logIndex: event.logIndex,
                     maker: args.maker,
                     orderHash: args.orderHash,
                     taker: args.taker,
@@ -420,20 +406,19 @@ export class Blockchain {
                     takerToken: args.takerToken,
                     paidMakerFee: args.paidMakerFee,
                     paidTakerFee: args.paidTakerFee,
-                    transactionHash: result.transactionHash,
+                    transactionHash: event.transactionHash,
                     blockTimestamp,
                 };
                 tradeHistoryStorage.addFillToUser(this.userAddress, this.networkId, fill);
             }
         });
-        this.exchangeLogFillEvents.push(exchangeLogFillEvent);
     }
     private async stopWatchingExchangeLogFillEventsAsync() {
-        if (!_.isEmpty(this.exchangeLogFillEvents)) {
-            for (const logFillEvent of this.exchangeLogFillEvents) {
-                await promisify(logFillEvent.stopWatching, logFillEvent)();
+        if (!_.isEmpty(this.exchangeLogFillEventEmitters)) {
+            for (const logFillEventEmitter of this.exchangeLogFillEventEmitters) {
+                await logFillEventEmitter.stopWatchingAsync();
             }
-            this.exchangeLogFillEvents = [];
+            this.exchangeLogFillEventEmitters = [];
         }
     }
     private async getTokenRegistryTokensAsync(): Promise<Token[]> {
