@@ -484,12 +484,4 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
     private addSymbolFlourish(symbol: string) {
         return `*${symbol}*`;
     }
-    private removeSymbolFlourishIfExists(symbol: string) {
-        if (symbol[0] === '*' && symbol[symbol.length - 1] === '*') {
-            const unflourishedSymbol = symbol.slice(1, -1);
-            return unflourishedSymbol;
-        } else {
-            return symbol;
-        }
-    }
 }
