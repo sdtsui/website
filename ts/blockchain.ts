@@ -121,6 +121,7 @@ export class Blockchain {
         this.ledgerSubProvider.setPathIndex(pathIndex);
     }
     public async providerTypeUpdatedFireAndForgetAsync(providerType: ProviderType) {
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         // Should actually be Web3.Provider|ProviderEngine union type but it causes issues
         // later on in the logic.
         let provider;
@@ -243,6 +244,7 @@ export class Blockchain {
         return this.web3Wrapper.isAddress(lowercaseAddress);
     }
     public async signOrderHashAsync(orderHash: string): Promise<SignatureData> {
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         const makerAddress = this.userAddress;
         // If makerAddress is undefined, this means they have a web3 instance injected into their browser
         // but no account addresses associated with it.
@@ -326,6 +328,7 @@ export class Blockchain {
         this.dispatcher.updateTokenByAddress(updatedTokens);
     }
     public async getUserAccountsAsync() {
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         const userAccountsIfExists = await this.zeroEx.getAvailableAddressesAsync();
         return userAccountsIfExists;
     }
@@ -359,6 +362,7 @@ export class Blockchain {
         }
     }
     private async startListeningForExchangeLogFillEventsAsync(indexFilterValues: IndexedFilterValues): Promise<void> {
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
         const fromBlock = tradeHistoryStorage.getFillsLatestBlock(this.userAddress, this.networkId);
@@ -425,6 +429,7 @@ export class Blockchain {
         }
     }
     private async getTokenRegistryTokensAsync(): Promise<Token[]> {
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         const tokenRegistryTokens = await this.zeroEx.tokenRegistry.getTokensAsync();
 
         const tokenBalanceAllowancePromises: Array<Promise<BigNumber.BigNumber[]>> = _.map(
@@ -495,6 +500,7 @@ export class Blockchain {
     // This method should always be run after instantiating or updating the provider
     // of the ZeroEx instance.
     private async postInstantiationOrUpdatingProviderZeroExAsync() {
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         this.exchangeAddress = await this.zeroEx.exchange.getContractAddressAsync();
     }
     private updateProviderName(injectedWeb3: Web3) {
