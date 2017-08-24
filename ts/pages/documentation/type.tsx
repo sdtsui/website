@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import {Link as ScrollLink} from 'react-scroll';
 import {colors} from 'material-ui/styles';
+import {typeDocUtils} from 'ts/utils/typedoc_utils';
 import {constants} from 'ts/utils/constants';
 import {TypeDocType, TypeDocTypes} from 'ts/types';
 import {utils} from 'ts/utils/utils';
@@ -97,7 +98,7 @@ export function Type(props: TypeProps): any {
             </a>
         );
     } else if ((isReference || isArray) &&
-                (_.includes(constants.public0xjsTypes, typeName) ||
+                (typeDocUtils.isPublicType(typeName as string) ||
                 !_.isUndefined(sectionNameIfExists))) {
         const typeDefinitionAnchorId = _.isUndefined(sectionNameIfExists) ? typeName : sectionNameIfExists;
         typeName = (

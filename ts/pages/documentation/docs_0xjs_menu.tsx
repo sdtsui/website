@@ -6,40 +6,40 @@ import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
 import compareVersions = require('compare-versions');
 import {VersionDropDown} from 'ts/pages/documentation/version_drop_down';
-import {DocSections, Styles, TypeDocNode, MenuSubsectionsBySection} from 'ts/types';
+import {ZeroExJsDocSections, Styles, TypeDocNode, MenuSubsectionsBySection} from 'ts/types';
 import {typeDocUtils} from 'ts/utils/typedoc_utils';
 import {Link as ScrollLink} from 'react-scroll';
 
 export const menu = {
     introduction: [
-        DocSections.introduction,
+        ZeroExJsDocSections.introduction,
     ],
     install: [
-        DocSections.installation,
+        ZeroExJsDocSections.installation,
     ],
     topics: [
-        DocSections.async,
-        DocSections.errors,
-        DocSections.versioning,
+        ZeroExJsDocSections.async,
+        ZeroExJsDocSections.errors,
+        ZeroExJsDocSections.versioning,
     ],
     zeroEx: [
-        DocSections.zeroEx,
+        ZeroExJsDocSections.zeroEx,
     ],
     contracts: [
-        DocSections.exchange,
-        DocSections.token,
-        DocSections.tokenRegistry,
-        DocSections.etherToken,
-        DocSections.proxy,
+        ZeroExJsDocSections.exchange,
+        ZeroExJsDocSections.token,
+        ZeroExJsDocSections.tokenRegistry,
+        ZeroExJsDocSections.etherToken,
+        ZeroExJsDocSections.proxy,
     ],
     types: [
-        DocSections.types,
+        ZeroExJsDocSections.types,
     ],
 };
 
 const menuSubsectionToVersionWhenIntroduced = {
-    [DocSections.etherToken]: '0.7.1',
-    [DocSections.proxy]: '0.8.0',
+    [ZeroExJsDocSections.etherToken]: '0.7.1',
+    [ZeroExJsDocSections.proxy]: '0.8.0',
 };
 
 interface Docs0xjsMenuProps {
