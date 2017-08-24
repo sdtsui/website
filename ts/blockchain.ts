@@ -489,10 +489,10 @@ export class Blockchain {
         }
 
         const provider = await this.getProviderAsync(injectedWeb3, networkId);
+        this.zeroEx = new ZeroEx(provider);
         await this.updateProviderName(injectedWeb3);
         const shouldPollUserAddress = true;
         this.web3Wrapper = new Web3Wrapper(this.dispatcher, provider, networkId, shouldPollUserAddress);
-        this.zeroEx = new ZeroEx(provider);
         await this.postInstantiationOrUpdatingProviderZeroExAsync();
     }
     // This method should always be run after instantiating or updating the provider
