@@ -36,8 +36,8 @@ export const typeDocUtils = {
     isPrivateOrProtectedProperty(propertyName: string): boolean {
         return _.startsWith(propertyName, '_');
     },
-    isPublicType(type: TypeDocNode): boolean {
-        return _.includes(constants.public0xjsTypes, type.name);
+    isPublicType(typeName: string): boolean {
+        return _.includes(constants.public0xjsTypes, typeName);
     },
     getModuleDefinitionBySectionNameIfExists(versionDocObj: TypeDocNode, sectionName: string): TypeDocNode|undefined {
         const possibleModulePathNames = sectionNameToPossibleModulePaths[sectionName];
@@ -64,7 +64,9 @@ export const typeDocUtils = {
                 const allModules = versionDocObj.children;
                 const typesModule = _.find(allModules, {name: TYPES_MODULE_PATH}) as TypeDocNode;
                 const allTypes = _.filter(typesModule.children, typeDocUtils.isType);
-                const publicTypes = _.filter(allTypes, typeDocUtils.isPublicType);
+                const publicTypes = _.filter(allTypes, type => {
+                    return typeDocUtils.isPublicType(type.name);
+                });
                 menuSubsectionsBySection[menuItemName] = publicTypes;
             } else {
                 const moduleDefinition = typeDocUtils.getModuleDefinitionBySectionNameIfExists(
