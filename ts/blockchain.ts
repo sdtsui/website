@@ -40,8 +40,6 @@ import {Web3Wrapper} from 'ts/web3_wrapper';
 import {errorReporter} from 'ts/utils/error_reporter';
 import {tradeHistoryStorage} from 'ts/local_storage/trade_history_storage';
 import {customTokenStorage} from 'ts/local_storage/custom_token_storage';
-import * as TokenTransferProxyArtifacts from '../contracts/TokenTransferProxy.json';
-import * as TokenRegistryArtifacts from '../contracts/TokenRegistry.json';
 import * as TokenArtifacts from '../contracts/Token.json';
 import * as MintableArtifacts from '../contracts/Mintable.json';
 import * as EtherTokenArtifacts from '../contracts/EtherToken.json';
@@ -92,9 +90,9 @@ export class Blockchain {
         }
     }
     public async isAddressInTokenRegistryAsync(tokenAddress: string): Promise<boolean> {
-        utils.assert(!_.isUndefined(this.tokenRegistry), 'TokenRegistry must be instantiated');
-        const tokenMetadata = await this.tokenRegistry.getTokenMetaData.call(tokenAddress);
-        return tokenMetadata[0] !== constants.NULL_ADDRESS;
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
+        const tokenIfExists = await this.zeroEx.tokenRegistry.getTokenIfExistsAsync(tokenAddress);
+        return !_.isUndefined(tokenIfExists);
     }
     public getLedgerDerivationPathIfExists(): string {
         if (_.isUndefined(this.ledgerSubProvider)) {
@@ -176,11 +174,12 @@ export class Blockchain {
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
         const tokenContract = await this.instantiateContractIfExistsAsync(TokenArtifacts, token.address);
+        const tokenTransferProxyAddress = await this.zeroEx.proxy.getContractAddressAsync();
         // Hack: for some reason default estimated gas amount causes `base fee exceeds gas limit` exception
         // on testrpc. Probably related to https://github.com/ethereumjs/testrpc/issues/294
         // TODO: Debug issue in testrpc and submit a PR, then remove this hack
         const estimatedGas = await tokenContract.approve.estimateGas(
-            this.tokenTransferProxy.address, amountInBaseUnits,
+            tokenTransferProxyAddress, amountInBaseUnits,
             {
                 from: this.userAddress,
             },
@@ -188,7 +187,7 @@ export class Blockchain {
         const gas = this.networkId === constants.TESTRPC_NETWORK_ID && amountInBaseUnits.eq(0) ?
                     ALLOWANCE_TO_ZERO_GAS_AMOUNT :
                     estimatedGas;
-        await tokenContract.approve(this.tokenTransferProxy.address, amountInBaseUnits, {
+        await tokenContract.approve(tokenTransferProxyAddress, amountInBaseUnits, {
             from: this.userAddress,
             gas,
         });
@@ -303,8 +302,9 @@ export class Blockchain {
         let balance = new BigNumber(0);
         let allowance = new BigNumber(0);
         if (this.doesUserAddressExist()) {
+            const tokenTransferProxyAddress = await this.zeroEx.proxy.getContractAddressAsync();
             balance = await tokenContract.balanceOf.call(ownerAddress);
-            allowance = await tokenContract.allowance.call(ownerAddress, this.tokenTransferProxy.address);
+            allowance = await tokenContract.allowance.call(ownerAddress, tokenTransferProxyAddress);
             // We rewrap BigNumbers from web3 into our BigNumber because the version that they're using is too old
             balance = new BigNumber(balance);
             allowance = new BigNumber(allowance);
@@ -571,29 +571,6 @@ export class Blockchain {
                      'Cannot call instantiateContractsAsync if disconnected from Ethereum node');
 
         this.dispatcher.updateBlockchainIsLoaded(false);
-        try {
-            const contractsPromises = _.map(
-                [
-                  TokenRegistryArtifacts,
-                  TokenTransferProxyArtifacts,
-                ],
-                (artifacts: any) => this.instantiateContractIfExistsAsync(artifacts),
-            );
-            const contracts = await Promise.all(contractsPromises);
-            this.tokenRegistry = contracts[0];
-            this.tokenTransferProxy = contracts[1];
-        } catch (err) {
-            const errMsg = err + '';
-            if (_.includes(errMsg, BlockchainCallErrs.CONTRACT_DOES_NOT_EXIST)) {
-                this.dispatcher.encounteredBlockchainError(BlockchainErrs.A_CONTRACT_NOT_DEPLOYED_ON_NETWORK);
-                this.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
-                return;
-            } else {
-                // We show a generic message for other possible caught errors
-                this.dispatcher.encounteredBlockchainError(BlockchainErrs.UNHANDLED_ERROR);
-                return;
-            }
-        }
         this.dispatcher.clearTokenByAddress();
         const tokenArrays = await Promise.all([
                 this.getTokenRegistryTokensAsync(),
