@@ -94,10 +94,6 @@ export const utils = {
         };
         return order;
     },
-    convertByte32HexToString(byte32Hex: string) {
-        const buf = ethUtil.toBuffer(byte32Hex);
-        return buf.toString().replace(/\0/g, '');
-    },
     consoleLog(message: string) {
         /* tslint:disable */
         console.log(message);
