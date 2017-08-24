@@ -63,7 +63,7 @@
     "thenby": "^1.2.3",
     "truffle-contract": "2.0.1",
     "tslint-config-0xproject": "^0.0.2",
-    "typescript": "2.4.1",
+    "typescript": "^2.4.1",
     "web3": "^0.18.2",
     "web3-provider-engine": "^11.0.0",
     "whatwg-fetch": "^2.0.3",
