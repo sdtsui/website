@@ -40,9 +40,7 @@ import {Web3Wrapper} from 'ts/web3_wrapper';
 import {errorReporter} from 'ts/utils/error_reporter';
 import {tradeHistoryStorage} from 'ts/local_storage/trade_history_storage';
 import {customTokenStorage} from 'ts/local_storage/custom_token_storage';
-import * as TokenArtifacts from '../contracts/Token.json';
 import * as MintableArtifacts from '../contracts/Mintable.json';
-import * as EtherTokenArtifacts from '../contracts/EtherToken.json';
 
 const ALLOWANCE_TO_ZERO_GAS_AMOUNT = 45730;
 
@@ -172,25 +170,11 @@ export class Blockchain {
     public async setProxyAllowanceAsync(token: Token, amountInBaseUnits: BigNumber.BigNumber): Promise<void> {
         utils.assert(this.isValidAddress(token.address), BlockchainCallErrs.TOKEN_ADDRESS_IS_INVALID);
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
 
-        const tokenContract = await this.instantiateContractIfExistsAsync(TokenArtifacts, token.address);
-        const tokenTransferProxyAddress = await this.zeroEx.proxy.getContractAddressAsync();
-        // Hack: for some reason default estimated gas amount causes `base fee exceeds gas limit` exception
-        // on testrpc. Probably related to https://github.com/ethereumjs/testrpc/issues/294
-        // TODO: Debug issue in testrpc and submit a PR, then remove this hack
-        const estimatedGas = await tokenContract.approve.estimateGas(
-            tokenTransferProxyAddress, amountInBaseUnits,
-            {
-                from: this.userAddress,
-            },
+        await this.zeroEx.token.setProxyAllowanceAsync(
+            token.address, this.userAddress, amountInBaseUnits,
         );
-        const gas = this.networkId === constants.TESTRPC_NETWORK_ID && amountInBaseUnits.eq(0) ?
-                    ALLOWANCE_TO_ZERO_GAS_AMOUNT :
-                    estimatedGas;
-        await tokenContract.approve(tokenTransferProxyAddress, amountInBaseUnits, {
-            from: this.userAddress,
-            gas,
-        });
         const allowance = amountInBaseUnits;
         this.dispatcher.replaceTokenAllowanceByAddress(token.address, allowance);
     }
@@ -230,6 +214,7 @@ export class Blockchain {
     }
     public async getUnavailableTakerAmountAsync(orderHash: string): Promise<BigNumber.BigNumber> {
         utils.assert(ZeroEx.isValidOrderHash(orderHash), 'Must be valid orderHash');
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         const unavailableTakerAmount = await this.zeroEx.exchange.getUnavailableTakerAmountAsync(orderHash);
         return unavailableTakerAmount;
     }
@@ -270,21 +255,16 @@ export class Blockchain {
         return balance;
     }
     public async convertEthToWrappedEthTokensAsync(amount: BigNumber.BigNumber) {
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
-        const wethContract = await this.instantiateContractIfExistsAsync(EtherTokenArtifacts);
-        await wethContract.deposit({
-            from: this.userAddress,
-            value: amount,
-        });
+        await this.zeroEx.etherToken.depositAsync(amount, this.userAddress);
     }
     public async convertWrappedEthTokensToEthAsync(amount: BigNumber.BigNumber) {
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
-        const wethContract = await this.instantiateContractIfExistsAsync(EtherTokenArtifacts);
-        await wethContract.withdraw(amount, {
-            from: this.userAddress,
-        });
+        await this.zeroEx.etherToken.withdrawAsync(amount, this.userAddress);
     }
     public async doesContractExistAtAddressAsync(address: string) {
         return await this.web3Wrapper.doesContractExistAtAddressAsync(address);
@@ -294,20 +274,17 @@ export class Blockchain {
     }
     public async getTokenBalanceAndAllowanceAsync(ownerAddress: string, tokenAddress: string):
                     Promise<BigNumber.BigNumber[]> {
+        utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
+
         if (_.isEmpty(ownerAddress)) {
             const zero = new BigNumber(0);
             return [zero, zero];
         }
-        const tokenContract = await this.instantiateContractIfExistsAsync(TokenArtifacts, tokenAddress);
         let balance = new BigNumber(0);
         let allowance = new BigNumber(0);
         if (this.doesUserAddressExist()) {
-            const tokenTransferProxyAddress = await this.zeroEx.proxy.getContractAddressAsync();
-            balance = await tokenContract.balanceOf.call(ownerAddress);
-            allowance = await tokenContract.allowance.call(ownerAddress, tokenTransferProxyAddress);
-            // We rewrap BigNumbers from web3 into our BigNumber because the version that they're using is too old
-            balance = new BigNumber(balance);
-            allowance = new BigNumber(allowance);
+            balance = await this.zeroEx.token.getBalanceAsync(tokenAddress, ownerAddress);
+            allowance = await this.zeroEx.token.getProxyAllowanceAsync(tokenAddress, ownerAddress);
         }
         return [balance, allowance];
     }
