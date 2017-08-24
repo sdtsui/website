@@ -74,7 +74,7 @@ export class Blockchain {
         } else if (this.networkId !== newNetworkId) {
             this.networkId = newNetworkId;
             this.dispatcher.encounteredBlockchainError('');
-            await this.instantiateContractsAsync();
+            await this.fetchTokenInformationAsync();
             await this.rehydrateStoreWithContractEvents();
         }
     }
@@ -167,7 +167,7 @@ export class Blockchain {
                 throw utils.spawnSwitchErr('providerType', providerType);
         }
 
-        await this.instantiateContractsAsync();
+        await this.fetchTokenInformationAsync();
     }
     public async setProxyAllowanceAsync(token: Token, amountInBaseUnits: BigNumber.BigNumber): Promise<void> {
         utils.assert(this.isValidAddress(token.address), BlockchainCallErrs.TOKEN_ADDRESS_IS_INVALID);
@@ -566,9 +566,9 @@ export class Blockchain {
 
         return constants.GENERIC_PROVIDER_NAME;
     }
-    private async instantiateContractsAsync() {
+    private async fetchTokenInformationAsync() {
         utils.assert(!_.isUndefined(this.networkId),
-                     'Cannot call instantiateContractsAsync if disconnected from Ethereum node');
+                     'Cannot call fetchTokenInformationAsync if disconnected from Ethereum node');
 
         this.dispatcher.updateBlockchainIsLoaded(false);
         this.dispatcher.clearTokenByAddress();
