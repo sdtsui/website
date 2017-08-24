@@ -348,7 +348,7 @@ export const TypeDocTypes = strEnum([
 ]);
 export type TypeDocTypes = keyof typeof TypeDocTypes;
 
-export const DocSections = strEnum([
+export const ZeroExJsDocSections = strEnum([
   'introduction',
   'installation',
   'async',
@@ -362,7 +362,7 @@ export const DocSections = strEnum([
   'proxy',
   'types',
 ]);
-export type DocSections = keyof typeof DocSections;
+export type ZeroExJsDocSections = keyof typeof ZeroExJsDocSections;
 
 interface CivicSignupOpts {
     style: string;
