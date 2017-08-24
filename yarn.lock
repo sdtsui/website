@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"0x.js@^0.9.3":
-  version "0.9.3"
-  resolved "https://registry.yarnpkg.com/0x.js/-/0x.js-0.9.3.tgz#5912e235e70757d53c6b56c3b9ce98d17fdb2d68"
+"0x.js@^0.10.4":
+  version "0.10.4"
+  resolved "https://registry.yarnpkg.com/0x.js/-/0x.js-0.10.4.tgz#8474e0dab524a4ba9fd8a1ab3f326d42d3b2ee39"
   dependencies:
     bignumber.js "^4.0.2"
     compare-versions "^3.0.1"
@@ -5777,9 +5777,9 @@ type-is@~1.6.15:
     media-typer "0.3.0"
     mime-types "~2.1.15"
 
-typescript@^2.4.1:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.5.1.tgz#ce7cc93ada3de19475cc9d17e3adea7aee1832aa"
+typescript@2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.4.1.tgz#c3ccb16ddaa0b2314de031e7e6fee89e5ba346bc"
 
 ua-parser-js@^0.7.9:
   version "0.7.12"
