@@ -7,7 +7,6 @@ import {Dispatcher} from 'ts/redux/dispatcher';
 import {Token, BalanceErrs} from 'ts/types';
 import {utils} from 'ts/utils/utils';
 import {errorReporter} from 'ts/utils/error_reporter';
-import {AllowanceConfirmationDialog} from 'ts/components/allowance_confirmation_dialog';
 
 const DEFAULT_ALLOWANCE_AMOUNT_IN_BASE_UNITS = new BigNumber(2).pow(256).minus(1);
 
@@ -17,13 +16,11 @@ interface AllowanceToggleProps {
     onErrorOccurred: (errType: BalanceErrs) => void;
     token: Token;
     userAddress: string;
-    networkId: number;
 }
 
 interface AllowanceToggleState {
     isSpinnerVisible: boolean;
     prevAllowance: BigNumber.BigNumber;
-    isConfirmationDialogVisible: boolean;
 }
 
 export class AllowanceToggle extends React.Component<AllowanceToggleProps, AllowanceToggleState> {
@@ -32,7 +29,6 @@ export class AllowanceToggle extends React.Component<AllowanceToggleProps, Allow
         this.state = {
             isSpinnerVisible: false,
             prevAllowance: props.token.allowance,
-            isConfirmationDialogVisible: false,
         };
     }
     public componentWillReceiveProps(nextProps: AllowanceToggleProps) {
@@ -58,40 +54,15 @@ export class AllowanceToggle extends React.Component<AllowanceToggleProps, Allow
                         <i className="zmdi zmdi-spinner zmdi-hc-spin" />
                     </div>
                 }
-                <AllowanceConfirmationDialog
-                    isOpen={this.state.isConfirmationDialogVisible}
-                    token={this.props.token}
-                    onToggleDialog={this.onConfirmationDialogClosedAsync.bind(this)}
-                    networkId={this.props.networkId}
-                />
             </div>
         );
-    }
-    private async onConfirmationDialogClosedAsync(isSettingAllowanceConfirmed: boolean) {
-        this.setState({
-            isConfirmationDialogVisible: false,
-        });
-        if (!isSettingAllowanceConfirmed) {
-            return;
-        }
-        await this.setAllowanceAsync();
     }
     private async onToggleAllowanceAsync() {
         if (this.props.userAddress === '') {
             this.props.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
             return false;
         }
-        const isInTokenRegistry = await this.props.blockchain.isAddressInTokenRegistryAsync(this.props.token.address);
-        if (!isInTokenRegistry && !this.isAllowanceSet()) {
-            this.setState({
-                isConfirmationDialogVisible: true,
-            });
-            return false;
-        }
 
-        await this.setAllowanceAsync();
-    }
-    private async setAllowanceAsync() {
         this.setState({
             isSpinnerVisible: true,
         });

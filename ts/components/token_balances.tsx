@@ -334,7 +334,6 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                         token={token}
                         onErrorOccurred={this.onErrorOccurred.bind(this)}
                         userAddress={this.props.userAddress}
-                        networkId={this.props.networkId}
                     />
                 </TableRowColumn>
                 <TableRowColumn
