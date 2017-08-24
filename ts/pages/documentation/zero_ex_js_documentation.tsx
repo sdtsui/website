@@ -15,7 +15,7 @@ import {
     scroller,
 } from 'react-scroll';
 import {Dispatcher} from 'ts/redux/dispatcher';
-import {KindString, TypeDocNode, DocSections, Styles, ScreenWidths, S3FileObject} from 'ts/types';
+import {KindString, TypeDocNode, ZeroExJsDocSections, Styles, ScreenWidths, S3FileObject} from 'ts/types';
 import {TopBar} from 'ts/components/top_bar';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
@@ -41,11 +41,11 @@ const versioningMarkdown = require('md/docs/0xjs/versioning');
 const SCROLL_TO_TIMEOUT = 500;
 
 const sectionNameToMarkdown = {
-    [DocSections.introduction]: IntroMarkdown,
-    [DocSections.installation]: InstallationMarkdown,
-    [DocSections.async]: AsyncMarkdown,
-    [DocSections.errors]: ErrorsMarkdown,
-    [DocSections.versioning]: versioningMarkdown,
+    [ZeroExJsDocSections.introduction]: IntroMarkdown,
+    [ZeroExJsDocSections.installation]: InstallationMarkdown,
+    [ZeroExJsDocSections.async]: AsyncMarkdown,
+    [ZeroExJsDocSections.errors]: ErrorsMarkdown,
+    [ZeroExJsDocSections.versioning]: versioningMarkdown,
 };
 
 export interface ZeroExJSDocumentationPassedProps {
@@ -231,7 +231,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                     <Comment
                         comment={packageComment}
                     />
-                    {sectionName === DocSections.zeroEx && constructors.length > 0 &&
+                    {sectionName === ZeroExJsDocSections.zeroEx && constructors.length > 0 &&
                         <div>
                             <h2 className="thin">Constructor</h2>
                             {this.renderZeroExConstructors(constructors)}
@@ -263,7 +263,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
     private renderZeroExConstructors(constructors: TypeDocNode[]): React.ReactNode {
         const isConstructor = true;
         const constructorDefs = _.map(constructors, constructor => {
-            return this.renderMethodBlocks(constructor, DocSections.zeroEx, isConstructor);
+            return this.renderMethodBlocks(constructor, ZeroExJsDocSections.zeroEx, isConstructor);
         });
         return (
             <div>
@@ -302,7 +302,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
             // Hack: currently the section names are identical as the property names on the ZeroEx class
             // For now we reply on this mapping to construct the method entity. In the future, we should
             // do this differently.
-            entity = (sectionName !== DocSections.zeroEx) ? `${entity}${sectionName}.` : entity;
+            entity = (sectionName !== ZeroExJsDocSections.zeroEx) ? `${entity}${sectionName}.` : entity;
             entity = isConstructor ? '' : entity;
             return (
                 <MethodBlock

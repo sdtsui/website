@@ -5,19 +5,20 @@
   "scripts": {
     "build": "webpack -p",
     "dev": "webpack-dev-server --content-base public --https",
-    "update_contracts": "copyfiles -u 4 ./../contracts/build/contracts/*.json ./contracts;",
+    "update_contracts": "for i in ${npm_package_config_artifacts}; do copyfiles -u 4 ../contracts/build/contracts/$i.json ../website/contracts; done;",
     "deploy_staging": "npm run build; aws s3 sync ./public/. s3://staging-0xproject --profile 0xproject --region us-east-1 --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers",
     "deploy_crowdsale": "npm run build; aws s3 sync ./public/. s3://c0139f56b662428187e64ffc035b2f1f300dbebf289f8cb33.0xproject.com --profile 0xproject --region us-east-1 --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers",
     "deploy_live": "npm run build; aws s3 sync ./public/. s3://0xproject.com --profile 0xproject --region us-east-1 --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers",
     "testrpc": "testrpc -p 8545 --networkId 50 -m \"${npm_package_config_mnemonic}\""
   },
   "config": {
+    "artifacts": "Mintable",
     "mnemonic": "concert load couple harbor equip island argue ramp clarify fence smart topic"
   },
   "author": "Fabio Berger",
   "license": "Apache-2.0",
   "dependencies": {
-    "0x.js": "^0.9.3",
+    "0x.js": "^0.10.4",
     "@types/query-string": "^5.0.0",
     "basscss": "^8.0.3",
     "bignumber.js": "^4.0.2",
