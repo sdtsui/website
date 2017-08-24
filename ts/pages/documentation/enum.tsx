@@ -1,26 +1,24 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import {utils} from 'ts/utils/utils';
-import {TypeDocNode} from 'ts/types';
+import {TypeDocNode, EnumValue} from 'ts/types';
 
 const STRING_ENUM_CODE_PREFIX = ' strEnum(';
 
 interface EnumProps {
-    type: TypeDocNode;
+    values: EnumValue[];
 }
 
 export function Enum(props: EnumProps) {
-    const type = props.type;
-    if (!_.startsWith(type.defaultValue, STRING_ENUM_CODE_PREFIX)) {
-        utils.consoleLog('We do not yet support `Variable` types that are not strEnums');
-        return null;
-    }
-    // Remove the prefix and postfix, leaving only the strEnum values without quotes.
-    const enumValues = type.defaultValue.slice(10, -3).replace(/'/g, '');
+    const values = _.map(props.values, (value, i) => {
+        const isLast = i === props.values.length - 1;
+        const defaultValueIfAny = !_.isUndefined(value.defaultValue) ? ` = ${value.defaultValue}` : '';
+        return `\n\t${value.name}${defaultValueIfAny},`;
+    });
     return (
         <span>
             {`{`}
-                {'\t'}{enumValues}
+                {values}
                 <br />
             {`}`}
         </span>
