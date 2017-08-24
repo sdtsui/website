@@ -7,7 +7,10 @@
         "target": "es5",
         "jsx": "react",
         "baseUrl": "./",
-        "allowJs": true
+        "allowJs": true,
+        "paths": {
+            "*": [ "node_modules/@types/*", "*"]
+        }
     },
     "include": [
         "./ts/**/*",
