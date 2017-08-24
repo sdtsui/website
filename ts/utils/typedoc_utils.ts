@@ -22,7 +22,8 @@ export const typeDocUtils = {
         return entity.kindString === KindString.Interface ||
                entity.kindString === KindString.Function ||
                entity.kindString === KindString['Type alias'] ||
-               entity.kindString === KindString.Variable;
+               entity.kindString === KindString.Variable ||
+               entity.kindString === KindString.Enumeration;
     },
     isMethod(entity: TypeDocNode): boolean {
         return entity.kindString === KindString.Method;

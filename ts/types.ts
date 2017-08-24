@@ -284,8 +284,14 @@ export const KindString = strEnum([
   'Type alias',
   'Variable',
   'Function',
+  'Enumeration',
 ]);
 export type KindString = keyof typeof KindString;
+
+export interface EnumValue {
+    name: string;
+    defaultValue?: string;
+}
 
 export enum Environments {
     DEVELOPMENT,
