@@ -32,7 +32,7 @@ export class TypeDefinition extends React.Component<TypeDefinitionProps, TypeDef
     public render() {
         const type = this.props.type;
         if (!typeDocUtils.isPublicType(type.name)) {
-            return null; // Skip
+            return null; // no-op
         }
 
         let typePrefix: string;
