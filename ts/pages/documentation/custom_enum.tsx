@@ -5,11 +5,14 @@ import {TypeDocNode} from 'ts/types';
 
 const STRING_ENUM_CODE_PREFIX = ' strEnum(';
 
-interface EnumProps {
+interface CustomEnumProps {
     type: TypeDocNode;
 }
 
-export function Enum(props: EnumProps) {
+// This component renders custom string enums that was a work-around for versions of
+// TypeScript <2.4.0 that did not support them natively. We keep it around to support
+// older versions of 0x.js <0.9.0
+export function CustomEnum(props: CustomEnumProps) {
     const type = props.type;
     if (!_.startsWith(type.defaultValue, STRING_ENUM_CODE_PREFIX)) {
         utils.consoleLog('We do not yet support `Variable` types that are not strEnums');

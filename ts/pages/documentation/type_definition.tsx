@@ -5,7 +5,7 @@ import {utils} from 'ts/utils/utils';
 import {KindString, TypeDocNode, TypeDocTypes} from 'ts/types';
 import {Type} from 'ts/pages/documentation/type';
 import {Interface} from 'ts/pages/documentation/interface';
-import {Enum} from 'ts/pages/documentation/enum';
+import {CustomEnum} from 'ts/pages/documentation/custom_enum';
 import {MethodSignature} from 'ts/pages/documentation/method_signature';
 import {AnchorTitle} from 'ts/pages/documentation/anchor_title';
 import {Comment} from 'ts/pages/documentation/comment';
@@ -49,7 +49,7 @@ export class TypeDefinition extends React.Component<TypeDefinitionProps, TypeDef
             case KindString.Variable:
                 typePrefix = 'Enum';
                 codeSnippet = (
-                    <Enum
+                    <CustomEnum
                         type={type}
                     />
                 );
