@@ -9,7 +9,8 @@ import {configs} from 'ts/utils/configs';
 import {constants} from 'ts/utils/constants';
 import {Identicon} from 'ts/components/ui/identicon';
 import {OTCMenu} from 'ts/components/otc_menu';
-import {Docs0xjsMenu} from 'ts/pages/documentation/docs_0xjs_menu';
+import {DocsMenu} from 'ts/pages/documentation/docs_menu';
+import {typeDocUtils} from 'ts/utils/typedoc_utils';
 import {Styles, TypeDocNode, MenuSubsectionsBySection} from 'ts/types';
 import {
     Link as ScrollLink,
@@ -155,7 +156,8 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
         return (
             <div className="lg-hide md-hide">
                 <div className="pl1 py1" style={{backgroundColor: SECTION_HEADER_COLOR}}>0x.js Docs</div>
-                <Docs0xjsMenu
+                <DocsMenu
+                    topLevelMenu={typeDocUtils.getFinal0xjsMenu(this.props.zeroExJSversion)}
                     menuSubsectionsBySection={this.props.menuSubsectionsBySection}
                     shouldDisplaySectionHeaders={false}
                     onMenuItemClick={this.onMenuButtonClick.bind(this)}

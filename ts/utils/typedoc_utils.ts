@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import compareVersions = require('compare-versions');
 import {constants} from 'ts/utils/constants';
 import {TypeDocNode, KindString, ZeroExJsDocSections, MenuSubsectionsBySection} from 'ts/types';
 
@@ -68,7 +69,8 @@ export const typeDocUtils = {
                 const publicTypes = _.filter(allTypes, type => {
                     return typeDocUtils.isPublicType(type.name);
                 });
-                menuSubsectionsBySection[menuItemName] = publicTypes;
+                const typeNames = _.map(publicTypes, t => t.name);
+                menuSubsectionsBySection[menuItemName] = typeNames;
             } else {
                 const moduleDefinition = typeDocUtils.getModuleDefinitionBySectionNameIfExists(
                     versionDocObj, menuItemName,
@@ -80,9 +82,24 @@ export const typeDocUtils = {
                 const allMembers = mainModuleExport.children;
                 const allMethods = _.filter(allMembers, typeDocUtils.isMethod);
                 const publicMethods = _.filter(allMethods, method => method.flags.isPublic);
-                menuSubsectionsBySection[menuItemName] = publicMethods;
+                const methodNames = _.map(publicMethods, t => t.name);
+                menuSubsectionsBySection[menuItemName] = methodNames;
             }
         });
         return menuSubsectionsBySection;
+    },
+    getFinal0xjsMenu(selectedVersion: string) {
+        const finalMenu = _.cloneDeep(constants.menu0xjs);
+        finalMenu.contracts = _.filter(finalMenu.contracts, (contractName: string) => {
+            const versionIntroducedIfExists = constants.menuSubsectionToVersionWhenIntroduced[contractName];
+            if (!_.isUndefined(versionIntroducedIfExists)) {
+                const existsInSelectedVersion = compareVersions(selectedVersion,
+                                                                versionIntroducedIfExists) >= 0;
+                return existsInSelectedVersion;
+            } else {
+                return true;
+            }
+        });
+        return finalMenu;
     },
 };

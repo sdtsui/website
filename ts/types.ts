@@ -396,7 +396,7 @@ export interface S3FileObject {
 }
 
 export interface MenuSubsectionsBySection {
-    [section: string]: TypeDocNode[];
+    [section: string]: string[];
 }
 
 export const ProviderType = strEnum([

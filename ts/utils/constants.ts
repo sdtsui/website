@@ -1,4 +1,4 @@
-import {ExchangeContractErrs, PublicNodeUrlsByNetworkId} from 'ts/types';
+import {ExchangeContractErrs, PublicNodeUrlsByNetworkId, ZeroExJsDocSections} from 'ts/types';
 import * as BigNumber from 'bignumber.js';
 
 const INFURA_API_KEY = 'T5WSC8cautR4KXyYgsRs';
@@ -128,4 +128,34 @@ export const constants = {
         'ApprovalContractEventArgs',
         'TokenContractEventArgs',
     ],
+    menu0xjs: {
+        introduction: [
+            ZeroExJsDocSections.introduction,
+        ],
+        install: [
+            ZeroExJsDocSections.installation,
+        ],
+        topics: [
+            ZeroExJsDocSections.async,
+            ZeroExJsDocSections.errors,
+            ZeroExJsDocSections.versioning,
+        ],
+        zeroEx: [
+            ZeroExJsDocSections.zeroEx,
+        ],
+        contracts: [
+            ZeroExJsDocSections.exchange,
+            ZeroExJsDocSections.token,
+            ZeroExJsDocSections.tokenRegistry,
+            ZeroExJsDocSections.etherToken,
+            ZeroExJsDocSections.proxy,
+        ],
+        types: [
+            ZeroExJsDocSections.types,
+        ],
+    },
+    menuSubsectionToVersionWhenIntroduced: {
+        [ZeroExJsDocSections.etherToken]: '0.7.1',
+        [ZeroExJsDocSections.proxy]: '0.8.0',
+    },
 };
