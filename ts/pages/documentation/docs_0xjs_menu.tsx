@@ -16,6 +16,7 @@ export const menu = {
     ],
     install: [
         ZeroExJsDocSections.installation,
+        ZeroExJsDocSections.testrpc,
     ],
     topics: [
         ZeroExJsDocSections.async,
