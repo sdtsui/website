@@ -357,6 +357,7 @@ export type TypeDocTypes = keyof typeof TypeDocTypes;
 export const ZeroExJsDocSections = strEnum([
   'introduction',
   'installation',
+  'testrpc',
   'async',
   'errors',
   'versioning',
