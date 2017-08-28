@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as ReactMarkdown from 'react-markdown';
 import {Chip} from 'material-ui/Chip';
 import {colors} from 'material-ui/styles';
-import {TypeDocNode, Styles} from 'ts/types';
+import {TypeDocNode, Styles, TypeDefinitionByName} from 'ts/types';
 import {utils} from 'ts/utils/utils';
 import {SourceLink} from 'ts/pages/documentation/source_link';
 import {MethodSignature} from 'ts/pages/documentation/method_signature';
@@ -18,6 +18,7 @@ interface MethodBlockProps {
     source: TypeDocNode;
     entity: string;
     libraryVersion: string;
+    typeDefinitionByName: TypeDefinitionByName;
 }
 
 interface MethodBlockState {
@@ -78,6 +79,7 @@ export class MethodBlock extends React.Component<MethodBlockProps, MethodBlockSt
                     <MethodSignature
                         signature={methodSignature}
                         entity={this.props.entity}
+                        typeDefinitionByName={this.props.typeDefinitionByName}
                     />
                 </code>
                 <SourceLink

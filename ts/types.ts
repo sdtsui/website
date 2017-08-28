@@ -471,3 +471,7 @@ export interface BlogPost {
     description: string;
     url: string;
 }
+
+export interface TypeDefinitionByName {
+    [typeName: string]: TypeDocNode;
+}
