@@ -127,5 +127,6 @@ export const constants = {
         'TransferContractEventArgs',
         'ApprovalContractEventArgs',
         'TokenContractEventArgs',
+        'ZeroExConfig',
     ],
 };
