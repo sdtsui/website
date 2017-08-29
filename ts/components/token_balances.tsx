@@ -555,7 +555,8 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                 isBalanceSpinnerVisible: true,
             });
         } else {
-            const zrxToken = _.find(_.values(this.props.tokenByAddress), t => t.symbol === ZRX_TOKEN_SYMBOL);
+            const tokens = _.values(this.props.tokenByAddress);
+            const zrxToken = _.find(tokens, t => t.symbol === ZRX_TOKEN_SYMBOL);
             this.setState({
                 isZRXSpinnerVisible: true,
                 currentZrxBalance: zrxToken.balance,
