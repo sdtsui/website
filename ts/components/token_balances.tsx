@@ -99,7 +99,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
             });
         }
         const nextZrxToken = _.find(_.values(nextProps.tokenByAddress), t => t.symbol === ZRX_TOKEN_SYMBOL);
-        if (!nextZrxToken.balance.eq(this.state.currentZrxBalance)) {
+        if (!_.isUndefined(this.state.currentZrxBalance) && !nextZrxToken.balance.eq(this.state.currentZrxBalance)) {
             if (this.state.isZRXSpinnerVisible) {
                 const receivedAmount = nextZrxToken.balance.minus(this.state.currentZrxBalance);
                 this.props.dispatcher.showFlashMessage(`Received ${receivedAmount.toString(10)} Kovan ZRX`);
