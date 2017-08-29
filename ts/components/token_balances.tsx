@@ -46,7 +46,7 @@ const ZRX_TOKEN_SYMBOL = 'ZRX';
 
 const PRECISION = 5;
 const ICON_DIMENSION = 40;
-const ARTIFICIAL_ETHER_REQUEST_DELAY = 1000;
+const ARTIFICIAL_FAUCET_REQUEST_DELAY = 1000;
 const TOKEN_TABLE_ROW_HEIGHT = 60;
 const MAX_TOKEN_TABLE_HEIGHT = 420;
 const TOKEN_COL_SPAN_LG = 2;
@@ -74,6 +74,8 @@ interface TokenBalancesState {
     errorType: BalanceErrs;
     isBalanceSpinnerVisible: boolean;
     isDharmaDialogVisible: boolean;
+    isZRXSpinnerVisible: boolean;
+    currentZrxBalance?: BigNumber.BigNumber;
 }
 
 export class TokenBalances extends React.Component<TokenBalancesProps, TokenBalancesState> {
@@ -82,6 +84,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
         this.state = {
             errorType: undefined,
             isBalanceSpinnerVisible: false,
+            isZRXSpinnerVisible: false,
             isDharmaDialogVisible: DharmaLoanFrame.isAuthTokenPresent(),
         };
     }
@@ -89,10 +92,21 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
         if (nextProps.userEtherBalance !== this.props.userEtherBalance) {
             if (this.state.isBalanceSpinnerVisible) {
                 const receivedAmount = nextProps.userEtherBalance.minus(this.props.userEtherBalance);
-                this.props.dispatcher.showFlashMessage(`Received ${receivedAmount.toString(10)} test Ether`);
+                this.props.dispatcher.showFlashMessage(`Received ${receivedAmount.toString(10)} Kovan Ether`);
             }
             this.setState({
                 isBalanceSpinnerVisible: false,
+            });
+        }
+        const nextZrxToken = _.find(_.values(nextProps.tokenByAddress), t => t.symbol === ZRX_TOKEN_SYMBOL);
+        if (!_.isUndefined(this.state.currentZrxBalance) && !nextZrxToken.balance.eq(this.state.currentZrxBalance)) {
+            if (this.state.isZRXSpinnerVisible) {
+                const receivedAmount = nextZrxToken.balance.minus(this.state.currentZrxBalance);
+                this.props.dispatcher.showFlashMessage(`Received ${receivedAmount.toString(10)} Kovan ZRX`);
+            }
+            this.setState({
+                isZRXSpinnerVisible: false,
+                currentZrxBalance: undefined,
             });
         }
     }
@@ -209,7 +223,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                         labelReady="Request"
                                         labelLoading="Sending..."
                                         labelComplete="Sent!"
-                                        onClickAsyncFn={this.requestEtherAsync.bind(this)}
+                                        onClickAsyncFn={this.faucetRequestAsync.bind(this, true)}
                                     />
                                 </TableRowColumn>
                             }
@@ -255,9 +269,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                                 />
                             </TableHeaderColumn>
                             <TableHeaderColumn>
-                                {isTestNetwork &&
-                                    `Mint${!isSmallScreen ? ' test tokens' : ''}`
-                                }
+                                Action
                             </TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
@@ -326,6 +338,11 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                 </TableRowColumn>
                 <TableRowColumn style={{paddingRight: 3, paddingLeft: 3}}>
                     {this.renderAmount(token.balance, token.decimals)} {token.symbol}
+                    {this.state.isZRXSpinnerVisible && token.symbol === ZRX_TOKEN_SYMBOL &&
+                        <span className="pl1">
+                            <i className="zmdi zmdi-spinner zmdi-hc-spin" />
+                        </span>
+                    }
                 </TableRowColumn>
                 <TableRowColumn>
                     <AllowanceToggle
@@ -354,6 +371,14 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                             ethToken={this.getWrappedEthToken()}
                             userEtherBalance={this.props.userEtherBalance}
                             onError={this.onEthWethConversionFailed.bind(this)}
+                        />
+                    }
+                    {token.symbol === ZRX_TOKEN_SYMBOL && this.props.networkId === constants.TESTNET_NETWORK_ID &&
+                        <LifeCycleRaisedButton
+                            labelReady="Request"
+                            labelLoading="Sending..."
+                            labelComplete="Sent!"
+                            onClickAsyncFn={this.faucetRequestAsync.bind(this, false)}
                         />
                     }
                 </TableRowColumn>
@@ -493,7 +518,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
             return false;
         }
     }
-    private async requestEtherAsync(): Promise<boolean> {
+    private async faucetRequestAsync(isEtherRequest: boolean): Promise<boolean> {
         if (this.props.userAddress === '') {
             this.props.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
             return false;
@@ -508,9 +533,10 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
             return false;
         }
 
-        await utils.sleepAsync(ARTIFICIAL_ETHER_REQUEST_DELAY);
+        await utils.sleepAsync(ARTIFICIAL_FAUCET_REQUEST_DELAY);
 
-        const response = await fetch(`${constants.ETHER_FAUCET_ENDPOINT}/${this.props.userAddress}`);
+        const segment = isEtherRequest ? 'ether' : 'zrx';
+        const response = await fetch(`${constants.ETHER_FAUCET_ENDPOINT}/${segment}/${this.props.userAddress}`);
         const responseBody = await response.text();
         if (response.status !== constants.SUCCESS_STATUS) {
             utils.consoleLog(`Unexpected status code: ${response.status} -> ${responseBody}`);
@@ -524,9 +550,18 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
             return false;
         }
 
-        this.setState({
-            isBalanceSpinnerVisible: true,
-        });
+        if (isEtherRequest) {
+            this.setState({
+                isBalanceSpinnerVisible: true,
+            });
+        } else {
+            const zrxToken = _.find(_.values(this.props.tokenByAddress), t => t.symbol === ZRX_TOKEN_SYMBOL);
+            this.setState({
+                isZRXSpinnerVisible: true,
+                currentZrxBalance: zrxToken.balance,
+            });
+            this.props.blockchain.pollTokenBalanceAsync(zrxToken);
+        }
         return true;
     }
     private onErrorDialogToggle(isOpen: boolean) {
