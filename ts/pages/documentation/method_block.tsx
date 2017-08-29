@@ -33,6 +33,7 @@ const styles: Styles = {
         height: 16,
         borderRadius: 14,
         marginTop: 13,
+        lineHeight: 1.2,
     },
 };
 
