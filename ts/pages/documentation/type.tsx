@@ -126,17 +126,22 @@ export function Type(props: TypeProps): any {
                 >
                     {typeName}
                 </span> :
-                <a data-tip={true} data-for={id}>
-                    <ReactTooltip type="warning" effect="solid" id={id}>
-                        <TypeDefinition type={typeDefinition}/>
-                    </ReactTooltip>
-                    <span
-                        onClick={utils.setUrlHash.bind(null, typeDefinitionAnchorId)}
-                        style={{color: colors.lightBlueA700, cursor: 'pointer'}}
+                <span
+                    data-tip={true}
+                    data-for={id}
+                    onClick={utils.setUrlHash.bind(null, typeDefinitionAnchorId)}
+                    style={{color: colors.lightBlueA700, cursor: 'pointer', display: 'inline-block'}}
+                >
+                    {typeName}
+                    <ReactTooltip
+                        type="light"
+                        effect="solid"
+                        id={id}
+                        className="typeTooltip"
                     >
-                        {typeName}
-                    </span>
-                </a>
+                        <TypeDefinition type={typeDefinition} shouldAddId={false} />
+                    </ReactTooltip>
+                </span>
             }
             </ScrollLink>
         );
