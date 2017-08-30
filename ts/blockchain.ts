@@ -57,6 +57,7 @@ export class Blockchain {
     private userAddress: string;
     private cachedProvider: Web3.Provider;
     private ledgerSubProvider: LedgerWalletSubprovider;
+    private zrxPollIntervalId: number;
     constructor(dispatcher: Dispatcher, isSalePage: boolean = false) {
         this.dispatcher = dispatcher;
         this.userAddress = '';
@@ -225,6 +226,21 @@ export class Blockchain {
         const lowercaseAddress = address.toLowerCase();
         return this.web3Wrapper.isAddress(lowercaseAddress);
     }
+    public async pollTokenBalanceAsync(token: Token) {
+        utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
+
+        const [currBalance] = await this.getTokenBalanceAndAllowanceAsync(this.userAddress, token.address);
+
+        this.zrxPollIntervalId = window.setInterval(async () => {
+            const [balance] = await this.getTokenBalanceAndAllowanceAsync(this.userAddress, token.address);
+            if (!balance.eq(currBalance)) {
+                token.balance = balance;
+                this.dispatcher.updateTokenByAddress([token]);
+                clearInterval(this.zrxPollIntervalId);
+                delete this.zrxPollIntervalId;
+            }
+        }, 5000);
+    }
     public async signOrderHashAsync(orderHash: string): Promise<SignatureData> {
         utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         const makerAddress = this.userAddress;
@@ -314,6 +330,7 @@ export class Blockchain {
         this.web3Wrapper.updatePrevUserAddress(newUserAddress);
     }
     public destroy() {
+        clearInterval(this.zrxPollIntervalId);
         this.web3Wrapper.destroy();
         this.stopWatchingExchangeLogFillEventsAsync(); // fire and forget
     }

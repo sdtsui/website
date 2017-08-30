@@ -15,7 +15,15 @@ import {
     scroller,
 } from 'react-scroll';
 import {Dispatcher} from 'ts/redux/dispatcher';
-import {KindString, TypeDocNode, ZeroExJsDocSections, Styles, ScreenWidths, S3FileObject} from 'ts/types';
+import {
+    KindString,
+    TypeDocNode,
+    ZeroExJsDocSections,
+    Styles,
+    ScreenWidths,
+    S3FileObject,
+    TypeDefinitionByName,
+} from 'ts/types';
 import {TopBar} from 'ts/components/top_bar';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
@@ -34,6 +42,7 @@ import {typeDocUtils} from 'ts/utils/typedoc_utils';
 const IntroMarkdown = require('md/docs/0xjs/introduction');
 const InstallationMarkdown = require('md/docs/0xjs/installation');
 const AsyncMarkdown = require('md/docs/0xjs/async');
+const TestRPCMarkdown = require('md/docs/0xjs/testrpc');
 const ErrorsMarkdown = require('md/docs/0xjs/errors');
 const versioningMarkdown = require('md/docs/0xjs/versioning');
 /* tslint:enable:no-var-requires */
@@ -43,6 +52,7 @@ const SCROLL_TO_TIMEOUT = 500;
 const sectionNameToMarkdown = {
     [ZeroExJsDocSections.introduction]: IntroMarkdown,
     [ZeroExJsDocSections.installation]: InstallationMarkdown,
+    [ZeroExJsDocSections.testrpc]: TestRPCMarkdown,
     [ZeroExJsDocSections.async]: AsyncMarkdown,
     [ZeroExJsDocSections.errors]: ErrorsMarkdown,
     [ZeroExJsDocSections.versioning]: versioningMarkdown,
@@ -168,103 +178,111 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
     private renderDocumentation(): React.ReactNode {
         const subMenus = _.values(constants.menu0xjs);
         const orderedSectionNames = _.flatten(subMenus);
-        const sections = _.map(orderedSectionNames, sectionName => {
-            const packageDefinitionIfExists = typeDocUtils.getModuleDefinitionBySectionNameIfExists(
-                this.state.versionDocObj, sectionName,
-            );
-
-            const markdownFileIfExists = sectionNameToMarkdown[sectionName];
-            if (!_.isUndefined(markdownFileIfExists)) {
-                return (
-                    <MarkdownSection
-                        key={`markdown-section-${sectionName}`}
-                        sectionName={sectionName}
-                        markdownContent={markdownFileIfExists}
-                    />
-                );
-            }
-
-            if (_.isUndefined(packageDefinitionIfExists)) {
-                return null;
-            }
-
-            // Since the `types.ts` file is the only file that does not export a module/class but
-            // instead has each type export itself, we do not need to go down two levels of nesting
-            // for it.
-            let entities;
-            let packageComment = '';
-            if (sectionName === 'types') {
-                entities = packageDefinitionIfExists.children;
-            } else {
-                entities = packageDefinitionIfExists.children[0].children;
-                const commentObj = packageDefinitionIfExists.children[0].comment;
-                packageComment = !_.isUndefined(commentObj) ? commentObj.shortText : packageComment;
-            }
-
-            const constructors = _.filter(entities, typeDocUtils.isConstructor);
-
-            const publicProperties = _.filter(entities, entity => {
-                return typeDocUtils.isProperty(entity) && !typeDocUtils.isPrivateOrProtectedProperty(entity.name);
-            });
-            const publicPropertyDefs = _.map(publicProperties, property => this.renderProperty(property));
-
-            const methods = _.filter(entities, typeDocUtils.isMethod);
-            const isConstructor = false;
-            const methodDefs = _.map(methods, method => {
-                return this.renderMethodBlocks(method, sectionName, isConstructor);
-            });
-
-            const types = _.filter(entities, typeDocUtils.isType);
-            const typeDefs = _.map(types, type => {
-                return (
-                    <TypeDefinition
-                        key={`type-${type.name}`}
-                        type={type}
-                    />
-                );
-            });
-            return (
-                <div
-                    key={`section-${sectionName}`}
-                    className="py2 pr3 md-pl2 sm-pl3"
-                >
-                    <SectionHeader sectionName={sectionName} />
-                    <Comment
-                        comment={packageComment}
-                    />
-                    {sectionName === ZeroExJsDocSections.zeroEx && constructors.length > 0 &&
-                        <div>
-                            <h2 className="thin">Constructor</h2>
-                            {this.renderZeroExConstructors(constructors)}
-                        </div>
-                    }
-                    {publicPropertyDefs.length > 0 &&
-                        <div>
-                            <h2 className="thin">Properties</h2>
-                            <div>{publicPropertyDefs}</div>
-                        </div>
-                    }
-                    {methodDefs.length > 0 &&
-                        <div>
-                            <h2 className="thin">Methods</h2>
-                            <div>{methodDefs}</div>
-                        </div>
-                    }
-                    {typeDefs.length > 0 &&
-                        <div>
-                            <div>{typeDefs}</div>
-                        </div>
-                    }
-                </div>
-            );
-        });
+        const sections = _.map(orderedSectionNames, this.renderSection.bind(this));
 
         return sections;
     }
-    private renderZeroExConstructors(constructors: TypeDocNode[]): React.ReactNode {
+    private renderSection(sectionName: string): React.ReactNode {
+        const packageDefinitionIfExists = typeDocUtils.getModuleDefinitionBySectionNameIfExists(
+            this.state.versionDocObj, sectionName,
+        );
+
+        const markdownFileIfExists = sectionNameToMarkdown[sectionName];
+        if (!_.isUndefined(markdownFileIfExists)) {
+            return (
+                <MarkdownSection
+                    key={`markdown-section-${sectionName}`}
+                    sectionName={sectionName}
+                    markdownContent={markdownFileIfExists}
+                />
+            );
+        }
+
+        if (_.isUndefined(packageDefinitionIfExists)) {
+            return null;
+        }
+
+        // Since the `types.ts` file is the only file that does not export a module/class but
+        // instead has each type export itself, we do not need to go down two levels of nesting
+        // for it.
+        let entities;
+        let packageComment = '';
+        if (sectionName === 'types') {
+            entities = packageDefinitionIfExists.children;
+        } else {
+            entities = packageDefinitionIfExists.children[0].children;
+            const commentObj = packageDefinitionIfExists.children[0].comment;
+            packageComment = !_.isUndefined(commentObj) ? commentObj.shortText : packageComment;
+        }
+
+        const constructors = _.filter(entities, typeDocUtils.isConstructor);
+
+        const publicProperties = _.filter(entities, entity => {
+            return typeDocUtils.isProperty(entity) && !typeDocUtils.isPrivateOrProtectedProperty(entity.name);
+        });
+        const publicPropertyDefs = _.map(publicProperties, property => this.renderProperty(property));
+
+        const methods = _.filter(entities, typeDocUtils.isMethod);
+        const typesPackageDefinitionIfExists = typeDocUtils.getModuleDefinitionBySectionNameIfExists(
+            this.state.versionDocObj, 'types',
+        );
+        const typeDefinitionByName = _.keyBy(typesPackageDefinitionIfExists.children, 'name');
+        const isConstructor = false;
+        const methodDefs = _.map(methods, method => {
+            return this.renderMethodBlocks(method, sectionName, isConstructor, typeDefinitionByName);
+        });
+
+        const types = _.filter(entities, typeDocUtils.isType);
+        const typeDefs = _.map(types, type => {
+            return (
+                <TypeDefinition
+                    key={`type-${type.name}`}
+                    type={type}
+                />
+            );
+        });
+        return (
+            <div
+                key={`section-${sectionName}`}
+                className="py2 pr3 md-pl2 sm-pl3"
+            >
+                <SectionHeader sectionName={sectionName} />
+                <Comment
+                    comment={packageComment}
+                />
+                {sectionName === ZeroExJsDocSections.zeroEx && constructors.length > 0 &&
+                    <div>
+                        <h2 className="thin">Constructor</h2>
+                        {this.renderZeroExConstructors(constructors, typeDefinitionByName)}
+                    </div>
+                }
+                {publicPropertyDefs.length > 0 &&
+                    <div>
+                        <h2 className="thin">Properties</h2>
+                        <div>{publicPropertyDefs}</div>
+                    </div>
+                }
+                {methodDefs.length > 0 &&
+                    <div>
+                        <h2 className="thin">Methods</h2>
+                        <div>{methodDefs}</div>
+                    </div>
+                }
+                {typeDefs.length > 0 &&
+                    <div>
+                        <div>{typeDefs}</div>
+                    </div>
+                }
+            </div>
+        );
+    }
+    private renderZeroExConstructors(constructors: TypeDocNode[],
+                                     typeDefinitionByName: TypeDefinitionByName): React.ReactNode {
         const isConstructor = true;
         const constructorDefs = _.map(constructors, constructor => {
-            return this.renderMethodBlocks(constructor, ZeroExJsDocSections.zeroEx, isConstructor);
+            return this.renderMethodBlocks(
+                constructor, ZeroExJsDocSections.zeroEx, isConstructor, typeDefinitionByName,
+            );
         });
         return (
             <div>
@@ -295,7 +313,8 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
             </div>
         );
     }
-    private renderMethodBlocks(method: TypeDocNode, sectionName: string, isConstructor: boolean): React.ReactNode {
+    private renderMethodBlocks(method: TypeDocNode, sectionName: string, isConstructor: boolean,
+                               typeDefinitionByName: TypeDefinitionByName): React.ReactNode {
         const signatures = method.signatures;
         const renderedSignatures = _.map(signatures, (signature: TypeDocNode, i: number) => {
             const source = method.sources[i];
@@ -313,6 +332,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                     methodSignature={signature}
                     source={source}
                     entity={entity}
+                    typeDefinitionByName={typeDefinitionByName}
                     libraryVersion={this.props.zeroExJSversion}
                 />
             );

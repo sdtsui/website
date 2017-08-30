@@ -357,6 +357,7 @@ export type TypeDocTypes = keyof typeof TypeDocTypes;
 export const ZeroExJsDocSections = strEnum([
   'introduction',
   'installation',
+  'testrpc',
   'async',
   'errors',
   'versioning',
@@ -469,4 +470,8 @@ export interface BlogPost {
     title: string;
     description: string;
     url: string;
+}
+
+export interface TypeDefinitionByName {
+    [typeName: string]: TypeDocNode;
 }
