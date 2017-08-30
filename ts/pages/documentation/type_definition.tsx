@@ -16,6 +16,7 @@ const KEYWORD_COLOR = '#a81ca6';
 
 interface TypeDefinitionProps {
     type: TypeDocNode;
+    shouldAddId?: boolean;
 }
 
 interface TypeDefinitionState {
@@ -23,6 +24,9 @@ interface TypeDefinitionState {
 }
 
 export class TypeDefinition extends React.Component<TypeDefinitionProps, TypeDefinitionState> {
+    public static defaultProps: Partial<TypeDefinitionProps> = {
+        shouldAddId: true,
+    };
     constructor(props: TypeDefinitionProps) {
         super(props);
         this.state = {
@@ -95,7 +99,7 @@ export class TypeDefinition extends React.Component<TypeDefinitionProps, TypeDef
         const typeDefinitionAnchorId = type.name;
         return (
             <div
-                id={typeDefinitionAnchorId}
+                id={this.props.shouldAddId ? typeDefinitionAnchorId : ''}
                 className="pb2"
                 style={{overflow: 'hidden', width: '100%'}}
                 onMouseOver={this.setAnchorVisibility.bind(this, true)}
@@ -104,7 +108,7 @@ export class TypeDefinition extends React.Component<TypeDefinitionProps, TypeDef
                 <AnchorTitle
                     headerType="h3"
                     title={`${typePrefix} ${type.name}`}
-                    id={typeDefinitionAnchorId}
+                    id={this.props.shouldAddId ? typeDefinitionAnchorId : ''}
                     shouldShowAnchor={this.state.shouldShowAnchor}
                 />
                 <div style={{fontSize: 16}}>
