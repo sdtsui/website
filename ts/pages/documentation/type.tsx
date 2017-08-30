@@ -119,7 +119,7 @@ export function Type(props: TypeProps): any {
                 duration={constants.DOCS_SCROLL_DURATION_MS}
                 containerId={constants.DOCS_CONTAINER_ID}
             >
-            {_.isUndefined(typeDefinition) ?
+            {(_.isUndefined(typeDefinition) || utils.isUserOnMobile()) ?
                 <span
                     onClick={utils.setUrlHash.bind(null, typeDefinitionAnchorId)}
                     style={{color: colors.lightBlueA700, cursor: 'pointer'}}

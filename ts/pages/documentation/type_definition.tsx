@@ -16,7 +16,7 @@ const KEYWORD_COLOR = '#a81ca6';
 
 interface TypeDefinitionProps {
     type: TypeDocNode;
-    shouldAddId: boolean;
+    shouldAddId?: boolean;
 }
 
 interface TypeDefinitionState {
