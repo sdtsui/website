@@ -47,7 +47,7 @@ export class LazyComponent extends React.Component<LazyComponentProps, LazyCompo
  * @param  componentName    name of exported component
  * @param  lazyImport       lambda returning module promise
  *                          we pass a lambda because we only want to require a module if it's used
- * @example `const LazyOTC = createLazyComponent('OTC', () => System.import<any>('ts/containers/otc'));``
+ * @example `const LazyPortal = createLazyComponent('Portal', () => System.import<any>('ts/containers/portal'));``
  */
 export const createLazyComponent = (componentName: string, lazyImport: () => Promise<any>) => {
     return (props: any) => {

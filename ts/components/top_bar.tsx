@@ -8,7 +8,7 @@ import ReactTooltip = require('react-tooltip');
 import {configs} from 'ts/utils/configs';
 import {constants} from 'ts/utils/constants';
 import {Identicon} from 'ts/components/ui/identicon';
-import {OTCMenu} from 'ts/components/otc_menu';
+import {PortalMenu} from 'ts/components/portal_menu';
 import {Docs0xjsMenu} from 'ts/pages/documentation/docs_0xjs_menu';
 import {Styles, TypeDocNode, MenuSubsectionsBySection} from 'ts/types';
 import {
@@ -102,7 +102,7 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
                 docked={false}
                 onRequestChange={this.onMenuButtonClick.bind(this)}
             >
-                {this.renderOTCMenu()}
+                {this.renderPortalMenu()}
                 {this.render0xjsDocMenu()}
                 <div className="pl1 py1 mt3" style={{backgroundColor: SECTION_HEADER_COLOR}}>Website</div>
                 {this.renderHomepageMenuItem('home')}
@@ -139,9 +139,9 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
                         <MenuItem className="py2">Documentation</MenuItem>
                     </Link>
                 }
-                {!this.isViewingOTC() &&
-                    <Link to="/otc" className="text-decoration-none">
-                        <MenuItem className="py2">OTC DApp</MenuItem>
+                {!this.isViewingPortal() &&
+                    <Link to="/portal" className="text-decoration-none">
+                        <MenuItem className="py2">Portal DApp</MenuItem>
                     </Link>
                 }
             </Drawer>
@@ -165,15 +165,15 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
             </div>
         );
     }
-    private renderOTCMenu() {
-        if (!this.isViewingOTC()) {
+    private renderPortalMenu() {
+        if (!this.isViewingPortal()) {
             return;
         }
 
         return (
             <div className="lg-hide md-hide">
-                <div className="pl1 py1" style={{backgroundColor: SECTION_HEADER_COLOR}}>OTC DApp</div>
-                <OTCMenu
+                <div className="pl1 py1" style={{backgroundColor: SECTION_HEADER_COLOR}}>Portal DApp</div>
+                <PortalMenu
                     menuItemStyle={{color: 'black'}}
                     onClick={this.onMenuButtonClick.bind(this)}
                 />
@@ -238,8 +238,8 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
             isDrawerOpen: !this.state.isDrawerOpen,
         });
     }
-    private isViewingOTC() {
-        return _.includes(this.props.location.pathname, '/otc');
+    private isViewingPortal() {
+        return _.includes(this.props.location.pathname, '/portal');
     }
     private isViewing0xjsDocs() {
         return _.includes(this.props.location.pathname, '/docs/0xjs');

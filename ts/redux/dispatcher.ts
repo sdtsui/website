@@ -20,7 +20,7 @@ export class Dispatcher {
     constructor(dispatch: Dispatch<State>) {
         this.dispatch = dispatch;
     }
-    // OTC
+    // Portal
     public resetState() {
         this.dispatch({
             type: ActionTypes.RESET_STATE,
