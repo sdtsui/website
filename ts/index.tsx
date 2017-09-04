@@ -89,7 +89,7 @@ render(
                     <div>
                         <Switch>
                             <Route exact={true} path="/" component={Home as any} />
-                            <Route path="/otc" component={LazyPortal} />
+                            <Redirect from="/otc" to="/portal"/>
                             <Route path="/portal" component={LazyPortal} />
                             <Route path="/token" component={TokenLaunch as any} />
                             <Route path="/faq" component={FAQ as any} />
