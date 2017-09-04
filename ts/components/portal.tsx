@@ -31,16 +31,16 @@ import {
 import {TopBar} from 'ts/components/top_bar';
 import {Footer} from 'ts/components/footer';
 import {Loading} from 'ts/components/ui/loading';
-import {OTCMenu} from 'ts/components/otc_menu';
+import {PortalMenu} from 'ts/components/portal_menu';
 import {BlockchainErrDialog} from 'ts/components/blockchain_err_dialog';
 import * as BigNumber from 'bignumber.js';
 import {FlashMessage} from 'ts/components/ui/flash_message';
 
 const THROTTLE_TIMEOUT = 100;
 
-export interface OTCPassedProps {}
+export interface PortalPassedProps {}
 
-export interface OTCAllProps {
+export interface PortalAllProps {
     blockchainErr: BlockchainErrs;
     blockchainIsLoaded: boolean;
     dispatcher: Dispatcher;
@@ -58,7 +58,7 @@ export interface OTCAllProps {
     flashMessage?: string|React.ReactNode;
 }
 
-interface OTCAllState {
+interface PortalAllState {
     prevNetworkId: number;
     prevNodeVersion: string;
     prevUserAddress: string;
@@ -86,11 +86,11 @@ const styles: Styles = {
     },
 };
 
-export class OTC extends React.Component<OTCAllProps, OTCAllState> {
+export class Portal extends React.Component<PortalAllProps, PortalAllState> {
     private blockchain: Blockchain;
     private sharedOrderIfExists: Order;
     private throttledScreenWidthUpdate: () => void;
-    constructor(props: OTCAllProps) {
+    constructor(props: PortalAllProps) {
         super(props);
         this.sharedOrderIfExists = this.getSharedOrderIfExists();
         this.throttledScreenWidthUpdate = _.throttle(this.updateScreenWidth.bind(this), THROTTLE_TIMEOUT);
@@ -110,13 +110,13 @@ export class OTC extends React.Component<OTCAllProps, OTCAllState> {
     public componentWillUnmount() {
         this.blockchain.destroy();
         window.removeEventListener('resize', this.throttledScreenWidthUpdate);
-        // We re-set the entire redux state when the OTC is unmounted so that when it is re-rendered
+        // We re-set the entire redux state when the portal is unmounted so that when it is re-rendered
         // the initialization process always occurs from the same base state. This helps avoid
-        // initialization inconsistencies (i.e While the OTC was unrendered, the user might have
+        // initialization inconsistencies (i.e While the portal was unrendered, the user might have
         // become disconnected from their backing Ethereum node, changes user accounts, etc...)
         this.props.dispatcher.resetState();
     }
-    public componentWillReceiveProps(nextProps: OTCAllProps) {
+    public componentWillReceiveProps(nextProps: PortalAllProps) {
         if (nextProps.networkId !== this.state.prevNetworkId) {
             this.blockchain.networkIdUpdatedFireAndForgetAsync(nextProps.networkId);
             this.setState({
@@ -141,21 +141,21 @@ export class OTC extends React.Component<OTCAllProps, OTCAllState> {
     public render() {
         const updateShouldBlockchainErrDialogBeOpen = this.props.dispatcher
                 .updateShouldBlockchainErrDialogBeOpen.bind(this.props.dispatcher);
-        const otcStyle: React.CSSProperties = {
+        const portalStyle: React.CSSProperties = {
             minHeight: '100vh',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
         };
         return (
-            <div style={otcStyle}>
-                <DocumentTitle title="OTC DApp"/>
+            <div style={portalStyle}>
+                <DocumentTitle title="0x Portal DApp"/>
                 <TopBar
                     userAddress={this.props.userAddress}
                     blockchainIsLoaded={this.props.blockchainIsLoaded}
                     location={this.props.location}
                 />
-                <div id="otc" className="mx-auto max-width-4 pt4" style={{width: '100%'}}>
+                <div id="portal" className="mx-auto max-width-4 pt4" style={{width: '100%'}}>
                     <Paper className="mb3 mt2">
                         {!configs.isMainnetEnabled && this.props.networkId === constants.MAINNET_NETWORK_ID  ?
                             <div className="p3 center">
@@ -167,7 +167,7 @@ export class OTC extends React.Component<OTCAllProps, OTCAllState> {
                                     />
                                 </div>
                                 <div>
-                                    0x OTC is currently unavailable on the Ethereum mainnet.
+                                    0x portal is currently unavailable on the Ethereum mainnet.
                                     <div>
                                         To try it out, switch to the Kovan test network
                                         (networkId: 42).
@@ -182,16 +182,25 @@ export class OTC extends React.Component<OTCAllProps, OTCAllState> {
                                     className="col col-2 pr2 pt1 sm-hide xs-hide"
                                     style={{overflow: 'hidden', backgroundColor: 'rgb(39, 39, 39)', color: 'white'}}
                                 >
-                                    <OTCMenu menuItemStyle={{color: 'white'}} />
+                                    <PortalMenu menuItemStyle={{color: 'white'}} />
                                 </div>
                                 <div className="col col-12 lg-col-10 md-col-10 sm-col sm-col-12">
                                     <div className="py2" style={{backgroundColor: colors.grey50}}>
                                         {this.props.blockchainIsLoaded ?
                                             <Switch>
-                                                <Route path="/otc/fill" render={this.renderFillOrder.bind(this)} />
-                                                <Route path="/otc/balances" render={this.renderTokenBalances.bind(this)} />
-                                                <Route path="/otc/trades" component={this.renderTradeHistory.bind(this)} />
-                                                <Route path="/" render={this.renderGenerateOrderForm.bind(this)} />
+                                                <Route path="/portal/fill" render={this.renderFillOrder.bind(this)} />
+                                                <Route
+                                                    path="/portal/balances"
+                                                    render={this.renderTokenBalances.bind(this)}
+                                                />
+                                                <Route
+                                                    path="/portal/trades"
+                                                    component={this.renderTradeHistory.bind(this)}
+                                                />
+                                                <Route
+                                                    path="/"
+                                                    render={this.renderGenerateOrderForm.bind(this)}
+                                                />
                                             </Switch> :
                                             <Loading />
                                         }

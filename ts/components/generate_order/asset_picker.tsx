@@ -82,7 +82,7 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
                 cursor: 'pointer',
                 opacity: isHovered ? 0.6 : 1,
             };
-            // We have temporarily disabled adding custom tokens to OTC until the UI
+            // We have temporarily disabled adding custom tokens to 0x portal until the UI
             // for filling orders can more adequately warn users of the dangers of malicious tokens
             // gridTiles.push((
             //     <div

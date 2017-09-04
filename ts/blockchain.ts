@@ -531,7 +531,7 @@ export class Blockchain {
             provider = injectedWeb3.currentProvider;
         } else {
             // If no injectedWeb3 instance, all requests fallback to our public hosted mainnet/testnet node
-            // We do this so that users can still browse the OTC DApp even if they do not have web3
+            // We do this so that users can still browse the 0x Portal DApp even if they do not have web3
             // injected into their browser.
             provider = new ProviderEngine();
             provider.addProvider(new FilterSubprovider());

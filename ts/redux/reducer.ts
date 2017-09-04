@@ -23,7 +23,7 @@ import {
 const DEFAULT_0X_JS_VERSION = '0.7.1';
 
 export interface State {
-    // OTC
+    // Portal
     blockchainErr: BlockchainErrs;
     blockchainIsLoaded: boolean;
     generateOrderStep: GenerateOrderSteps;
@@ -54,7 +54,7 @@ export interface State {
 };
 
 const INITIAL_STATE: State = {
-    // OTC
+    // Portal
     blockchainErr: '',
     blockchainIsLoaded: false,
     generateOrderStep: GenerateOrderSteps.ChooseAssets,
@@ -93,7 +93,7 @@ const INITIAL_STATE: State = {
 
 export function reducer(state: State = INITIAL_STATE, action: Action) {
     switch (action.type) {
-        // OTC
+        // Portal
         case ActionTypes.RESET_STATE:
             return INITIAL_STATE;
 
