@@ -12,10 +12,12 @@ import RaisedButton from 'material-ui/RaisedButton';
 import {colors} from 'material-ui/styles';
 import {GenerateOrderForm} from 'ts/containers/generate_order_form';
 import {TokenBalances} from 'ts/components/token_balances';
+import {PortalDisclaimerDialog} from 'ts/components/portal_disclaimer_dialog';
 import {FillOrder} from 'ts/components/fill_order';
 import {Blockchain} from 'ts/blockchain';
 import {SchemaValidator} from 'ts/schemas/validator';
 import {orderSchema} from 'ts/schemas/order_schema';
+import {localStorage} from 'ts/local_storage/local_storage';
 import {TradeHistory} from 'ts/components/trade_history/trade_history';
 import {
     HashData,
@@ -62,6 +64,7 @@ interface PortalAllState {
     prevNetworkId: number;
     prevNodeVersion: string;
     prevUserAddress: string;
+    hasAcceptedDisclaimer: boolean;
 }
 
 const styles: Styles = {
@@ -98,6 +101,7 @@ export class Portal extends React.Component<PortalAllProps, PortalAllState> {
             prevNetworkId: this.props.networkId,
             prevNodeVersion: this.props.nodeVersion,
             prevUserAddress: this.props.userAddress,
+            hasAcceptedDisclaimer: false,
         };
     }
     public componentDidMount() {
@@ -106,6 +110,12 @@ export class Portal extends React.Component<PortalAllProps, PortalAllState> {
     }
     public componentWillMount() {
         this.blockchain = new Blockchain(this.props.dispatcher);
+        const didAcceptPortalDisclaimer = localStorage.getItemIfExists(constants.ACCEPT_DISCLAIMER_LOCAL_STORAGE_KEY);
+        const hasAcceptedDisclaimer = !_.isUndefined(didAcceptPortalDisclaimer) &&
+                                      !_.isEmpty(didAcceptPortalDisclaimer);
+        this.setState({
+            hasAcceptedDisclaimer,
+        });
     }
     public componentWillUnmount() {
         this.blockchain.destroy();
@@ -217,6 +227,10 @@ export class Portal extends React.Component<PortalAllProps, PortalAllState> {
                         toggleDialogFn={updateShouldBlockchainErrDialogBeOpen}
                         networkId={this.props.networkId}
                     />
+                    <PortalDisclaimerDialog
+                        isOpen={!this.state.hasAcceptedDisclaimer}
+                        onToggleDialog={this.onPortalDisclaimerAccepted.bind(this)}
+                    />
                     <FlashMessage
                         dispatcher={this.props.dispatcher}
                         flashMessage={this.props.flashMessage}
@@ -275,6 +289,12 @@ export class Portal extends React.Component<PortalAllProps, PortalAllState> {
                 dispatcher={this.props.dispatcher}
             />
         );
+    }
+    private onPortalDisclaimerAccepted() {
+        localStorage.setItem(constants.ACCEPT_DISCLAIMER_LOCAL_STORAGE_KEY, 'set');
+        this.setState({
+            hasAcceptedDisclaimer: true,
+        });
     }
     private getSharedOrderIfExists(): Order {
         const queryString = window.location.search;
