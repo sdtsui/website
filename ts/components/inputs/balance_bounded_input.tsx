@@ -140,7 +140,7 @@ export class BalanceBoundedInput extends
         if (_.isUndefined(this.props.onVisitBalancesPageClick)) {
             return (
                 <Link
-                    to="/otc/balances"
+                    to="/portal/balances"
                     style={linkStyle}
                 >
                     {increaseBalanceText}

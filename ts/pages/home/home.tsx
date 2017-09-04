@@ -144,9 +144,9 @@ export class Home extends React.Component<HomeProps, HomeState> {
                                             label="Docs"
                                         />
                                     </Link>
-                                    <Link to="/otc">
+                                    <Link to="/portal">
                                         <FlatButton
-                                            label="OTC"
+                                            label="Portal"
                                         />
                                     </Link>
                                 </div>

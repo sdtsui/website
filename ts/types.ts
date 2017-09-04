@@ -131,7 +131,7 @@ export enum BalanceErrs {
 };
 
 export const ActionTypes = strEnum([
-    // OTC
+    // Portal
     'UPDATE_SCREEN_WIDTH',
     'UPDATE_NODE_VERSION',
     'RESET_STATE',
