@@ -72,7 +72,9 @@ const muiTheme = getMuiTheme({
 // cause we only want to import the module when the user navigates to the page.
 // At the same time webpack statically parses for System.import() to determine bundle chunk split points
 // so each lazy import needs it's own `System.import()` declaration.
-const LazyOTC = createLazyComponent('OTC', () => System.import<any>(/* webpackChunkName: "otc" */'ts/containers/otc'));
+const LazyPortal = createLazyComponent(
+    'Portal', () => System.import<any>(/* webpackChunkName: "portal" */'ts/containers/portal'),
+);
 const LazyZeroExJSDocumentation = createLazyComponent(
     'ZeroExJSDocumentation',
     () => System.import<any>(/* webpackChunkName: "docs" */'ts/containers/zero_ex_js_documentation'),
@@ -87,7 +89,8 @@ render(
                     <div>
                         <Switch>
                             <Route exact={true} path="/" component={Home as any} />
-                            <Route path="/otc" component={LazyOTC} />
+                            <Redirect from="/otc" to="/portal"/>
+                            <Route path="/portal" component={LazyPortal} />
                             <Route path="/token" component={TokenLaunch as any} />
                             <Route path="/faq" component={FAQ as any} />
                             <Route path="/docs/0xjs/:version?" component={LazyZeroExJSDocumentation} />
