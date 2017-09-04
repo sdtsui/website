@@ -37,9 +37,29 @@ const teamRow1: ProfileInfo[] = [
         github: 'https://github.com/fabioberger',
         medium: 'https://medium.com/@fabioberger',
     },
+    {
+        name: 'Alex Xu',
+        title: 'Director of Operations',
+        description: `End-to-end business operations & strategy. Previously digital marketing consultant at
+                      Google and vendor management at Amazon. Economics at UC San Diego.`,
+        image: '/images/team/alex.jpg',
+        linkedIn: 'https://www.linkedin.com/in/alex-xu/',
+        github: '',
+        medium: '',
+    },
 ];
 
 const teamRow2: ProfileInfo[] = [
+    {
+        name: 'Ben Burns',
+        title: 'Designer',
+        description: `Product, motion, and graphic designer. Previously designer at Airtable and Apple.
+                      Digital Design at University of Cincinnati.`,
+        image: '/images/team/ben.jpg',
+        linkedIn: 'https://www.linkedin.com/in/ben-burns-30170478/',
+        github: '',
+        medium: '',
+    },
     {
         name: 'Leonid Logvinov',
         title: 'Engineer',
@@ -52,24 +72,22 @@ const teamRow2: ProfileInfo[] = [
         medium: '',
     },
     {
-        name: 'Alex Xu',
-        title: 'Director of Operations',
-        description: `End-to-end business operations & strategy. Previously digital marketing consultant at
-                      Google and vendor management at Amazon. Economics at UC San Diego.`,
-        image: '/images/team/alex.jpg',
-        linkedIn: 'https://www.linkedin.com/in/alex-xu/',
-        github: '',
+        name: 'Philippe Castonguay',
+        title: 'Developer Relations Manager',
+        description: `Previously Computational neuroscience research at Janelia and Master
+                      degree in Statistics at Western University [Dropout].`,
+        image: '/images/team/philippe.png',
+        linkedIn: '',
+        github: 'https://github.com/PhABC',
         medium: '',
     },
     {
-        name: 'Ben Burns',
-        title: 'Designer',
-        description: `Product, motion, and graphic designer. Previously designer at Airtable and Apple.
-                      Digital Design at University of Cincinnati.`,
-        image: '/images/team/ben.jpg',
-        linkedIn: 'https://www.linkedin.com/in/ben-burns-30170478/',
-        github: '',
-        medium: '',
+        name: 'We\'re hiring',
+        title: 'Designer/UI/UX/Blockchain Engineer',
+        description: `We are looking for talented, self-starters who are passionate about decentralization
+                      to join the team! Apply at jobs@0xproject.com`,
+        image: '/images/team/anyone.png',
+        linkedIn: 'https://www.linkedin.com/company-beta/17942619/',
     },
 ];
 
