@@ -102,7 +102,8 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
         if (!_.isUndefined(this.state.currentZrxBalance) && !nextZrxToken.balance.eq(this.state.currentZrxBalance)) {
             if (this.state.isZRXSpinnerVisible) {
                 const receivedAmount = nextZrxToken.balance.minus(this.state.currentZrxBalance);
-                this.props.dispatcher.showFlashMessage(`Received ${receivedAmount.toString(10)} Kovan ZRX`);
+                const receiveAmountInUnits = ZeroEx.toUnitAmount(receivedAmount, 18);
+                this.props.dispatcher.showFlashMessage(`Received ${receiveAmountInUnits.toString(10)} Kovan ZRX`);
             }
             this.setState({
                 isZRXSpinnerVisible: false,
