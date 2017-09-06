@@ -129,5 +129,8 @@ export const constants = {
         'ApprovalContractEventArgs',
         'TokenContractEventArgs',
         'ZeroExConfig',
+        'TransactionReceiptWithDecodedLogs',
+        'LogWithDecodedArgs',
+        'DecodedLogArgs',
     ],
 };
