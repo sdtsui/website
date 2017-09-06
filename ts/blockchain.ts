@@ -189,7 +189,6 @@ export class Blockchain {
 
         taker = taker === '' ? constants.NULL_ADDRESS : taker;
         const ecSignature = signatureData;
-        delete ecSignature.hash;
         const exchangeContractAddress = this.getExchangeContractAddressIfExists();
         const signedOrder = {
             ecSignature,
