@@ -213,8 +213,9 @@ export class Blockchain {
             signedOrder, fillTakerTokenAmount, shouldThrowOnInsufficientBalanceOrAllowance, this.userAddress,
         );
         const receipt = await this.zeroEx.awaitTransactionMinedAsync(txHash);
-        const logs = receipt.logs;
-        const logFill: LogWithDecodedArgs = _.find(logs, {event: 'LogFill'}) as any;
+        const logs: LogWithDecodedArgs[] = receipt.logs as any;
+        this.zeroEx.exchange.throwLogErrorsAsErrors(logs);
+        const logFill = _.find(logs, {event: 'LogFill'});
         const filledTakerTokenAmount = new BigNumber(logFill.args.filledTakerTokenAmount);
         return filledTakerTokenAmount;
     }

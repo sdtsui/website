@@ -8,9 +8,9 @@
   dependencies:
     jsonschema "^1.2.0"
 
-"0x.js@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/0x.js/-/0x.js-0.13.0.tgz#4df7e19e8b56822fcc72bdba63d02677b071c2bd"
+"0x.js@^0.14.0":
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/0x.js/-/0x.js-0.14.0.tgz#0a7037d9b2a18528a0ed3886d2edba910469f58f"
   dependencies:
     "0x-json-schemas" "^0.5.1"
     bignumber.js "^4.0.2"
@@ -4810,18 +4810,9 @@ read@~1.0.5:
   dependencies:
     mute-stream "~0.0.4"
 
-"readable-stream@>=1.0.33-1 <1.1.0-0", readable-stream@~1.0.15, readable-stream@~1.0.26, readable-stream@~1.0.31:
+"readable-stream@>=1.0.33-1 <1.1.0-0", readable-stream@^1.0.33, readable-stream@~1.0.15, readable-stream@~1.0.26, readable-stream@~1.0.31:
   version "1.0.34"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-1.0.34.tgz#125820e34bc842d2f2aaafafe4c2916ee32c157c"
-  dependencies:
-    core-util-is "~1.0.0"
-    inherits "~2.0.1"
-    isarray "0.0.1"
-    string_decoder "~0.10.x"
-
-readable-stream@^1.0.33, readable-stream@~1.1.9:
-  version "1.1.14"
-  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-1.1.14.tgz#7cf4c54ef648e3813084c636dd2079e166c081d9"
   dependencies:
     core-util-is "~1.0.0"
     inherits "~2.0.1"
@@ -4839,6 +4830,15 @@ readable-stream@^2.0.0, readable-stream@^2.0.1, readable-stream@^2.0.2, readable
     safe-buffer "^5.0.1"
     string_decoder "~1.0.0"
     util-deprecate "~1.0.1"
+
+readable-stream@~1.1.9:
+  version "1.1.14"
+  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-1.1.14.tgz#7cf4c54ef648e3813084c636dd2079e166c081d9"
+  dependencies:
+    core-util-is "~1.0.0"
+    inherits "~2.0.1"
+    isarray "0.0.1"
+    string_decoder "~0.10.x"
 
 readable-stream@~2.1.4:
   version "2.1.5"
