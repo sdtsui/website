@@ -2,20 +2,25 @@
 # yarn lockfile v1
 
 
-"0x.js@^0.10.4":
-  version "0.10.4"
-  resolved "https://registry.yarnpkg.com/0x.js/-/0x.js-0.10.4.tgz#8474e0dab524a4ba9fd8a1ab3f326d42d3b2ee39"
+"0x-json-schemas@^0.5.1":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/0x-json-schemas/-/0x-json-schemas-0.5.2.tgz#b641358b8064f94efd475fd060580bb0047f7d13"
   dependencies:
+    jsonschema "^1.2.0"
+
+"0x.js@^0.13.0":
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/0x.js/-/0x.js-0.13.0.tgz#4df7e19e8b56822fcc72bdba63d02677b071c2bd"
+  dependencies:
+    "0x-json-schemas" "^0.5.1"
     bignumber.js "^4.0.2"
     compare-versions "^3.0.1"
     es6-promisify "^5.0.0"
     ethereumjs-abi "^0.6.4"
     ethereumjs-util "^5.1.1"
     find-versions "^2.0.0"
-    jsonschema "^1.1.1"
     lodash "^4.17.4"
     publish-release "^1.3.3"
-    truffle-contract "^2.0.1"
     web3 "^0.20.0"
 
 "@types/bignumber.js@^4.0.2":
@@ -3278,6 +3283,10 @@ jsonschema@*, jsonschema@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/jsonschema/-/jsonschema-1.1.1.tgz#3cede8e3e411d377872eefbc9fdf26383cbc3ed9"
 
+jsonschema@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/jsonschema/-/jsonschema-1.2.0.tgz#d6ebaf70798db7b3a20c544f6c9ef9319b077de2"
+
 jsprim@^1.2.2:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/jsprim/-/jsprim-1.4.0.tgz#a3b87e40298d8c380552d8cc7628a0bb95a22918"
@@ -5690,13 +5699,7 @@ truffle-blockchain-utils@0.0.1:
   dependencies:
     web3 "^0.18.0"
 
-truffle-blockchain-utils@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/truffle-blockchain-utils/-/truffle-blockchain-utils-0.0.3.tgz#ae8a111ec124d96504f0e042c6f205c0b3817e29"
-  dependencies:
-    web3 "^0.20.1"
-
-truffle-contract-schema@0.0.5, truffle-contract-schema@^0.0.5:
+truffle-contract-schema@0.0.5:
   version "0.0.5"
   resolved "https://registry.yarnpkg.com/truffle-contract-schema/-/truffle-contract-schema-0.0.5.tgz#5e9d20bd0bf2a27fe94310748249d484eee49961"
   dependencies:
@@ -5710,15 +5713,6 @@ truffle-contract@2.0.1:
     truffle-blockchain-utils "0.0.1"
     truffle-contract-schema "0.0.5"
     web3 "^0.18.0"
-
-truffle-contract@^2.0.1:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/truffle-contract/-/truffle-contract-2.0.5.tgz#3394df90ffa927d106ae3b36b33c6debf9117491"
-  dependencies:
-    ethjs-abi "0.1.8"
-    truffle-blockchain-utils "^0.0.3"
-    truffle-contract-schema "^0.0.5"
-    web3 "^0.20.1"
 
 tslint-config-0xproject@^0.0.2:
   version "0.0.2"
@@ -6002,9 +5996,9 @@ web3-provider-engine@^11.0.0:
     xhr "^2.2.0"
     xtend "^4.0.1"
 
-web3-typescript-typings@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/web3-typescript-typings/-/web3-typescript-typings-0.3.0.tgz#1df583d8d9012059802dee90f72144576e0ab4fe"
+web3-typescript-typings@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/web3-typescript-typings/-/web3-typescript-typings-0.6.0.tgz#ed8f01cfa3ef2c7ff2f1b0cafe7c682d0c6dc333"
   dependencies:
     bignumber.js "^4.0.2"
 
@@ -6027,7 +6021,7 @@ web3@^0.18.0, web3@^0.18.2:
     xhr2 "*"
     xmlhttprequest "*"
 
-web3@^0.20.0, web3@^0.20.1:
+web3@^0.20.0:
   version "0.20.1"
   resolved "https://registry.yarnpkg.com/web3/-/web3-0.20.1.tgz#fb262e9ad71552167a6af012fdd420de017032f0"
   dependencies:
