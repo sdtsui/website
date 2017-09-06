@@ -275,14 +275,14 @@ export class Blockchain {
         const balance = await this.web3Wrapper.getBalanceInEthAsync(owner);
         return balance;
     }
-    public async convertEthToWrappedEthTokensAsync(amount: BigNumber.BigNumber) {
+    public async convertEthToWrappedEthTokensAsync(amount: BigNumber.BigNumber): Promise<void> {
         utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
         const txHash = await this.zeroEx.etherToken.depositAsync(amount, this.userAddress);
         await this.zeroEx.awaitTransactionMinedAsync(txHash);
     }
-    public async convertWrappedEthTokensToEthAsync(amount: BigNumber.BigNumber) {
+    public async convertWrappedEthTokensToEthAsync(amount: BigNumber.BigNumber): Promise<void> {
         utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
