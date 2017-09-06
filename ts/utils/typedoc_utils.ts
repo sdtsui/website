@@ -88,7 +88,7 @@ export const typeDocUtils = {
         });
         return menuSubsectionsBySection;
     },
-    getFinal0xjsMenu(selectedVersion: string) {
+    getFinal0xjsMenu(selectedVersion: string): {[section: string]: string[]} {
         const finalMenu = _.cloneDeep(constants.menu0xjs);
         finalMenu.contracts = _.filter(finalMenu.contracts, (contractName: string) => {
             const versionIntroducedIfExists = constants.menuSubsectionToVersionWhenIntroduced[contractName];
