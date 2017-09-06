@@ -110,14 +110,6 @@ export class Home extends React.Component<HomeProps, HomeState> {
                                     {' '}The Protocol for Trading Tokens
                                 </div>
                                 <div className="flex sm-hide xs-hide">
-                                    <Link to="/token">
-                                        <RaisedButton
-                                            label="Token Sale"
-                                            primary={true}
-                                            style={{marginRight: 12}}
-                                            buttonStyle={{width: 136}}
-                                        />
-                                    </Link>
                                     <a
                                         target="_blank"
                                         href="/pdfs/0x_white_paper.pdf"
@@ -144,9 +136,9 @@ export class Home extends React.Component<HomeProps, HomeState> {
                                             label="Docs"
                                         />
                                     </Link>
-                                    <Link to="/otc">
+                                    <Link to="/portal">
                                         <FlatButton
-                                            label="OTC"
+                                            label="Portal"
                                         />
                                     </Link>
                                 </div>

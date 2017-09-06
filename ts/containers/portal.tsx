@@ -7,10 +7,10 @@ import {constants} from 'ts/utils/constants';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {Side, HashData, TokenByAddress, BlockchainErrs, Fill, Order, ScreenWidths} from 'ts/types';
 import {
-    OTC as OTCComponent,
-    OTCAllProps as OTCComponentAllProps,
-    OTCPassedProps as OTCComponentPassedProps,
-} from 'ts/components/otc';
+    Portal as PortalComponent,
+    PortalAllProps as PortalComponentAllProps,
+    PortalPassedProps as PortalComponentPassedProps,
+} from 'ts/components/portal';
 import * as BigNumber from 'bignumber.js';
 
 interface MapStateToProps {
@@ -34,7 +34,7 @@ interface ConnectedDispatch {
     dispatcher: Dispatcher;
 }
 
-const mapStateToProps = (state: State, ownProps: OTCComponentAllProps): ConnectedState => {
+const mapStateToProps = (state: State, ownProps: PortalComponentAllProps): ConnectedState => {
     const receiveAssetToken = state.sideToAssetToken[Side.receive];
     const depositAssetToken = state.sideToAssetToken[Side.deposit];
     const receiveAddress = !_.isUndefined(receiveAssetToken.address) ?
@@ -79,5 +79,5 @@ const mapDispatchToProps = (dispatch: Dispatch<State>): ConnectedDispatch => ({
     dispatcher: new Dispatcher(dispatch),
 });
 
-export const OTC: React.ComponentClass<OTCComponentPassedProps> =
-  connect(mapStateToProps, mapDispatchToProps)(OTCComponent);
+export const Portal: React.ComponentClass<PortalComponentPassedProps> =
+  connect(mapStateToProps, mapDispatchToProps)(PortalComponent);

@@ -25,5 +25,3 @@ const provider = new Web3.providers.HttpProvider('http://localhost:8545');
 ```
 
 0x.js will now communicate with TestRPC over HTTP!
-
-**Note:** If you use Web3, make sure you're installing Web3 V0.19.0. 0x.js does not yet support Web3 1.0-beta.

@@ -3,15 +3,15 @@ import * as React from 'react';
 import {MenuItem} from 'ts/components/ui/menu_item';
 import {Link} from 'react-router-dom';
 
-export interface OTCMenuProps {
+export interface PortalMenuProps {
     menuItemStyle: React.CSSProperties;
     onClick?: () => void;
 }
 
-interface OTCMenuState {}
+interface PortalMenuState {}
 
-export class OTCMenu extends React.Component<OTCMenuProps, OTCMenuState> {
-    public static defaultProps: Partial<OTCMenuProps> = {
+export class PortalMenu extends React.Component<PortalMenuProps, PortalMenuState> {
+    public static defaultProps: Partial<PortalMenuProps> = {
         onClick: _.noop,
     };
     public render() {
@@ -20,7 +20,7 @@ export class OTCMenu extends React.Component<OTCMenuProps, OTCMenuState> {
                 <MenuItem
                     style={this.props.menuItemStyle}
                     className="py2"
-                    to="/otc"
+                    to="/portal"
                     onClick={this.props.onClick.bind(this)}
                 >
                     {this.renderMenuItemWithIcon('Generate order', 'zmdi-arrow-right-top')}
@@ -28,7 +28,7 @@ export class OTCMenu extends React.Component<OTCMenuProps, OTCMenuState> {
                 <MenuItem
                     style={this.props.menuItemStyle}
                     className="py2"
-                    to="/otc/fill"
+                    to="/portal/fill"
                     onClick={this.props.onClick.bind(this)}
                 >
                     {this.renderMenuItemWithIcon('Fill order', 'zmdi-arrow-left-bottom')}
@@ -36,7 +36,7 @@ export class OTCMenu extends React.Component<OTCMenuProps, OTCMenuState> {
                 <MenuItem
                     style={this.props.menuItemStyle}
                     className="py2"
-                    to="/otc/balances"
+                    to="/portal/balances"
                     onClick={this.props.onClick.bind(this)}
                 >
                     {this.renderMenuItemWithIcon('Balances', 'zmdi-balance-wallet')}
@@ -44,7 +44,7 @@ export class OTCMenu extends React.Component<OTCMenuProps, OTCMenuState> {
                 <MenuItem
                     style={this.props.menuItemStyle}
                     className="py2"
-                    to="/otc/trades"
+                    to="/portal/trades"
                     onClick={this.props.onClick.bind(this)}
                 >
                     {this.renderMenuItemWithIcon('Trade history', 'zmdi-format-list-bulleted')}

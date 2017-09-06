@@ -37,9 +37,9 @@ const sections: FAQSection[] = [
                         (<a href={`${configs.BASE_URL}/docs/0xjs#introduction`} target="blank">0x.js</a> is a
                         Javascript library for interacting with the 0x protocol). For end users, 0x will be
                         the infrastructure of a wide variety of user-facing applications i.e.{' '}
-                        <a href={`${configs.BASE_URL}/otc`} target="blank">0x OTC</a>,
-                        a decentralized application that facilitates trustless over-the-counter trading of
-                        Ethereum-based tokens.
+                        <a href={`${configs.BASE_URL}/portal`} target="blank">0x Portal</a>,
+                        a decentralized application that facilitates trustless trading of Ethereum-based tokens
+                        between known counterparties.
                     </div>
                 ),
             },

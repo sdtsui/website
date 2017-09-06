@@ -102,7 +102,8 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
         if (!_.isUndefined(this.state.currentZrxBalance) && !nextZrxToken.balance.eq(this.state.currentZrxBalance)) {
             if (this.state.isZRXSpinnerVisible) {
                 const receivedAmount = nextZrxToken.balance.minus(this.state.currentZrxBalance);
-                this.props.dispatcher.showFlashMessage(`Received ${receivedAmount.toString(10)} Kovan ZRX`);
+                const receiveAmountInUnits = ZeroEx.toUnitAmount(receivedAmount, 18);
+                this.props.dispatcher.showFlashMessage(`Received ${receiveAmountInUnits.toString(10)} Kovan ZRX`);
             }
             this.setState({
                 isZRXSpinnerVisible: false,
@@ -156,7 +157,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                 <Divider />
                 <div className="pt2 pb2">
                     {isTestNetwork ?
-                        'In order to try out the 0x OTC Dapp, request some test ether to pay for \
+                        'In order to try out the 0x Portal Dapp, request some test ether to pay for \
                         gas costs. It might take a bit of time for the test ether to show up.' :
                         'Ether must be converted to Ether Tokens in order to be tradable via 0x. \
                          You can convert between Ether and Ether Tokens by clicking the "convert" button below.'
