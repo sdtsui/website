@@ -397,7 +397,7 @@ export interface S3FileObject {
 }
 
 export interface MenuSubsectionsBySection {
-    [section: string]: TypeDocNode[];
+    [section: string]: string[];
 }
 
 export const ProviderType = strEnum([
@@ -474,4 +474,15 @@ export interface BlogPost {
 
 export interface TypeDefinitionByName {
     [typeName: string]: TypeDocNode;
+}
+
+export interface Article {
+    section: string;
+    title: string;
+    content: string;
+    fileName: string;
+}
+
+export interface ArticlesBySection {
+    [section: string]: Article[];
 }

@@ -147,3 +147,10 @@ declare class HookedWalletSubprovider {
 declare module 'web3-provider-engine/subproviders/hooked-wallet' {
     export = HookedWalletSubprovider;
 }
+
+declare interface Artifact {
+    abi: any;
+    networks: {[networkId: number]: {
+        address: string;
+    }};
+}

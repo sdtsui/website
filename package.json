@@ -18,7 +18,7 @@
   "author": "Fabio Berger",
   "license": "Apache-2.0",
   "dependencies": {
-    "0x.js": "^0.10.4",
+    "0x.js": "^0.14.0",
     "@types/query-string": "^5.0.0",
     "basscss": "^8.0.3",
     "bignumber.js": "^4.0.2",
@@ -102,7 +102,7 @@
     "style-loader": "0.13.x",
     "tslint": "^4.5.1",
     "tslint-react": "^2.5.0",
-    "web3-typescript-typings": "^0.3.0",
+    "web3-typescript-typings": "^0.6.0",
     "webpack": "^2.6.1",
     "webpack-dev-middleware": "^1.10.0",
     "webpack-dev-server": "^2.5.0"
