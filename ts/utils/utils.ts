@@ -192,7 +192,7 @@ export const utils = {
         }
     },
     getIdFromName(name: string) {
-        const id = name.replace(/ /g, '-').toLowerCase();
+        const id = name.replace(/ /g, '-');
         return id;
     },
 };
