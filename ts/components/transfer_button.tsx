@@ -75,7 +75,7 @@ export class TransferButton extends React.Component<TransferButtonProps, Transfe
             });
             this.props.dispatcher.updateTokenByAddress([updatedToken]);
         } catch (err) {
-            const errMsg = '' + err;
+            const errMsg = `${err}`;
             if (_.includes(errMsg, BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES)) {
                 this.props.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
             } else if (!_.includes(errMsg, 'User denied transaction')) {
