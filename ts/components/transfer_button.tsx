@@ -21,7 +21,7 @@ interface TransferButtonProps {
 
 interface TransferButtonState {
     isTransferDialogVisible: boolean;
-    isTransferHappening: boolean;
+    isTransferring: boolean;
 }
 
 export class TransferButton extends React.Component<TransferButtonProps, TransferButtonState> {
@@ -29,18 +29,18 @@ export class TransferButton extends React.Component<TransferButtonProps, Transfe
         super(props);
         this.state = {
             isTransferDialogVisible: false,
-            isTransferHappening: false,
+            isTransferring: false,
         };
     }
     public render() {
-        const labelStyle = this.state.isTransferHappening ? {fontSize: 10} : {};
+        const labelStyle = this.state.isTransferring ? {fontSize: 10} : {};
         return (
             <div>
                 <RaisedButton
                     style={{width: '100%'}}
                     labelStyle={labelStyle}
-                    disabled={this.state.isTransferHappening}
-                    label={this.state.isTransferHappening ? 'Sending...' : 'Send'}
+                    disabled={this.state.isTransferring}
+                    label={this.state.isTransferring ? 'Sending...' : 'Send'}
                     onClick={this.toggleTransferDialog.bind(this)}
                 />
                 <TransferDialog
@@ -59,7 +59,7 @@ export class TransferButton extends React.Component<TransferButtonProps, Transfe
     }
     private async onTransferAmountSelectedAsync(recipient: string, value: BigNumber.BigNumber) {
         this.setState({
-            isTransferHappening: true,
+            isTransferring: true,
         });
         this.toggleTransferDialog();
         const token = this.props.token;
@@ -87,7 +87,7 @@ export class TransferButton extends React.Component<TransferButtonProps, Transfe
             }
         }
         this.setState({
-            isTransferHappening: false,
+            isTransferring: false,
         });
     }
 }
