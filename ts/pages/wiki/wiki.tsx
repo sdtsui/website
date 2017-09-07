@@ -11,7 +11,7 @@ import {TopBar} from 'ts/components/top_bar';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
 import {configs} from 'ts/utils/configs';
-import {DocsMenu} from 'ts/pages/shared/docs_menu';
+import {NestedSidebarMenu} from 'ts/pages/shared/nested_sidebar_menu';
 import {SectionHeader} from 'ts/pages/shared/section_header';
 import {MarkdownSection} from 'ts/pages/shared/markdown_section';
 
@@ -96,7 +96,7 @@ export class Wiki extends React.Component<WikiProps, WikiState> {
                                 className="border-right absolute pt2"
                                 style={{...styles.menuContainer, ...styles.mainContainers}}
                             >
-                                <DocsMenu
+                                <NestedSidebarMenu
                                     topLevelMenu={menuSubsectionsBySection}
                                     menuSubsectionsBySection={menuSubsectionsBySection}
                                 />

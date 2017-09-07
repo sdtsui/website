@@ -36,7 +36,7 @@ import {MarkdownSection} from 'ts/pages/shared/markdown_section';
 import {Comment} from 'ts/pages/documentation/comment';
 import {AnchorTitle} from 'ts/pages/shared/anchor_title';
 import {SectionHeader} from 'ts/pages/shared/section_header';
-import {DocsMenu} from 'ts/pages/shared/docs_menu';
+import {NestedSidebarMenu} from 'ts/pages/shared/nested_sidebar_menu';
 import {typeDocUtils} from 'ts/utils/typedoc_utils';
 /* tslint:disable:no-var-requires */
 const IntroMarkdown = require('md/docs/0xjs/introduction');
@@ -147,7 +147,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                                 className="border-right absolute"
                                 style={{...styles.menuContainer, ...styles.mainContainers}}
                             >
-                                <DocsMenu
+                                <NestedSidebarMenu
                                     selectedVersion={this.props.zeroExJSversion}
                                     versions={this.props.availableZeroExJSVersions}
                                     topLevelMenu={typeDocUtils.getFinal0xjsMenu(this.props.zeroExJSversion)}

@@ -8,7 +8,7 @@ import ReactTooltip = require('react-tooltip');
 import {configs} from 'ts/utils/configs';
 import {constants} from 'ts/utils/constants';
 import {Identicon} from 'ts/components/ui/identicon';
-import {DocsMenu} from 'ts/pages/shared/docs_menu';
+import {NestedSidebarMenu} from 'ts/pages/shared/nested_sidebar_menu';
 import {typeDocUtils} from 'ts/utils/typedoc_utils';
 import {PortalMenu} from 'ts/components/portal_menu';
 import {Styles, TypeDocNode, MenuSubsectionsBySection} from 'ts/types';
@@ -160,7 +160,7 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
         return (
             <div className="lg-hide md-hide">
                 <div className="pl1 py1" style={{backgroundColor: SECTION_HEADER_COLOR}}>0x.js Docs</div>
-                <DocsMenu
+                <NestedSidebarMenu
                     topLevelMenu={typeDocUtils.getFinal0xjsMenu(this.props.zeroExJSversion)}
                     menuSubsectionsBySection={this.props.menuSubsectionsBySection}
                     shouldDisplaySectionHeaders={false}
@@ -179,7 +179,7 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
         return (
             <div className="lg-hide md-hide">
                 <div className="pl1 py1" style={{backgroundColor: SECTION_HEADER_COLOR}}>0x Protocol Wiki</div>
-                <DocsMenu
+                <NestedSidebarMenu
                     topLevelMenu={this.props.menuSubsectionsBySection}
                     menuSubsectionsBySection={this.props.menuSubsectionsBySection}
                     shouldDisplaySectionHeaders={false}

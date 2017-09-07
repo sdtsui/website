@@ -9,7 +9,7 @@ import {ZeroExJsDocSections, Styles, MenuSubsectionsBySection} from 'ts/types';
 import {typeDocUtils} from 'ts/utils/typedoc_utils';
 import {Link as ScrollLink} from 'react-scroll';
 
-interface DocsMenuProps {
+interface NestedSidebarMenuProps {
     shouldDisplaySectionHeaders?: boolean;
     onMenuItemClick?: () => void;
     selectedVersion?: string;
@@ -18,7 +18,7 @@ interface DocsMenuProps {
     menuSubsectionsBySection: MenuSubsectionsBySection;
 }
 
-interface DocsMenuState {}
+interface NestedSidebarMenuState {}
 
 const styles: Styles = {
     menuItemWithHeaders: {
@@ -32,8 +32,8 @@ const styles: Styles = {
     },
 };
 
-export class DocsMenu extends React.Component<DocsMenuProps, DocsMenuState> {
-    public static defaultProps: Partial<DocsMenuProps> = {
+export class NestedSidebarMenu extends React.Component<NestedSidebarMenuProps, NestedSidebarMenuState> {
+    public static defaultProps: Partial<NestedSidebarMenuProps> = {
         shouldDisplaySectionHeaders: true,
         onMenuItemClick: _.noop,
     };
