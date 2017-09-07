@@ -533,30 +533,6 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
             return false;
         }
     }
-    private async onTransfer(token: Token): Promise<boolean> {
-        try {
-            await this.props.blockchain.mintTestTokensAsync(token);
-            const amount = ZeroEx.toUnitAmount(constants.MINT_AMOUNT, token.decimals);
-            this.props.dispatcher.showFlashMessage(`Successfully minted ${amount.toString(10)} ${token.symbol}`);
-            return true;
-        } catch (err) {
-            const errMsg = '' + err;
-            if (_.includes(errMsg, BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES)) {
-                this.props.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
-                return false;
-            }
-            if (_.includes(errMsg, 'User denied transaction')) {
-                return false;
-            }
-            utils.consoleLog(`Unexpected error encountered: ${err}`);
-            utils.consoleLog(err.stack);
-            await errorReporter.reportAsync(err);
-            this.setState({
-                errorType: BalanceErrs.mintingFailed,
-            });
-            return false;
-        }
-    }
     private async faucetRequestAsync(isEtherRequest: boolean): Promise<boolean> {
         if (this.props.userAddress === '') {
             this.props.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
