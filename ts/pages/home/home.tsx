@@ -118,6 +118,11 @@ export class Home extends React.Component<HomeProps, HomeState> {
                                             label="Whitepaper"
                                         />
                                     </a>
+                                    <Link to="/wiki">
+                                        <FlatButton
+                                            label="Wiki"
+                                        />
+                                    </Link>
                                     <Link to="/faq">
                                         <FlatButton
                                             label="FAQ"

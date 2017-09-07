@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {Element as ScrollElement} from 'react-scroll';
 import {AnchorTitle} from 'ts/pages/documentation/anchor_title';
+import {utils} from 'ts/utils/utils';
 
 interface SectionHeaderProps {
     sectionName: string;
@@ -19,16 +20,17 @@ export class SectionHeader extends React.Component<SectionHeaderProps, SectionHe
     }
     public render() {
         const sectionName = this.props.sectionName;
+        const id = utils.getIdFromName(sectionName);
         return (
             <div
                 onMouseOver={this.setAnchorVisibility.bind(this, true)}
                 onMouseOut={this.setAnchorVisibility.bind(this, false)}
             >
-                <ScrollElement name={sectionName}>
+                <ScrollElement name={id}>
                     <AnchorTitle
                         headerType="h2"
                         title={<span style={{textTransform: 'capitalize'}}>{sectionName}</span>}
-                        id={sectionName}
+                        id={id}
                         shouldShowAnchor={this.state.shouldShowAnchor}
                     />
                 </ScrollElement>

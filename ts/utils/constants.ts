@@ -17,6 +17,8 @@ export const constants = {
     FEE_RECIPIENT_ADDRESS: '0x0000000000000000000000000000000000000000',
     FIREFOX_U2F_ADDON: 'https://addons.mozilla.org/en-US/firefox/addon/u2f-support-add-on/',
     GITHUB_0X_JS_URL: 'https://github.com/0xProject/0x.js',
+    GITHUB_WIKI_URL: 'https://github.com/0xProject/wiki',
+    HTTP_NO_CONTENT_STATUS_CODE: 204,
     ACCEPT_DISCLAIMER_LOCAL_STORAGE_KEY: 'didAcceptPortalDisclaimer',
     LINKEDIN_0X_URL: 'https://www.linkedin.com/company/0x',
     LEDGER_PROVIDER_NAME: 'Ledger',

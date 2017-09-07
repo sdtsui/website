@@ -105,6 +105,7 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
             >
                 {this.renderPortalMenu()}
                 {this.render0xjsDocMenu()}
+                {this.renderWiki()}
                 <div className="pl1 py1 mt3" style={{backgroundColor: SECTION_HEADER_COLOR}}>Website</div>
                 {this.renderHomepageMenuItem('home')}
                 <a
@@ -114,6 +115,14 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
                 >
                     <MenuItem className="py2">Whitepaper</MenuItem>
                 </a>
+                {!this.isViewing0xjsDocs() &&
+                    <Link to="/docs/0xjs" className="text-decoration-none">
+                        <MenuItem className="py2">Documentation</MenuItem>
+                    </Link>
+                }
+                <Link to="/wiki" className="text-decoration-none">
+                    <MenuItem className="py2">Wiki</MenuItem>
+                </Link>
                 <a
                     className="text-decoration-none"
                     target="_blank"
@@ -135,11 +144,6 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
                         FAQ
                     </MenuItem>
                 </Link>
-                {!this.isViewing0xjsDocs() &&
-                    <Link to="/docs/0xjs" className="text-decoration-none">
-                        <MenuItem className="py2">Documentation</MenuItem>
-                    </Link>
-                }
                 {!this.isViewingPortal() &&
                     <Link to="/portal" className="text-decoration-none">
                         <MenuItem className="py2">Portal DApp</MenuItem>
@@ -163,6 +167,23 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
                     onMenuItemClick={this.onMenuButtonClick.bind(this)}
                     selectedVersion={this.props.zeroExJSversion}
                     versions={this.props.availableZeroExJSVersions}
+                />
+            </div>
+        );
+    }
+    private renderWiki() {
+        if (!this.isViewingWiki()) {
+            return;
+        }
+
+        return (
+            <div className="lg-hide md-hide">
+                <div className="pl1 py1" style={{backgroundColor: SECTION_HEADER_COLOR}}>0x Protocol Wiki</div>
+                <DocsMenu
+                    topLevelMenu={this.props.menuSubsectionsBySection}
+                    menuSubsectionsBySection={this.props.menuSubsectionsBySection}
+                    shouldDisplaySectionHeaders={false}
+                    onMenuItemClick={this.onMenuButtonClick.bind(this)}
                 />
             </div>
         );
@@ -245,5 +266,8 @@ export class TopBar extends React.Component<TopBarProps, TopBarState> {
     }
     private isViewing0xjsDocs() {
         return _.includes(this.props.location.pathname, '/docs/0xjs');
+    }
+    private isViewingWiki() {
+        return _.includes(this.props.location.pathname, '/wiki');
     }
 }

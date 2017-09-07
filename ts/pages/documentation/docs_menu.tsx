@@ -12,8 +12,8 @@ import {Link as ScrollLink} from 'react-scroll';
 interface DocsMenuProps {
     shouldDisplaySectionHeaders?: boolean;
     onMenuItemClick?: () => void;
-    selectedVersion: string;
-    versions: string[];
+    selectedVersion?: string;
+    versions?: string[];
     topLevelMenu: {[topLevel: string]: string[]};
     menuSubsectionsBySection: MenuSubsectionsBySection;
 }
@@ -82,11 +82,12 @@ export class DocsMenu extends React.Component<DocsMenuProps, DocsMenuState> {
         const menuItemInnerDivStyles = this.props.shouldDisplaySectionHeaders ?
                                     styles.menuItemInnerDivWithHeaders : {};
         const menuItems = _.map(menuItemNames, menuItemName => {
+            const id = utils.getIdFromName(menuItemName);
             return (
                 <div key={menuItemName}>
                     <ScrollLink
                         key={`menuItem-${menuItemName}`}
-                        to={menuItemName}
+                        to={id}
                         offset={-10}
                         duration={constants.DOCS_SCROLL_DURATION_MS}
                         containerId={constants.DOCS_CONTAINER_ID}
@@ -117,10 +118,11 @@ export class DocsMenu extends React.Component<DocsMenuProps, DocsMenuState> {
         return (
             <ul style={{margin: 0, listStyleType: 'none', paddingLeft: 0}} key={menuItemName}>
             {_.map(entityNames, entityName => {
+                const id = utils.getIdFromName(entityName);
                 return (
                     <li key={`menuItem-${entityName}`}>
                         <ScrollLink
-                            to={entityName}
+                            to={id}
                             offset={0}
                             duration={constants.DOCS_SCROLL_DURATION_MS}
                             containerId={constants.DOCS_CONTAINER_ID}
@@ -141,7 +143,8 @@ export class DocsMenu extends React.Component<DocsMenuProps, DocsMenuState> {
         );
     }
     private onMenuItemClick(menuItemName: string): void {
-        utils.setUrlHash(menuItemName);
+        const id = utils.getIdFromName(menuItemName);
+        utils.setUrlHash(id);
         this.props.onMenuItemClick();
     }
 }
