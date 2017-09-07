@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactMarkdown from 'react-markdown';
-import {MarkdownCodeBlock} from 'ts/pages/documentation/markdown_code_block';
+import {MarkdownCodeBlock} from 'ts/pages/shared/markdown_code_block';
 
 interface CommentProps {
     comment: string;
