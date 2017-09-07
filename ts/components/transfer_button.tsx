@@ -5,7 +5,7 @@ import * as BigNumber from 'bignumber.js';
 import RaisedButton from 'material-ui/RaisedButton';
 import {BlockchainCallErrs} from 'ts/types';
 import {TransferDialog} from 'ts/components/transfer_dialog';
-import {Side, Token} from 'ts/types';
+import {Token} from 'ts/types';
 import {constants} from 'ts/utils/constants';
 import {utils} from 'ts/utils/utils';
 import {Dispatcher} from 'ts/redux/dispatcher';
