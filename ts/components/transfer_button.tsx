@@ -67,7 +67,7 @@ export class TransferButton extends React.Component<TransferButtonProps, Transfe
         try {
             await this.props.blockchain.transferAsync(token.address, recipient, value);
             const tokenAmount = ZeroEx.toUnitAmount(value, token.decimals);
-            const flashMessage = `Successfully transfered ${tokenAmount.toString()} ${token.symbol} to ${recipient}`;
+            const flashMessage = `Successfully transferred ${tokenAmount.toString()} ${token.symbol} to ${recipient}`;
             this.props.dispatcher.showFlashMessage(flashMessage);
             balance = balance.minus(value);
             const updatedToken = _.assign({}, token, {
