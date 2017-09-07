@@ -100,6 +100,7 @@ export class TransferDialog extends React.Component<TransferDialogProps, Transfe
         } else {
             const value = this.state.value;
             this.setState({
+                recipient: undefined,
                 value: undefined,
             });
             this.props.onComplete(this.state.recipient, value);

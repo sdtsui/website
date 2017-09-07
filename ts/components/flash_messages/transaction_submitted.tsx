@@ -20,7 +20,7 @@ export class TransactionSubmitted extends React.Component<TransactionSubmittedPr
                         href={`${this.props.etherScanLinkIfExists}`}
                         target="_blank"
                     >
-                        etherscan
+                        Verify on Etherscan
                     </a>
                 </div>
             );
