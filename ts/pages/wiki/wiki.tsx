@@ -132,9 +132,8 @@ export class Wiki extends React.Component<WikiProps, WikiState> {
         const renderedArticles = _.map(articles, (article: Article) => {
             const githubLink = `${constants.GITHUB_WIKI_URL}/edit/master/${sectionName}/${article.fileName}`;
             return (
-                <div>
+                <div key={`markdown-section-${article.title}`}>
                     <MarkdownSection
-                        key={`markdown-section-${article.title}`}
                         sectionName={article.title}
                         markdownContent={article.content}
                         headerType="h2"
