@@ -39,6 +39,7 @@ import {HelpTooltip} from 'ts/components/ui/help_tooltip';
 import {errorReporter} from 'ts/utils/error_reporter';
 import {AllowanceToggle} from 'ts/components/inputs/allowance_toggle';
 import {EthWethConversionButton} from 'ts/components/eth_weth_conversion_button';
+import {TransferButton} from 'ts/components/transfer_button';
 
 const ETHER_ICON_PATH = '/images/ether.png';
 const ETHER_TOKEN_SYMBOL = 'WETH';
@@ -272,6 +273,9 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                             <TableHeaderColumn>
                                 Action
                             </TableHeaderColumn>
+                            <TableHeaderColumn>
+                                Send
+                            </TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false}>
@@ -382,6 +386,16 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                             onClickAsyncFn={this.faucetRequestAsync.bind(this, false)}
                         />
                     }
+                </TableRowColumn>
+                <TableRowColumn
+                    style={{paddingLeft: actionPaddingX, paddingRight: actionPaddingX}}
+                >
+                    <TransferButton
+                        blockchain={this.props.blockchain}
+                        dispatcher={this.props.dispatcher}
+                        token={token}
+                        onError={this.onEthWethConversionFailed.bind(this)}
+                    />
                 </TableRowColumn>
             </TableRow>
         );
@@ -496,6 +510,30 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
         });
     }
     private async onMintTestTokensAsync(token: Token): Promise<boolean> {
+        try {
+            await this.props.blockchain.mintTestTokensAsync(token);
+            const amount = ZeroEx.toUnitAmount(constants.MINT_AMOUNT, token.decimals);
+            this.props.dispatcher.showFlashMessage(`Successfully minted ${amount.toString(10)} ${token.symbol}`);
+            return true;
+        } catch (err) {
+            const errMsg = '' + err;
+            if (_.includes(errMsg, BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES)) {
+                this.props.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
+                return false;
+            }
+            if (_.includes(errMsg, 'User denied transaction')) {
+                return false;
+            }
+            utils.consoleLog(`Unexpected error encountered: ${err}`);
+            utils.consoleLog(err.stack);
+            await errorReporter.reportAsync(err);
+            this.setState({
+                errorType: BalanceErrs.mintingFailed,
+            });
+            return false;
+        }
+    }
+    private async onTransfer(token: Token): Promise<boolean> {
         try {
             await this.props.blockchain.mintTestTokensAsync(token);
             const amount = ZeroEx.toUnitAmount(constants.MINT_AMOUNT, token.decimals);

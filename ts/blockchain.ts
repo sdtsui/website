@@ -181,6 +181,13 @@ export class Blockchain {
         const allowance = amountInBaseUnits;
         this.dispatcher.replaceTokenAllowanceByAddress(token.address, allowance);
     }
+    public async transferAsync(tokenAddress: string, toAddress: string,
+                               amountInBaseUnits: BigNumber.BigNumber): Promise<void> {
+        const txHash = await this.zeroEx.token.transferAsync(
+            tokenAddress, this.userAddress, toAddress, amountInBaseUnits,
+        );
+        await this.zeroEx.awaitTransactionMinedAsync(txHash);
+    }
     public async fillOrderAsync(maker: string, taker: string, makerTokenAddress: string,
                                 takerTokenAddress: string, makerTokenAmount: BigNumber.BigNumber,
                                 takerTokenAmount: BigNumber.BigNumber, makerFee: BigNumber.BigNumber,
