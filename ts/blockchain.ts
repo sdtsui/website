@@ -181,7 +181,7 @@ export class Blockchain {
         const txHash = await this.zeroEx.token.setProxyAllowanceAsync(
             token.address, this.userAddress, amountInBaseUnits,
         );
-        await this.awaitTransactionMinedAsync(txHash);
+        await this.showEtherScanLinkAndAwaitTransactionMinedAsync(txHash);
         const allowance = amountInBaseUnits;
         this.dispatcher.replaceTokenAllowanceByAddress(token.address, allowance);
     }
@@ -190,7 +190,7 @@ export class Blockchain {
         const txHash = await this.zeroEx.token.transferAsync(
             tokenAddress, this.userAddress, toAddress, amountInBaseUnits,
         );
-        await this.awaitTransactionMinedAsync(txHash);
+        await this.showEtherScanLinkAndAwaitTransactionMinedAsync(txHash);
     }
     public async fillOrderAsync(maker: string, taker: string, makerTokenAddress: string,
                                 takerTokenAddress: string, makerTokenAmount: BigNumber.BigNumber,
@@ -223,7 +223,7 @@ export class Blockchain {
         const txHash = await this.zeroEx.exchange.fillOrderAsync(
             signedOrder, fillTakerTokenAmount, shouldThrowOnInsufficientBalanceOrAllowance, this.userAddress,
         );
-        const receipt = await this.awaitTransactionMinedAsync(txHash);
+        const receipt = await this.showEtherScanLinkAndAwaitTransactionMinedAsync(txHash);
         const logs: LogWithDecodedArgs[] = receipt.logs as any;
         this.zeroEx.exchange.throwLogErrorsAsErrors(logs);
         const logFill = _.find(logs, {event: 'LogFill'});
@@ -292,14 +292,14 @@ export class Blockchain {
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
         const txHash = await this.zeroEx.etherToken.depositAsync(amount, this.userAddress);
-        await this.awaitTransactionMinedAsync(txHash);
+        await this.showEtherScanLinkAndAwaitTransactionMinedAsync(txHash);
     }
     public async convertWrappedEthTokensToEthAsync(amount: BigNumber.BigNumber): Promise<void> {
         utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
 
         const txHash = await this.zeroEx.etherToken.withdrawAsync(amount, this.userAddress);
-        await this.awaitTransactionMinedAsync(txHash);
+        await this.showEtherScanLinkAndAwaitTransactionMinedAsync(txHash);
     }
     public async doesContractExistAtAddressAsync(address: string) {
         return await this.web3Wrapper.doesContractExistAtAddressAsync(address);
@@ -353,7 +353,8 @@ export class Blockchain {
         this.web3Wrapper.destroy();
         this.stopWatchingExchangeLogFillEventsAsync(); // fire and forget
     }
-    private async awaitTransactionMinedAsync(txHash: string): Promise<TransactionReceiptWithDecodedLogs> {
+    private async showEtherScanLinkAndAwaitTransactionMinedAsync(
+        txHash: string): Promise<TransactionReceiptWithDecodedLogs> {
         const etherScanLinkIfExists = utils.getEtherScanLinkIfExists(txHash, this.networkId, EtherscanLinkSuffixes.tx);
         this.dispatcher.showFlashMessage(React.createElement(TransactionSubmitted, {
             etherScanLinkIfExists,
