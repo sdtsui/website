@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Element as ScrollElement} from 'react-scroll';
-import {AnchorTitle} from 'ts/pages/documentation/anchor_title';
+import {AnchorTitle} from 'ts/pages/shared/anchor_title';
 import {utils} from 'ts/utils/utils';
 
 interface SectionHeaderProps {

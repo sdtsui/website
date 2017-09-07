@@ -11,9 +11,9 @@ import {TopBar} from 'ts/components/top_bar';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
 import {configs} from 'ts/utils/configs';
-import {DocsMenu} from 'ts/pages/documentation/docs_menu';
-import {SectionHeader} from 'ts/pages/documentation/section_header';
-import {MarkdownSection} from 'ts/pages/documentation/markdown_section';
+import {DocsMenu} from 'ts/pages/shared/docs_menu';
+import {SectionHeader} from 'ts/pages/shared/section_header';
+import {MarkdownSection} from 'ts/pages/shared/markdown_section';
 
 const WIKI_NOT_READY_BACKOUT_TIMEOUT_MS = 5000;
 

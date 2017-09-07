@@ -4,7 +4,7 @@ import MenuItem from 'material-ui/MenuItem';
 import {colors} from 'material-ui/styles';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
-import {VersionDropDown} from 'ts/pages/documentation/version_drop_down';
+import {VersionDropDown} from 'ts/pages/shared/version_drop_down';
 import {ZeroExJsDocSections, Styles, MenuSubsectionsBySection} from 'ts/types';
 import {typeDocUtils} from 'ts/utils/typedoc_utils';
 import {Link as ScrollLink} from 'react-scroll';

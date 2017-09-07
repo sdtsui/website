@@ -2,9 +2,9 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactMarkdown from 'react-markdown';
 import {Element as ScrollElement} from 'react-scroll';
-import {AnchorTitle} from 'ts/pages/documentation/anchor_title';
+import {AnchorTitle} from 'ts/pages/shared/anchor_title';
 import {utils} from 'ts/utils/utils';
-import {MarkdownCodeBlock} from 'ts/pages/documentation/markdown_code_block';
+import {MarkdownCodeBlock} from 'ts/pages/shared/markdown_code_block';
 import RaisedButton from 'material-ui/RaisedButton';
 
 interface MarkdownSectionProps {

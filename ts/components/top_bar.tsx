@@ -8,7 +8,7 @@ import ReactTooltip = require('react-tooltip');
 import {configs} from 'ts/utils/configs';
 import {constants} from 'ts/utils/constants';
 import {Identicon} from 'ts/components/ui/identicon';
-import {DocsMenu} from 'ts/pages/documentation/docs_menu';
+import {DocsMenu} from 'ts/pages/shared/docs_menu';
 import {typeDocUtils} from 'ts/utils/typedoc_utils';
 import {PortalMenu} from 'ts/components/portal_menu';
 import {Styles, TypeDocNode, MenuSubsectionsBySection} from 'ts/types';
