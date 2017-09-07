@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as React from 'react';
 import {
     ZeroEx,
     ExchangeEvents,
@@ -20,6 +21,7 @@ import contract = require('truffle-contract');
 import ethUtil = require('ethereumjs-util');
 import ProviderEngine = require('web3-provider-engine');
 import FilterSubprovider = require('web3-provider-engine/subproviders/filters');
+import {TransactionSubmitted} from 'ts/components/flash_messages/transaction_submitted';
 import {RedundantRPCSubprovider} from 'ts/subproviders/redundant_rpc_subprovider';
 import {InjectedWeb3SubProvider} from 'ts/subproviders/injected_web3_subprovider';
 import {ledgerWalletSubproviderFactory} from 'ts/subproviders/ledger_wallet_subprovider_factory';
@@ -353,11 +355,9 @@ export class Blockchain {
     }
     private async awaitTransactionMinedAsync(txHash: string): Promise<TransactionReceiptWithDecodedLogs> {
         const etherScanLinkIfExists = utils.getEtherScanLinkIfExists(txHash, this.networkId, EtherscanLinkSuffixes.tx);
-        if (_.isUndefined(etherScanLinkIfExists)) {
-            this.dispatcher.showFlashMessage('Transaction submitted');
-        } else {
-            this.dispatcher.showFlashMessage(`Transaction submitted: ${etherScanLinkIfExists}`);
-        }
+        this.dispatcher.showFlashMessage(React.createElement(TransactionSubmitted, {
+            etherScanLinkIfExists,
+        }));
         const receipt = await this.zeroEx.awaitTransactionMinedAsync(txHash);
         return receipt;
     }
