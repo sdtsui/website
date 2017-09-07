@@ -21,6 +21,7 @@ interface TransferDialogState {
     value?: BigNumber.BigNumber;
     recipient: string;
     shouldShowIncompleteErrs: boolean;
+    isAmountValid: boolean;
 }
 
 export class TransferDialog extends React.Component<TransferDialogProps, TransferDialogState> {
@@ -29,6 +30,7 @@ export class TransferDialog extends React.Component<TransferDialogProps, Transfe
         this.state = {
             recipient: '',
             shouldShowIncompleteErrs: false,
+            isAmountValid: false,
         };
     }
     public render() {
@@ -86,6 +88,7 @@ export class TransferDialog extends React.Component<TransferDialogProps, Transfe
     }
     private onValueChange(isValid: boolean, amount?: BigNumber.BigNumber) {
         this.setState({
+            isAmountValid: isValid,
             value: amount,
         });
     }
@@ -109,6 +112,8 @@ export class TransferDialog extends React.Component<TransferDialogProps, Transfe
         this.props.onCancelled();
     }
     private hasErrors() {
-        return _.isUndefined(this.state.recipient) ||  _.isUndefined(this.state.value);
+        return _.isUndefined(this.state.recipient) ||
+               _.isUndefined(this.state.value) ||
+               !this.state.isAmountValid;
     }
 }
