@@ -8,7 +8,7 @@ import {Interface} from 'ts/pages/documentation/interface';
 import {CustomEnum} from 'ts/pages/documentation/custom_enum';
 import {Enum} from 'ts/pages/documentation/enum';
 import {MethodSignature} from 'ts/pages/documentation/method_signature';
-import {AnchorTitle} from 'ts/pages/documentation/anchor_title';
+import {AnchorTitle} from 'ts/pages/shared/anchor_title';
 import {Comment} from 'ts/pages/documentation/comment';
 import {typeDocUtils} from 'ts/utils/typedoc_utils';
 

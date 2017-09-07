@@ -32,11 +32,11 @@ import {MethodBlock} from 'ts/pages/documentation/method_block';
 import {SourceLink} from 'ts/pages/documentation/source_link';
 import {Type} from 'ts/pages/documentation/type';
 import {TypeDefinition} from 'ts/pages/documentation/type_definition';
-import {MarkdownSection} from 'ts/pages/documentation/markdown_section';
+import {MarkdownSection} from 'ts/pages/shared/markdown_section';
 import {Comment} from 'ts/pages/documentation/comment';
-import {AnchorTitle} from 'ts/pages/documentation/anchor_title';
-import {SectionHeader} from 'ts/pages/documentation/section_header';
-import {DocsMenu} from 'ts/pages/documentation/docs_menu';
+import {AnchorTitle} from 'ts/pages/shared/anchor_title';
+import {SectionHeader} from 'ts/pages/shared/section_header';
+import {NestedSidebarMenu} from 'ts/pages/shared/nested_sidebar_menu';
 import {typeDocUtils} from 'ts/utils/typedoc_utils';
 /* tslint:disable:no-var-requires */
 const IntroMarkdown = require('md/docs/0xjs/introduction');
@@ -147,7 +147,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                                 className="border-right absolute"
                                 style={{...styles.menuContainer, ...styles.mainContainers}}
                             >
-                                <DocsMenu
+                                <NestedSidebarMenu
                                     selectedVersion={this.props.zeroExJSversion}
                                     versions={this.props.availableZeroExJSVersions}
                                     topLevelMenu={typeDocUtils.getFinal0xjsMenu(this.props.zeroExJSversion)}

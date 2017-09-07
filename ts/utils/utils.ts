@@ -191,4 +191,8 @@ export const utils = {
                 return 'production';
         }
     },
+    getIdFromName(name: string) {
+        const id = name.replace(/ /g, '-').toLowerCase();
+        return id;
+    },
 };
