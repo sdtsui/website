@@ -60,13 +60,15 @@ export class SendDialog extends React.Component<SendDialogProps, SendDialogState
     private renderSendDialogBody() {
         return (
             <div className="mx-auto" style={{maxWidth: 300}}>
-                <AddressInput
-                    initialAddress={this.state.recipient}
-                    updateAddress={this.onRecipientChange.bind(this)}
-                    isRequired={true}
-                    label={'Recipient address'}
-                    hintText={'Address'}
-                />
+                <div style={{height: 80}}>
+                    <AddressInput
+                        initialAddress={this.state.recipient}
+                        updateAddress={this.onRecipientChange.bind(this)}
+                        isRequired={true}
+                        label={'Recipient address'}
+                        hintText={'Address'}
+                    />
+                </div>
                 <TokenAmountInput
                     label="Amount to send"
                     token={this.props.token}
