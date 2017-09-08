@@ -10,21 +10,21 @@ import {EthAmountInput} from 'ts/components/inputs/eth_amount_input';
 import {AddressInput} from 'ts/components/inputs/address_input';
 import * as BigNumber from 'bignumber.js';
 
-interface TransferDialogProps {
+interface SendDialogProps {
     onComplete: (recipient: string, value: BigNumber.BigNumber) => void;
     onCancelled: () => void;
     isOpen: boolean;
     token: Token;
 }
 
-interface TransferDialogState {
+interface SendDialogState {
     value?: BigNumber.BigNumber;
     recipient: string;
     shouldShowIncompleteErrs: boolean;
     isAmountValid: boolean;
 }
 
-export class TransferDialog extends React.Component<TransferDialogProps, TransferDialogState> {
+export class SendDialog extends React.Component<SendDialogProps, SendDialogState> {
     constructor() {
         super();
         this.state = {
@@ -41,23 +41,23 @@ export class TransferDialog extends React.Component<TransferDialogProps, Transfe
             />,
             <FlatButton
                 disabled={this.hasErrors()}
-                label="Transfer"
+                label="Send"
                 primary={true}
-                onTouchTap={this.onTransferClick.bind(this)}
+                onTouchTap={this.onSendClick.bind(this)}
             />,
         ];
         return (
             <Dialog
-                title="I want to tranfer"
+                title="I want to send"
                 titleStyle={{fontWeight: 100}}
                 actions={transferDialogActions}
                 open={this.props.isOpen}
             >
-                {this.renderTransferDialogBody()}
+                {this.renderSendDialogBody()}
             </Dialog>
         );
     }
-    private renderTransferDialogBody() {
+    private renderSendDialogBody() {
         return (
             <div className="mx-auto" style={{maxWidth: 300}}>
                 <AddressInput
@@ -68,7 +68,7 @@ export class TransferDialog extends React.Component<TransferDialogProps, Transfe
                     hintText={'Address'}
                 />
                 <TokenAmountInput
-                    label="Amount to transfer"
+                    label="Amount to send"
                     token={this.props.token}
                     shouldShowIncompleteErrs={this.state.shouldShowIncompleteErrs}
                     shouldCheckBalance={true}
@@ -92,7 +92,7 @@ export class TransferDialog extends React.Component<TransferDialogProps, Transfe
             value: amount,
         });
     }
-    private onTransferClick() {
+    private onSendClick() {
         if (this.hasErrors()) {
             this.setState({
                 shouldShowIncompleteErrs: true,
