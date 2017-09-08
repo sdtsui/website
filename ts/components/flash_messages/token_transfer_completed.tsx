@@ -15,17 +15,16 @@ interface TokenTransferCompletedState {}
 
 export class TokenTransferCompleted extends React.Component<TokenTransferCompletedProps, TokenTransferCompletedState> {
     public render() {
-        const etherScanLink = _.isUndefined(this.props.etherScanLinkIfExists) ?
-            null :
-            (
-                <a
-                    style={{color: 'white'}}
-                    href={`${this.props.etherScanLinkIfExists}`}
-                    target="_blank"
-                >
-                    Verify on Etherscan
-                </a>
-            );
+        const etherScanLink = !_.isUndefined(this.props.etherScanLinkIfExists) &&
+                            (
+                                <a
+                                    style={{color: 'white'}}
+                                    href={`${this.props.etherScanLinkIfExists}`}
+                                    target="_blank"
+                                >
+                                    Verify on Etherscan
+                                </a>
+                            );
         const amountInUnits = ZeroEx.toUnitAmount(this.props.amountInBaseUnits, this.props.token.decimals);
         const truncatedAddress = utils.getAddressBeginAndEnd(this.props.toAddress);
         return (
