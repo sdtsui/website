@@ -4,16 +4,16 @@ import {ZeroEx} from '0x.js';
 import {Token} from 'ts/types';
 import {utils} from 'ts/utils/utils';
 
-interface TokenTransferCompletedProps {
+interface TokenSendCompletedProps {
     etherScanLinkIfExists?: string;
     token: Token;
     toAddress: string;
     amountInBaseUnits: BigNumber.BigNumber;
 }
 
-interface TokenTransferCompletedState {}
+interface TokenSendCompletedState {}
 
-export class TokenTransferCompleted extends React.Component<TokenTransferCompletedProps, TokenTransferCompletedState> {
+export class TokenSendCompleted extends React.Component<TokenSendCompletedProps, TokenSendCompletedState> {
     public render() {
         const etherScanLink = !_.isUndefined(this.props.etherScanLinkIfExists) &&
                             (
