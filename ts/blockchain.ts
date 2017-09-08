@@ -193,7 +193,7 @@ export class Blockchain {
         );
         await this.showEtherScanLinkAndAwaitTransactionMinedAsync(txHash);
         const etherScanLinkIfExists = utils.getEtherScanLinkIfExists(txHash, this.networkId, EtherscanLinkSuffixes.tx);
-        this.dispatcher.showFlashMessage(React.createElement(TokenTransferCompleted, {
+        this.dispatcher.showFlashMessage(React.createElement(TokenSendCompleted, {
             etherScanLinkIfExists,
             token,
             toAddress,
