@@ -30,7 +30,7 @@ export class Party extends React.Component<PartyProps, PartyState> {
         const identiconDiameter = this.props.identiconDiameter;
         const addressWidth = identiconDiameter > MIN_ADDRESS_WIDTH ?
                              identiconDiameter : MIN_ADDRESS_WIDTH;
-        const truncatedAddress = utils.truncateAddress(address);
+        const truncatedAddress = utils.getAddressBeginAndEnd(address);
         const emptyIdenticonStyles = {
             width: identiconDiameter,
             height: identiconDiameter,

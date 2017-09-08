@@ -27,7 +27,7 @@ export class TokenTransferCompleted extends React.Component<TokenTransferComplet
                 </a>
             );
         const amountInUnits = ZeroEx.toUnitAmount(this.props.amountInBaseUnits, this.props.token.decimals);
-        const truncatedAddress = utils.truncateAddress(this.props.toAddress);
+        const truncatedAddress = utils.getAddressBeginAndEnd(this.props.toAddress);
         return (
             <div>
                 {`Sent ${amountInUnits} ${this.props.token.symbol} to ${truncatedAddress}: `}
