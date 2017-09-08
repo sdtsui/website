@@ -134,13 +134,13 @@ export const utils = {
         const isUserOnMobile = isMobile();
         return isUserOnMobile;
     },
-    getEtherScanLinkIfExists(address: string, networkId: number, suffix: EtherscanLinkSuffixes): string {
+    getEtherScanLinkIfExists(addressOrTxHash: string, networkId: number, suffix: EtherscanLinkSuffixes): string {
         const networkName = constants.networkNameById[networkId];
         if (_.isUndefined(networkName)) {
             return undefined;
         }
         const etherScanPrefix = networkName === 'Frontier' ? '' : `${networkName.toLowerCase()}.`;
-        return `https://${etherScanPrefix}etherscan.io/${suffix}/${address}`;
+        return `https://${etherScanPrefix}etherscan.io/${suffix}/${addressOrTxHash}`;
     },
     setUrlHash(anchorId: string) {
         window.location.hash = anchorId;
@@ -194,5 +194,9 @@ export const utils = {
     getIdFromName(name: string) {
         const id = name.replace(/ /g, '-');
         return id;
+    },
+    getAddressBeginAndEnd(address: string): string {
+        const truncatedAddress = `${address.substring(0, 6)}...${address.substr(-4)}`; // 0x3d5a...b287
+        return truncatedAddress;
     },
 };
