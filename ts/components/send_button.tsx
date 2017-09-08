@@ -65,10 +65,7 @@ export class SendButton extends React.Component<SendButtonProps, SendButtonState
         const token = this.props.token;
         let balance = token.balance;
         try {
-            await this.props.blockchain.transferAsync(token.address, recipient, value);
-            const tokenAmount = ZeroEx.toUnitAmount(value, token.decimals);
-            const flashMessage = `Successfully transferred ${tokenAmount.toString()} ${token.symbol} to ${recipient}`;
-            this.props.dispatcher.showFlashMessage(flashMessage);
+            await this.props.blockchain.transferAsync(token, recipient, value);
             balance = balance.minus(value);
             const updatedToken = _.assign({}, token, {
                 balance,
