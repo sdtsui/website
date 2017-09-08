@@ -366,7 +366,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                     {isMintable &&
                         <LifeCycleRaisedButton
                             labelReady="Mint"
-                            labelLoading="Minting..."
+                            labelLoading={<span style={{fontSize: 12}}>Minting...</span>}
                             labelComplete="Minted!"
                             onClickAsyncFn={this.onMintTestTokensAsync.bind(this, token)}
                         />
