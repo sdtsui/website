@@ -17,9 +17,9 @@ interface LifeCycleRaisedButtonProps {
     isHidden?: boolean;
     isDisabled?: boolean;
     isPrimary?: boolean;
-    labelReady: string;
-    labelLoading: string;
-    labelComplete: string;
+    labelReady: React.ReactNode|string;
+    labelLoading: React.ReactNode|string;
+    labelComplete: React.ReactNode|string;
     onClickAsyncFn: () => boolean;
     backgroundColor?: string;
     labelColor?: string;
