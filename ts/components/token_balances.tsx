@@ -273,9 +273,11 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                             <TableHeaderColumn>
                                 Action
                             </TableHeaderColumn>
-                            <TableHeaderColumn>
-                                Send
-                            </TableHeaderColumn>
+                            {this.props.screenWidth !== ScreenWidths.SM &&
+                                <TableHeaderColumn>
+                                    Send
+                                </TableHeaderColumn>
+                            }
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false}>
@@ -387,16 +389,18 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                         />
                     }
                 </TableRowColumn>
-                <TableRowColumn
-                    style={{paddingLeft: actionPaddingX, paddingRight: actionPaddingX}}
-                >
-                    <TransferButton
-                        blockchain={this.props.blockchain}
-                        dispatcher={this.props.dispatcher}
-                        token={token}
-                        onError={this.onEthWethConversionFailed.bind(this)}
-                    />
-                </TableRowColumn>
+                {this.props.screenWidth !== ScreenWidths.SM &&
+                    <TableRowColumn
+                        style={{paddingLeft: actionPaddingX, paddingRight: actionPaddingX}}
+                    >
+                        <TransferButton
+                            blockchain={this.props.blockchain}
+                            dispatcher={this.props.dispatcher}
+                            token={token}
+                            onError={this.onEthWethConversionFailed.bind(this)}
+                        />
+                    </TableRowColumn>
+                }
             </TableRow>
         );
     }
