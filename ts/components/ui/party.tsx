@@ -4,6 +4,7 @@ import {CopyIcon} from 'ts/components/ui/copy_icon';
 import ReactTooltip = require('react-tooltip');
 import {Identicon} from 'ts/components/ui/identicon';
 import {Styles} from 'ts/types';
+import {utils} from 'ts/utils/utils';
 
 const MIN_ADDRESS_WIDTH = 70;
 
@@ -29,7 +30,7 @@ export class Party extends React.Component<PartyProps, PartyState> {
         const identiconDiameter = this.props.identiconDiameter;
         const addressWidth = identiconDiameter > MIN_ADDRESS_WIDTH ?
                              identiconDiameter : MIN_ADDRESS_WIDTH;
-        const truncatedAddress = `${address.substring(0, 6)}...${address.substr(-4)}`; // 0x3d5a...b287
+        const truncatedAddress = utils.truncateAddress(address);
         const emptyIdenticonStyles = {
             width: identiconDiameter,
             height: identiconDiameter,

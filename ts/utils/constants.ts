@@ -1,4 +1,4 @@
-import {ExchangeContractErrs, PublicNodeUrlsByNetworkId} from 'ts/types';
+import {ExchangeContractErrs, PublicNodeUrlsByNetworkId, ZeroExJsDocSections} from 'ts/types';
 import * as BigNumber from 'bignumber.js';
 
 const INFURA_API_KEY = 'T5WSC8cautR4KXyYgsRs';
@@ -17,6 +17,8 @@ export const constants = {
     FEE_RECIPIENT_ADDRESS: '0x0000000000000000000000000000000000000000',
     FIREFOX_U2F_ADDON: 'https://addons.mozilla.org/en-US/firefox/addon/u2f-support-add-on/',
     GITHUB_0X_JS_URL: 'https://github.com/0xProject/0x.js',
+    GITHUB_WIKI_URL: 'https://github.com/0xProject/wiki',
+    HTTP_NO_CONTENT_STATUS_CODE: 204,
     ACCEPT_DISCLAIMER_LOCAL_STORAGE_KEY: 'didAcceptPortalDisclaimer',
     LINKEDIN_0X_URL: 'https://www.linkedin.com/company/0x',
     LEDGER_PROVIDER_NAME: 'Ledger',
@@ -133,4 +135,34 @@ export const constants = {
         'LogWithDecodedArgs',
         'DecodedLogArgs',
     ],
+    menu0xjs: {
+        introduction: [
+            ZeroExJsDocSections.introduction,
+        ],
+        install: [
+            ZeroExJsDocSections.installation,
+        ],
+        topics: [
+            ZeroExJsDocSections.async,
+            ZeroExJsDocSections.errors,
+            ZeroExJsDocSections.versioning,
+        ],
+        zeroEx: [
+            ZeroExJsDocSections.zeroEx,
+        ],
+        contracts: [
+            ZeroExJsDocSections.exchange,
+            ZeroExJsDocSections.token,
+            ZeroExJsDocSections.tokenRegistry,
+            ZeroExJsDocSections.etherToken,
+            ZeroExJsDocSections.proxy,
+        ],
+        types: [
+            ZeroExJsDocSections.types,
+        ],
+    },
+    menuSubsectionToVersionWhenIntroduced: {
+        [ZeroExJsDocSections.etherToken]: '0.7.1',
+        [ZeroExJsDocSections.proxy]: '0.8.0',
+    },
 };

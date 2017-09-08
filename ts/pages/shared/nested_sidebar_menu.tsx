@@ -4,54 +4,21 @@ import MenuItem from 'material-ui/MenuItem';
 import {colors} from 'material-ui/styles';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
-import compareVersions = require('compare-versions');
-import {VersionDropDown} from 'ts/pages/documentation/version_drop_down';
-import {ZeroExJsDocSections, Styles, TypeDocNode, MenuSubsectionsBySection} from 'ts/types';
+import {VersionDropDown} from 'ts/pages/shared/version_drop_down';
+import {ZeroExJsDocSections, Styles, MenuSubsectionsBySection} from 'ts/types';
 import {typeDocUtils} from 'ts/utils/typedoc_utils';
 import {Link as ScrollLink} from 'react-scroll';
 
-export const menu = {
-    introduction: [
-        ZeroExJsDocSections.introduction,
-    ],
-    install: [
-        ZeroExJsDocSections.installation,
-        ZeroExJsDocSections.testrpc,
-    ],
-    topics: [
-        ZeroExJsDocSections.async,
-        ZeroExJsDocSections.errors,
-        ZeroExJsDocSections.versioning,
-    ],
-    zeroEx: [
-        ZeroExJsDocSections.zeroEx,
-    ],
-    contracts: [
-        ZeroExJsDocSections.exchange,
-        ZeroExJsDocSections.token,
-        ZeroExJsDocSections.tokenRegistry,
-        ZeroExJsDocSections.etherToken,
-        ZeroExJsDocSections.proxy,
-    ],
-    types: [
-        ZeroExJsDocSections.types,
-    ],
-};
-
-const menuSubsectionToVersionWhenIntroduced = {
-    [ZeroExJsDocSections.etherToken]: '0.7.1',
-    [ZeroExJsDocSections.proxy]: '0.8.0',
-};
-
-interface Docs0xjsMenuProps {
+interface NestedSidebarMenuProps {
     shouldDisplaySectionHeaders?: boolean;
     onMenuItemClick?: () => void;
-    selectedVersion: string;
-    versions: string[];
+    selectedVersion?: string;
+    versions?: string[];
+    topLevelMenu: {[topLevel: string]: string[]};
     menuSubsectionsBySection: MenuSubsectionsBySection;
 }
 
-interface Docs0xjsMenuState {}
+interface NestedSidebarMenuState {}
 
 const styles: Styles = {
     menuItemWithHeaders: {
@@ -65,25 +32,13 @@ const styles: Styles = {
     },
 };
 
-export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMenuState> {
-    public static defaultProps: Partial<Docs0xjsMenuProps> = {
+export class NestedSidebarMenu extends React.Component<NestedSidebarMenuProps, NestedSidebarMenuState> {
+    public static defaultProps: Partial<NestedSidebarMenuProps> = {
         shouldDisplaySectionHeaders: true,
         onMenuItemClick: _.noop,
     };
     public render() {
-        const finalMenu = _.cloneDeep(menu);
-        finalMenu.contracts = _.filter(finalMenu.contracts, (contractName: string) => {
-            const versionIntroducedIfExists = menuSubsectionToVersionWhenIntroduced[contractName];
-            if (!_.isUndefined(versionIntroducedIfExists)) {
-                const existsInSelectedVersion = compareVersions(this.props.selectedVersion,
-                                                                versionIntroducedIfExists) >= 0;
-                return existsInSelectedVersion;
-            } else {
-                return true;
-            }
-        });
-
-        const navigation = _.map(finalMenu, (menuItems: string[], sectionName: string) => {
+        const navigation = _.map(this.props.topLevelMenu, (menuItems: string[], sectionName: string) => {
             if (this.props.shouldDisplaySectionHeaders) {
                 return (
                     <div
@@ -127,11 +82,12 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
         const menuItemInnerDivStyles = this.props.shouldDisplaySectionHeaders ?
                                     styles.menuItemInnerDivWithHeaders : {};
         const menuItems = _.map(menuItemNames, menuItemName => {
+            const id = utils.getIdFromName(menuItemName);
             return (
                 <div key={menuItemName}>
                     <ScrollLink
                         key={`menuItem-${menuItemName}`}
-                        to={menuItemName}
+                        to={id}
                         offset={-10}
                         duration={constants.DOCS_SCROLL_DURATION_MS}
                         containerId={constants.DOCS_CONTAINER_ID}
@@ -158,25 +114,26 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
         }
         return this.renderMenuSubsectionsBySection(menuItemName, this.props.menuSubsectionsBySection[menuItemName]);
     }
-    private renderMenuSubsectionsBySection(menuItemName: string, entities: TypeDocNode[]): React.ReactNode {
+    private renderMenuSubsectionsBySection(menuItemName: string, entityNames: string[]): React.ReactNode {
         return (
             <ul style={{margin: 0, listStyleType: 'none', paddingLeft: 0}} key={menuItemName}>
-            {_.map(entities, entity => {
+            {_.map(entityNames, entityName => {
+                const id = utils.getIdFromName(entityName);
                 return (
-                    <li key={entity.id}>
+                    <li key={`menuItem-${entityName}`}>
                         <ScrollLink
-                            to={entity.name}
+                            to={id}
                             offset={0}
                             duration={constants.DOCS_SCROLL_DURATION_MS}
                             containerId={constants.DOCS_CONTAINER_ID}
-                            onTouchTap={this.onMenuItemClick.bind(this, entity.name)}
+                            onTouchTap={this.onMenuItemClick.bind(this, entityName)}
                         >
                             <MenuItem
                                 onTouchTap={this.onMenuItemClick.bind(this, menuItemName)}
                                 style={{minHeight: 35}}
                                 innerDivStyle={{paddingLeft: 36, fontSize: 14, lineHeight: '35px'}}
                             >
-                                {entity.name}
+                                {entityName}
                             </MenuItem>
                         </ScrollLink>
                     </li>
@@ -186,7 +143,8 @@ export class Docs0xjsMenu extends React.Component<Docs0xjsMenuProps, Docs0xjsMen
         );
     }
     private onMenuItemClick(menuItemName: string): void {
-        utils.setUrlHash(menuItemName);
+        const id = utils.getIdFromName(menuItemName);
+        utils.setUrlHash(id);
         this.props.onMenuItemClick();
     }
 }

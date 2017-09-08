@@ -32,11 +32,11 @@ import {MethodBlock} from 'ts/pages/documentation/method_block';
 import {SourceLink} from 'ts/pages/documentation/source_link';
 import {Type} from 'ts/pages/documentation/type';
 import {TypeDefinition} from 'ts/pages/documentation/type_definition';
-import {MarkdownSection} from 'ts/pages/documentation/markdown_section';
+import {MarkdownSection} from 'ts/pages/shared/markdown_section';
 import {Comment} from 'ts/pages/documentation/comment';
-import {AnchorTitle} from 'ts/pages/documentation/anchor_title';
-import {SectionHeader} from 'ts/pages/documentation/section_header';
-import {Docs0xjsMenu, menu} from 'ts/pages/documentation/docs_0xjs_menu';
+import {AnchorTitle} from 'ts/pages/shared/anchor_title';
+import {SectionHeader} from 'ts/pages/shared/section_header';
+import {NestedSidebarMenu} from 'ts/pages/shared/nested_sidebar_menu';
 import {typeDocUtils} from 'ts/utils/typedoc_utils';
 /* tslint:disable:no-var-requires */
 const IntroMarkdown = require('md/docs/0xjs/introduction');
@@ -147,9 +147,10 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
                                 className="border-right absolute"
                                 style={{...styles.menuContainer, ...styles.mainContainers}}
                             >
-                                <Docs0xjsMenu
+                                <NestedSidebarMenu
                                     selectedVersion={this.props.zeroExJSversion}
                                     versions={this.props.availableZeroExJSVersions}
+                                    topLevelMenu={typeDocUtils.getFinal0xjsMenu(this.props.zeroExJSversion)}
                                     menuSubsectionsBySection={menuSubsectionsBySection}
                                 />
                             </div>
@@ -175,7 +176,7 @@ export class ZeroExJSDocumentation extends React.Component<ZeroExJSDocumentation
         );
     }
     private renderDocumentation(): React.ReactNode {
-        const subMenus = _.values(menu);
+        const subMenus = _.values(constants.menu0xjs);
         const orderedSectionNames = _.flatten(subMenus);
         const sections = _.map(orderedSectionNames, this.renderSection.bind(this));
 

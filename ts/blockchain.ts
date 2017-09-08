@@ -22,6 +22,7 @@ import ethUtil = require('ethereumjs-util');
 import ProviderEngine = require('web3-provider-engine');
 import FilterSubprovider = require('web3-provider-engine/subproviders/filters');
 import {TransactionSubmitted} from 'ts/components/flash_messages/transaction_submitted';
+import {TokenTransferCompleted} from 'ts/components/flash_messages/token_transfer_completed';
 import {RedundantRPCSubprovider} from 'ts/subproviders/redundant_rpc_subprovider';
 import {InjectedWeb3SubProvider} from 'ts/subproviders/injected_web3_subprovider';
 import {ledgerWalletSubproviderFactory} from 'ts/subproviders/ledger_wallet_subprovider_factory';
@@ -185,12 +186,19 @@ export class Blockchain {
         const allowance = amountInBaseUnits;
         this.dispatcher.replaceTokenAllowanceByAddress(token.address, allowance);
     }
-    public async transferAsync(tokenAddress: string, toAddress: string,
+    public async transferAsync(token: Token, toAddress: string,
                                amountInBaseUnits: BigNumber.BigNumber): Promise<void> {
         const txHash = await this.zeroEx.token.transferAsync(
-            tokenAddress, this.userAddress, toAddress, amountInBaseUnits,
+            token.address, this.userAddress, toAddress, amountInBaseUnits,
         );
         await this.showEtherScanLinkAndAwaitTransactionMinedAsync(txHash);
+        const etherScanLinkIfExists = utils.getEtherScanLinkIfExists(txHash, this.networkId, EtherscanLinkSuffixes.tx);
+        this.dispatcher.showFlashMessage(React.createElement(TokenTransferCompleted, {
+            etherScanLinkIfExists,
+            token,
+            toAddress,
+            amountInBaseUnits,
+        }));
     }
     public async fillOrderAsync(maker: string, taker: string, makerTokenAddress: string,
                                 takerTokenAddress: string, makerTokenAmount: BigNumber.BigNumber,

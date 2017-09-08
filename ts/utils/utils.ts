@@ -191,4 +191,12 @@ export const utils = {
                 return 'production';
         }
     },
+    getIdFromName(name: string) {
+        const id = name.replace(/ /g, '-');
+        return id;
+    },
+    truncateAddress(address: string): string {
+        const truncatedAddress = `${address.substring(0, 6)}...${address.substr(-4)}`; // 0x3d5a...b287
+        return truncatedAddress;
+    },
 };

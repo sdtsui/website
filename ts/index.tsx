@@ -9,6 +9,7 @@ import * as BigNumber from 'bignumber.js';
 import {constants} from 'ts/utils/constants';
 import {Home} from 'ts/pages/home/home';
 import {FAQ} from 'ts/pages/faq/faq';
+import {Wiki} from 'ts/pages/wiki/wiki';
 import {TokenLaunch} from 'ts/pages/token_launch/token_launch';
 import {NotFound} from 'ts/pages/not_found';
 import {createLazyComponent} from 'ts/lazy_component';
@@ -93,6 +94,7 @@ render(
                             <Route path="/portal" component={LazyPortal} />
                             <Route path="/token" component={TokenLaunch as any} />
                             <Route path="/faq" component={FAQ as any} />
+                            <Route path="/wiki" component={Wiki as any} />
                             <Route path="/docs/0xjs/:version?" component={LazyZeroExJSDocumentation} />
                             <Route component={NotFound as any} />
                         </Switch>
