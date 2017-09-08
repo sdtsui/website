@@ -25,3 +25,7 @@ Download the UMD module from our [releases page](https://github.com/0xProject/0x
 ```html
 <script type="text/javascript" src="0x.js"></script>
 ```
+
+### Wiki
+
+Check out our [wiki](https://0xproject.com/wiki) for articles on how to get 0x.js setup with TestRPC, Infura and more!
