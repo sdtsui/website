@@ -109,6 +109,7 @@ export class TransferDialog extends React.Component<TransferDialogProps, Transfe
     private onCancel() {
         this.setState({
             value: undefined,
+            recipient: '',
         });
         this.props.onCancelled();
     }
