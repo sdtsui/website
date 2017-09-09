@@ -12,7 +12,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import {colors} from 'material-ui/styles';
 import {GenerateOrderForm} from 'ts/containers/generate_order_form';
 import {TokenBalances} from 'ts/components/token_balances';
-import {PortalDisclaimerDialog} from 'ts/components/portal_disclaimer_dialog';
+import {PortalDisclaimerDialog} from 'ts/components/dialogs/portal_disclaimer_dialog';
 import {FillOrder} from 'ts/components/fill_order';
 import {Blockchain} from 'ts/blockchain';
 import {SchemaValidator} from 'ts/schemas/validator';
@@ -34,7 +34,7 @@ import {TopBar} from 'ts/components/top_bar';
 import {Footer} from 'ts/components/footer';
 import {Loading} from 'ts/components/ui/loading';
 import {PortalMenu} from 'ts/components/portal_menu';
-import {BlockchainErrDialog} from 'ts/components/blockchain_err_dialog';
+import {BlockchainErrDialog} from 'ts/components/dialogs/blockchain_err_dialog';
 import * as BigNumber from 'bignumber.js';
 import {FlashMessage} from 'ts/components/ui/flash_message';
 
