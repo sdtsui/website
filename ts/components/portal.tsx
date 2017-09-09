@@ -273,6 +273,7 @@ export class Portal extends React.Component<PortalAllProps, PortalAllState> {
                 blockchain={this.blockchain}
                 blockchainErr={this.props.blockchainErr}
                 initialOrder={initialFillOrder}
+                isOrderInUrl={!_.isUndefined(this.sharedOrderIfExists)}
                 orderFillAmount={this.props.orderFillAmount}
                 networkId={this.props.networkId}
                 userAddress={this.props.userAddress}

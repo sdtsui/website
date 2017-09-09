@@ -5,8 +5,11 @@ import {ZeroEx} from '0x.js';
 import * as moment from 'moment';
 import * as BigNumber from 'bignumber.js';
 import Paper from 'material-ui/Paper';
+import {Card, CardText, CardHeader} from 'material-ui/Card';
 import Divider from 'material-ui/Divider';
+import CircularProgress from 'material-ui/CircularProgress';
 import TextField from 'material-ui/TextField';
+import RaisedButton from 'material-ui/RaisedButton';
 import {utils} from 'ts/utils/utils';
 import {constants} from 'ts/utils/constants';
 import {zeroEx} from 'ts/utils/zero_ex';
@@ -22,9 +25,11 @@ import {
     ContractResponse,
 } from 'ts/types';
 import {Alert} from 'ts/components/ui/alert';
+import {Identicon} from 'ts/components/ui/identicon';
+import {EthereumAddress} from 'ts/components/ui/ethereum_address';
 import {TokenAmountInput} from 'ts/components/inputs/token_amount_input';
+import {FillWarningDialog} from 'ts/components/fill_warning_dialog';
 import {VisualOrder} from 'ts/components/visual_order';
-import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 import {SchemaValidator} from 'ts/schemas/validator';
 import {orderSchema} from 'ts/schemas/order_schema';
 import {Dispatcher} from 'ts/redux/dispatcher';
@@ -36,6 +41,7 @@ interface FillOrderProps {
     blockchain: Blockchain;
     blockchainErr: BlockchainErrs;
     orderFillAmount: BigNumber.BigNumber;
+    isOrderInUrl: boolean;
     networkId: number;
     userAddress: string;
     tokenByAddress: TokenByAddress;
@@ -44,13 +50,17 @@ interface FillOrderProps {
 }
 
 interface FillOrderState {
-    isValidOrder: boolean;
+    didOrderValidationRun: boolean;
     globalErrMsg: string;
     orderJSON: string;
     orderJSONErrMsg: string;
     parsedOrder: Order;
     didFillOrderSucceed: boolean;
     unavailableTakerAmount: BigNumber.BigNumber;
+    isMakerTokenAddressInRegistry: boolean;
+    isTakerTokenAddressInRegistry: boolean;
+    isFillWarningDialogOpen: boolean;
+    isFilling: boolean;
 }
 
 export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
@@ -59,12 +69,16 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         super(props);
         this.state = {
             globalErrMsg: '',
-            isValidOrder: false,
+            didOrderValidationRun: false,
             didFillOrderSucceed: false,
             orderJSON: _.isUndefined(this.props.initialOrder) ? '' : JSON.stringify(this.props.initialOrder),
             orderJSONErrMsg: '',
             parsedOrder: this.props.initialOrder,
             unavailableTakerAmount: new BigNumber(0),
+            isMakerTokenAddressInRegistry: false,
+            isTakerTokenAddressInRegistry: false,
+            isFillWarningDialogOpen: false,
+            isFilling: false,
         };
         this.validator = new SchemaValidator();
     }
@@ -77,7 +91,69 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         window.scrollTo(0, 0);
     }
     public render() {
+        return (
+            <div className="clearfix lg-px4 md-px4 sm-px2" style={{minHeight: 600}}>
+                <h3>Fill an order</h3>
+                <Divider />
+                <div>
+                    {!this.props.isOrderInUrl &&
+                        <div>
+                            <div className="pt2 pb2">
+                                Paste an order JSON snippet below to begin
+                            </div>
+                            <div className="pb2">Order JSON</div>
+                            {this.renderOrderJson()}
+                            {this.renderOrderJsonNotices()}
+                        </div>
+                    }
+                    <div>
+                        {!_.isUndefined(this.state.parsedOrder) && this.state.didOrderValidationRun &&
+                             this.renderVisualOrder()
+                        }
+                    </div>
+                    {this.props.isOrderInUrl &&
+                        <div className="pt2">
+                            <Card style={{boxShadow: 'none', backgroundColor: 'none', border: '1px solid #eceaea'}}>
+                                <CardHeader
+                                    title="Order JSON"
+                                    actAsExpander={true}
+                                    showExpandableButton={true}
+                                />
+                                <CardText expandable={true}>
+                                    {this.renderOrderJson()}
+                                </CardText>
+                            </Card>
+                            {this.renderOrderJsonNotices()}
+                        </div>
+                    }
+                </div>
+                <FillWarningDialog
+                    isOpen={this.state.isFillWarningDialogOpen}
+                    onToggleDialog={this.onFillWarningClosed.bind(this)}
+                />
+            </div>
+        );
+    }
+    private renderOrderJsonNotices() {
+        return (
+            <div>
+                {!_.isUndefined(this.props.initialOrder) && !this.state.didOrderValidationRun &&
+                    <div className="pt2">
+                        <span className="pr1">
+                            <i className="zmdi zmdi-spinner zmdi-hc-spin" />
+                        </span>
+                        <span>Validating order...</span>
+                    </div>
+                }
+                {this.state.orderJSONErrMsg !== '' &&
+                    <Alert type={AlertTypes.ERROR} message={this.state.orderJSONErrMsg} />
+                }
+            </div>
+        );
+    }
+    private renderOrderJson() {
         const addresses = _.keys(this.props.tokenByAddress);
+        const exchangeContract = this.props.blockchain.getExchangeContractAddressIfExists();
         const hintSideToAssetToken = {
             [Side.deposit]: {
                 amount: new BigNumber(35),
@@ -96,20 +172,13 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             v: 27,
         };
         const hintSalt = ZeroEx.generatePseudoRandomSalt();
-        const exchangeContract = this.props.blockchain.getExchangeContractAddressIfExists();
         const hintOrder = utils.generateOrder(this.props.networkId, exchangeContract, hintSideToAssetToken,
                                               hintOrderExpiryTimestamp, '', '', constants.MAKER_FEE,
                                               constants.TAKER_FEE, constants.FEE_RECIPIENT_ADDRESS,
                                               hintSignatureData, this.props.tokenByAddress, hintSalt);
         const hintOrderJSON = `${JSON.stringify(hintOrder, null, '\t').substring(0, 500)}...`;
         return (
-            <div className="clearfix lg-px4 md-px4 sm-px2" style={{minHeight: 600}}>
-                <h3>Fill an order</h3>
-                <Divider />
-                <div className="pt2 pb2">
-                    Paste an order JSON snippet below to begin
-                </div>
-                <div className="pb2">Order JSON</div>
+            <div>
                 <Paper className="p1 overflow-hidden" style={{height: 164}}>
                     <TextField
                         id="orderJSON"
@@ -125,12 +194,6 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                         textareaStyle={{marginTop: 0}}
                     />
                 </Paper>
-                <div>
-                    {this.state.orderJSONErrMsg !== '' &&
-                        <Alert type={AlertTypes.ERROR} message={this.state.orderJSONErrMsg} />
-                    }
-                    {!_.isUndefined(this.state.parsedOrder) && this.renderVisualOrder()}
-                </div>
             </div>
         );
     }
@@ -160,7 +223,26 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         const expiryDate = utils.convertToReadableDateTimeFromUnixTimestamp(parsedOrderExpiration);
         return (
             <div className="pt3 pb1">
-                <span>Order details</span>
+                <div className="clearfix pb2" style={{width: '100%'}}>
+                    <div className="inline left">Order details</div>
+                    <div className="inline right" style={{minWidth: 208}}>
+                        <div className="col col-4 pl2" style={{color: '#BEBEBE'}}>
+                            Maker:
+                        </div>
+                        <div className="col col-2 pr1">
+                            <Identicon
+                                address={this.state.parsedOrder.maker.address}
+                                diameter={23}
+                            />
+                        </div>
+                        <div className="col col-6">
+                            <EthereumAddress
+                                address={this.state.parsedOrder.maker.address}
+                                networkId={this.props.networkId}
+                            />
+                        </div>
+                    </div>
+                </div>
                 <div className="lg-px4 md-px4 sm-px0">
                     <div className="lg-px4 md-px4 sm-px1 pt1">
                         <VisualOrder
@@ -170,6 +252,9 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                             takerAssetToken={takerAssetToken}
                             makerToken={makerToken}
                             takerToken={takerToken}
+                            networkId={this.props.networkId}
+                            isMakerTokenAddressInRegistry={this.state.isMakerTokenAddressInRegistry}
+                            isTakerTokenAddressInRegistry={this.state.isTakerTokenAddressInRegistry}
                         />
                         <div className="center pt3 pb2">
                             Expires: {expiryDate} UTC
@@ -188,11 +273,11 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                     />
                 </div>
                 <div>
-                    <LifeCycleRaisedButton
-                        labelReady="Fill order"
-                        labelLoading="Filling order..."
-                        labelComplete="Order filled!"
-                        onClickAsyncFn={this.onFillOrderClickAsync.bind(this)}
+                    <RaisedButton
+                        style={{width: '100%'}}
+                        disabled={this.state.isFilling}
+                        label={this.state.isFilling ? 'Filling order...' : 'Fill order'}
+                        onClick={this.onFillOrderClick.bind(this)}
                     />
                     {this.state.globalErrMsg !== '' &&
                         <Alert type={AlertTypes.ERROR} message={this.state.globalErrMsg} />
@@ -220,14 +305,32 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             </div>
         );
     }
+    private onFillOrderClick() {
+        if (!this.state.isMakerTokenAddressInRegistry || !this.state.isTakerTokenAddressInRegistry) {
+            this.setState({
+                isFillWarningDialogOpen: true,
+            });
+        } else {
+            this.onFillOrderClickAsync();
+        }
+    }
+    private onFillWarningClosed(didUserCancel: boolean) {
+        this.setState({
+            isFillWarningDialogOpen: false,
+        });
+        if (!didUserCancel) {
+            this.onFillOrderClickAsync();
+        }
+    }
     private onFillAmountChange(isValid: boolean, amount?: BigNumber.BigNumber) {
         this.props.dispatcher.updateOrderFillAmount(amount);
     }
     private onFillOrderChanged(e: any) {
+        const orderJSON = e.target.value;
         this.setState({
+            didOrderValidationRun: _.isEmpty(orderJSON) && _.isEmpty(this.state.orderJSONErrMsg),
             didFillOrderSucceed: false,
         });
-        const orderJSON = e.target.value;
         this.validateFillOrderFireAndForgetAsync(orderJSON);
     }
     private async validateFillOrderFireAndForgetAsync(orderJSON: string) {
@@ -283,6 +386,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                 orderJSONErrMsg = 'Submitted order JSON is not valid JSON';
             }
             this.setState({
+                didOrderValidationRun: true,
                 orderJSON,
                 orderJSONErrMsg,
                 parsedOrder,
@@ -310,6 +414,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         }
 
         this.setState({
+            didOrderValidationRun: true,
             orderJSON,
             orderJSONErrMsg,
             parsedOrder,
@@ -317,13 +422,14 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         });
     }
 
-    private async onFillOrderClickAsync(): Promise<boolean> {
+    private async onFillOrderClickAsync(): Promise<void> {
         if (this.props.blockchainErr !== '' || this.props.userAddress === '') {
             this.props.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
-            return false;
+            return;
         }
 
         this.setState({
+            isFilling: true,
             didFillOrderSucceed: false,
         });
 
@@ -353,7 +459,10 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
 
         if (_.isUndefined(takerAddress)) {
             this.props.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
-            return false;
+            this.setState({
+                isFilling: false,
+            });
+            return;
         }
 
         const [
@@ -386,9 +495,10 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         }
         if (globalErrMsg !== '') {
             this.setState({
+                isFilling: false,
                 globalErrMsg,
             });
-            return false;
+            return;
         }
 
         const parsedOrderSalt = new BigNumber(parsedOrder.salt);
@@ -415,15 +525,19 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             const tokens = [makerToken, takerToken];
             await this.props.blockchain.updateTokenBalancesAndAllowancesAsync(tokens);
             this.setState({
+                isFilling: false,
                 didFillOrderSucceed: true,
                 globalErrMsg: '',
                 unavailableTakerAmount: this.state.unavailableTakerAmount.plus(orderFilledAmount),
             });
-            return true;
+            return;
         } catch (err) {
+            this.setState({
+                isFilling: false,
+            });
             const errMsg = `${err}`;
             if (_.includes(errMsg, 'User denied transaction signature')) {
-                return false;
+                return;
             }
             globalErrMsg = 'Failed to fill order, please refresh and try again';
             if (_.includes(errMsg, ExchangeContractErrs.OrderFillRoundingError)) {
@@ -434,7 +548,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             this.setState({
                 globalErrMsg,
             });
-            return false;
+            return;
         }
     }
     private addTokenToCustomTokensIfUnseen(orderToken: OrderToken) {
