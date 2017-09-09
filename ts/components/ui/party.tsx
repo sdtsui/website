@@ -120,8 +120,8 @@ export class Party extends React.Component<PartyProps, PartyState> {
                                     </div> :
                                     <div>
                                         This token is not included in the token registry<br />
-                                        smart contract. We cannot guarentee the legitimacy<br />
-                                        of this token. Make sure to verify it's address on Etherscan.
+                                        smart contract. We cannot guarantee the legitimacy<br />
+                                        of this token. Make sure to verify its address on Etherscan.
                                     </div>
                                 }
                             </ReactTooltip>
