@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as BigNumber from 'bignumber.js';
 import RaisedButton from 'material-ui/RaisedButton';
 import {BlockchainCallErrs} from 'ts/types';
-import {SendDialog} from 'ts/components/send_dialog';
+import {SendDialog} from 'ts/components/dialogs/send_dialog';
 import {Token} from 'ts/types';
 import {constants} from 'ts/utils/constants';
 import {utils} from 'ts/utils/utils';

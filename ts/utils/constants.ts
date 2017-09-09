@@ -139,6 +139,7 @@ export const constants = {
         'TransactionReceiptWithDecodedLogs',
         'LogWithDecodedArgs',
         'DecodedLogArgs',
+        'MethodOpts',
     ],
     menu0xjs: {
         introduction: [

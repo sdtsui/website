@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as BigNumber from 'bignumber.js';
 import RaisedButton from 'material-ui/RaisedButton';
 import {BlockchainCallErrs} from 'ts/types';
-import {EthWethConversionDialog} from 'ts/components/eth_weth_conversion_dialog';
+import {EthWethConversionDialog} from 'ts/components/dialogs/eth_weth_conversion_dialog';
 import {Side, Token} from 'ts/types';
 import {constants} from 'ts/utils/constants';
 import {utils} from 'ts/utils/utils';
