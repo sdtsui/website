@@ -297,19 +297,16 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         } else {
             const orderHash = parsedOrder.signature.hash;
             unavailableTakerAmount = await this.props.blockchain.getUnavailableTakerAmountAsync(orderHash);
-        }
-
-        const isMakerTokenAddressInRegistry = await this.props.blockchain.isAddressInTokenRegistryAsync(
-            parsedOrder.maker.token.address,
-        );
-        const isTakerTokenAddressInRegistry = await this.props.blockchain.isAddressInTokenRegistryAsync(
-            parsedOrder.taker.token.address,
-        );
-        if (!isMakerTokenAddressInRegistry || !isTakerTokenAddressInRegistry) {
-            orderJSONErrMsg = 'Trading of tokens not whitelisted in 0x Token Registry is \
-                               temporarily disabled due to a high number of malicious token scams. \
-                               We hope to address this issue shortly.';
-            parsedOrder = undefined;
+            const isMakerTokenAddressInRegistry = await this.props.blockchain.isAddressInTokenRegistryAsync(
+                parsedOrder.maker.token.address,
+            );
+            const isTakerTokenAddressInRegistry = await this.props.blockchain.isAddressInTokenRegistryAsync(
+                parsedOrder.taker.token.address,
+            );
+            this.setState({
+                isMakerTokenAddressInRegistry,
+                isTakerTokenAddressInRegistry,
+            });
         }
 
         this.setState({
