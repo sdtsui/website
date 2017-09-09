@@ -1,13 +1,13 @@
 import * as _ from 'lodash';
 import {Fill} from 'ts/types';
 import {configs} from 'ts/utils/configs';
+import {constants} from 'ts/utils/constants';
 import {localStorage} from 'ts/local_storage/local_storage';
 import ethUtil = require('ethereumjs-util');
 import * as BigNumber from 'bignumber.js';
 
 const FILLS_KEY = 'fills';
 const FILLS_LATEST_BLOCK = 'fillsLatestBlock';
-const GENESIS_TRADE_BLOCK_NUMBER = 4145578;
 const FILL_CLEAR_KEY = 'lastClearFillDate';
 
 export const tradeHistoryStorage = {
@@ -57,7 +57,7 @@ export const tradeHistoryStorage = {
         const userFillsLatestBlockKey = this._getFillsLatestBlockKey(userAddress, networkId);
         const blockNumberStr = localStorage.getItemIfExists(userFillsLatestBlockKey);
         if (_.isEmpty(blockNumberStr)) {
-            return GENESIS_TRADE_BLOCK_NUMBER;
+            return constants.GENESIS_ORDER_BLOCK_BY_NETWORK_ID[networkId];
         }
         const blockNumber = _.parseInt(blockNumberStr);
         return blockNumber;

@@ -23,6 +23,11 @@ export const constants = {
     LINKEDIN_0X_URL: 'https://www.linkedin.com/company/0x',
     LEDGER_PROVIDER_NAME: 'Ledger',
     METAMASK_PROVIDER_NAME: 'Metamask',
+    GENESIS_ORDER_BLOCK_BY_NETWORK_ID: {
+        1: 4145578,
+        42: 3117574,
+        50: 0,
+    } as {[networkId: number]: number},
     PUBLIC_PROVIDER_NAME: '0x Public',
     // The order matters. We first try first node and only then fall back to others.
     PUBLIC_NODE_URLS_BY_NETWORK_ID: {
