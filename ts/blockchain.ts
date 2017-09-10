@@ -617,8 +617,8 @@ export class Blockchain {
         }
         await this.updateTokenBalancesAndAllowancesAsync(tokens);
         const mostPopularTradingPairTokens: Token[] = [
-            _.find(tokens, {symbol: configs.mostPopularTradingPairSymbols[0]}),
-            _.find(tokens, {symbol: configs.mostPopularTradingPairSymbols[1]}),
+            _.find(tokens, {symbol: configs.defaultTrackedTokens[0]}),
+            _.find(tokens, {symbol: configs.defaultTrackedTokens[1]}),
         ];
         this.dispatcher.updateChosenAssetTokenAddress(Side.deposit, mostPopularTradingPairTokens[0].address);
         this.dispatcher.updateChosenAssetTokenAddress(Side.receive, mostPopularTradingPairTokens[1].address);
