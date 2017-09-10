@@ -3,7 +3,7 @@ import Paper from 'material-ui/Paper';
 import {colors} from 'material-ui/styles';
 import {Blockchain} from 'ts/blockchain';
 import {Dispatcher} from 'ts/redux/dispatcher';
-import {AssetToken, Side, TokenByAddress, BlockchainErrs, Token} from 'ts/types';
+import {AssetToken, Side, TokenByAddress, BlockchainErrs, Token, TokenState} from 'ts/types';
 import {AssetPicker} from 'ts/components/generate_order/asset_picker';
 import {NewTokenDialog} from 'ts/components/generate_order/new_token_dialog';
 import {trackedTokenStorage} from 'ts/local_storage/tracked_token_storage';
@@ -118,9 +118,12 @@ export class TokenInput extends React.Component<TokenInputProps, TokenInputState
             isPickerOpen: false,
         });
     }
-    private onNewTokenSubmitted(newToken: Token) {
+    private onNewTokenSubmitted(newToken: Token, newTokenState: TokenState) {
         trackedTokenStorage.addTrackedToken(this.props.blockchain.networkId, newToken);
         this.props.dispatcher.addTokenToTokenByAddress(newToken);
+        this.props.dispatcher.updateTokenStateByAddress({
+            [newToken.address]: newTokenState,
+        });
         this.props.updateChosenAssetToken(this.props.side, {
             amount: this.props.assetToken.amount,
             address: newToken.address,

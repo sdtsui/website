@@ -4,7 +4,7 @@ import * as BigNumber from 'bignumber.js';
 import Toggle from 'material-ui/Toggle';
 import {Blockchain} from 'ts/blockchain';
 import {Dispatcher} from 'ts/redux/dispatcher';
-import {Token, BalanceErrs} from 'ts/types';
+import {Token, TokenState, BalanceErrs} from 'ts/types';
 import {utils} from 'ts/utils/utils';
 import {errorReporter} from 'ts/utils/error_reporter';
 
@@ -15,6 +15,7 @@ interface AllowanceToggleProps {
     dispatcher: Dispatcher;
     onErrorOccurred: (errType: BalanceErrs) => void;
     token: Token;
+    tokenState: TokenState;
     userAddress: string;
 }
 
@@ -28,14 +29,14 @@ export class AllowanceToggle extends React.Component<AllowanceToggleProps, Allow
         super(props);
         this.state = {
             isSpinnerVisible: false,
-            prevAllowance: props.token.allowance,
+            prevAllowance: props.tokenState.allowance,
         };
     }
     public componentWillReceiveProps(nextProps: AllowanceToggleProps) {
-        if (!nextProps.token.allowance.eq(this.state.prevAllowance)) {
+        if (!nextProps.tokenState.allowance.eq(this.state.prevAllowance)) {
             this.setState({
                 isSpinnerVisible: false,
-                prevAllowance: nextProps.token.allowance,
+                prevAllowance: nextProps.tokenState.allowance,
             });
         }
     }
@@ -88,7 +89,6 @@ export class AllowanceToggle extends React.Component<AllowanceToggleProps, Allow
         }
     }
     private isAllowanceSet() {
-        const token = this.props.token;
-        return !token.allowance.eq(0);
+        return !this.props.tokenState.allowance.eq(0);
     }
 }

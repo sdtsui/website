@@ -22,6 +22,7 @@ import QueryString = require('query-string');
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {
     TokenByAddress,
+    TokenStateByAddress,
     Token,
     BlockchainErrs,
     BalanceErrs,
@@ -66,6 +67,7 @@ interface TokenBalancesProps {
     dispatcher: Dispatcher;
     screenWidth: ScreenWidths;
     tokenByAddress: TokenByAddress;
+    tokenStateByAddress: TokenStateByAddress;
     userAddress: string;
     userEtherBalance: BigNumber.BigNumber;
     networkId: number;
@@ -100,9 +102,10 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
             });
         }
         const nextZrxToken = _.find(_.values(nextProps.tokenByAddress), t => t.symbol === ZRX_TOKEN_SYMBOL);
-        if (!_.isUndefined(this.state.currentZrxBalance) && !nextZrxToken.balance.eq(this.state.currentZrxBalance)) {
+        const nextZrxTokenBalance = nextProps.tokenStateByAddress[nextZrxToken.address].balance;
+        if (!_.isUndefined(this.state.currentZrxBalance) && !nextZrxTokenBalance.eq(this.state.currentZrxBalance)) {
             if (this.state.isZRXSpinnerVisible) {
-                const receivedAmount = nextZrxToken.balance.minus(this.state.currentZrxBalance);
+                const receivedAmount = nextZrxTokenBalance.minus(this.state.currentZrxBalance);
                 const receiveAmountInUnits = ZeroEx.toUnitAmount(receivedAmount, 18);
                 this.props.dispatcher.showFlashMessage(`Received ${receiveAmountInUnits.toString(10)} Kovan ZRX`);
             }
@@ -314,19 +317,21 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
         const isSmallScreen = this.props.screenWidth === ScreenWidths.SM;
         const tokenColSpan = isSmallScreen ? TOKEN_COL_SPAN_SM : TOKEN_COL_SPAN_LG;
         const actionPaddingX = isSmallScreen ? 2 : 24;
-        const tokens = _.values(this.props.tokenByAddress);
-        const tokensStartingWithEtherToken = tokens.sort(
+        const allTokens = _.values(this.props.tokenByAddress);
+        const trackedTokens = _.filter(allTokens, t => t.isTracked);
+        const trackedTokensStartingWithEtherToken = trackedTokens.sort(
             firstBy((t: Token) => (t.symbol !== ETHER_TOKEN_SYMBOL))
             .thenBy((t: Token) => (t.symbol !== ZRX_TOKEN_SYMBOL))
             .thenBy('address'),
         );
         const tableRows = _.map(
-            tokensStartingWithEtherToken,
+            trackedTokensStartingWithEtherToken,
             this.renderTokenRow.bind(this, tokenColSpan, actionPaddingX),
         );
         return tableRows;
     }
     private renderTokenRow(tokenColSpan: number, actionPaddingX: number, token: Token) {
+        const tokenState = this.props.tokenStateByAddress[token.address];
         const tokenLink = utils.getEtherScanLinkIfExists(token.address, this.props.networkId,
                                                          EtherscanLinkSuffixes.address);
         const isMintable = _.includes(configs.symbolsOfMintableTokens, token.symbol) &&
@@ -344,7 +349,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                     }
                 </TableRowColumn>
                 <TableRowColumn style={{paddingRight: 3, paddingLeft: 3}}>
-                    {this.renderAmount(token.balance, token.decimals)} {token.symbol}
+                    {this.renderAmount(tokenState.balance, token.decimals)} {token.symbol}
                     {this.state.isZRXSpinnerVisible && token.symbol === ZRX_TOKEN_SYMBOL &&
                         <span className="pl1">
                             <i className="zmdi zmdi-spinner zmdi-hc-spin" />
@@ -356,6 +361,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                         blockchain={this.props.blockchain}
                         dispatcher={this.props.dispatcher}
                         token={token}
+                        tokenState={tokenState}
                         onErrorOccurred={this.onErrorOccurred.bind(this)}
                         userAddress={this.props.userAddress}
                     />
@@ -376,6 +382,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                             blockchain={this.props.blockchain}
                             dispatcher={this.props.dispatcher}
                             ethToken={this.getWrappedEthToken()}
+                            ethTokenState={tokenState}
                             userEtherBalance={this.props.userEtherBalance}
                             onError={this.onEthWethConversionFailed.bind(this)}
                         />
@@ -397,6 +404,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                             blockchain={this.props.blockchain}
                             dispatcher={this.props.dispatcher}
                             token={token}
+                            tokenState={tokenState}
                             onError={this.onSendFailed.bind(this)}
                         />
                     </TableRowColumn>
@@ -581,9 +589,10 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
         } else {
             const tokens = _.values(this.props.tokenByAddress);
             const zrxToken = _.find(tokens, t => t.symbol === ZRX_TOKEN_SYMBOL);
+            const zrxTokenState = this.props.tokenStateByAddress[zrxToken.address];
             this.setState({
                 isZRXSpinnerVisible: true,
-                currentZrxBalance: zrxToken.balance,
+                currentZrxBalance: zrxTokenState.balance,
             });
             this.props.blockchain.pollTokenBalanceAsync(zrxToken);
         }

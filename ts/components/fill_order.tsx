@@ -16,6 +16,7 @@ import {zeroEx} from 'ts/utils/zero_ex';
 import {
     Side,
     TokenByAddress,
+    TokenStateByAddress,
     Order,
     BlockchainErrs,
     OrderToken,
@@ -45,6 +46,7 @@ interface FillOrderProps {
     networkId: number;
     userAddress: string;
     tokenByAddress: TokenByAddress;
+    tokenStateByAddress: TokenStateByAddress;
     initialOrder: Order;
     dispatcher: Dispatcher;
 }
@@ -207,6 +209,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             symbol: takerToken.symbol,
         };
         const fillToken = this.props.tokenByAddress[takerToken.address];
+        const fillTokenState = this.props.tokenStateByAddress[takerToken.address];
         const makerTokenAddress = this.state.parsedOrder.maker.token.address;
         const makerToken = this.props.tokenByAddress[makerTokenAddress];
         const makerAssetToken = {
@@ -267,6 +270,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                         onChange={this.onFillAmountChange.bind(this)}
                         shouldShowIncompleteErrs={false}
                         token={fillToken}
+                        tokenState={fillTokenState}
                         amount={fillAssetToken.amount}
                         shouldCheckBalance={true}
                         shouldCheckAllowance={true}
@@ -378,8 +382,8 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                 // Update user supplied order cache so that if they navigate away from fill view
                 // e.g to set a token allowance, when they come back, the fill order persists
                 this.props.dispatcher.updateUserSuppliedOrderCache(parsedOrder);
-                this.addTokenToTrackedTokensIfUnseen(parsedOrder.maker.token);
-                this.addTokenToTrackedTokensIfUnseen(parsedOrder.taker.token);
+                await this.addTokenToTrackedTokensIfUnseenAsync(parsedOrder.maker.token);
+                await this.addTokenToTrackedTokensIfUnseenAsync(parsedOrder.taker.token);
             }
         } catch (err) {
             if (!_.isEmpty(orderJSON)) {
@@ -453,6 +457,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         const makerFillAmount = takerFillAmount.times(depositAssetToken.amount).div(receiveAssetToken.amount);
         const takerAddress = this.props.userAddress;
         const takerToken = this.props.tokenByAddress[takerTokenAddress];
+        const takerTokenState = this.props.tokenStateByAddress[takerTokenAddress];
         let isValidSignature = false;
         const signatureData = parsedOrder.signature;
         isValidSignature = ZeroEx.isValidSignature(signatureData.hash, signatureData, parsedOrder.maker.address);
@@ -474,8 +479,8 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         let globalErrMsg = '';
         if (_.isUndefined(takerFillAmount)) {
             globalErrMsg = 'You must specify a fill amount';
-        } else if (takerFillAmount.lte(0) || takerFillAmount.gt(takerToken.balance) ||
-            takerFillAmount.gt(takerToken.allowance)) {
+        } else if (takerFillAmount.lte(0) || takerFillAmount.gt(takerTokenState.balance) ||
+            takerFillAmount.gt(takerTokenState.allowance)) {
             globalErrMsg = 'You must fix the above errors in order to fill this order';
         } else if (!_.isEmpty(specifiedTakerAddressIfExists) && specifiedTakerAddressIfExists !== takerAddress) {
             globalErrMsg = `This order can only be filled by ${specifiedTakerAddressIfExists}`;
@@ -551,7 +556,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             return;
         }
     }
-    private addTokenToTrackedTokensIfUnseen(orderToken: OrderToken) {
+    private async addTokenToTrackedTokensIfUnseenAsync(orderToken: OrderToken) {
         const existingToken = this.props.tokenByAddress[orderToken.address];
 
         // If a token with the address already exists, we trust the tokens retrieved from the
@@ -577,17 +582,28 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             orderToken.symbol = this.addSymbolFlourish(orderToken.symbol);
         }
 
-        // Add default token icon url
         const token: Token = {
             ...orderToken,
             iconUrl: constants.DEFAULT_TOKEN_ICON_URL,
-            balance: new BigNumber(0),
-            allowance: new BigNumber(0),
+            isTracked: true,
         };
+
+        const [
+            balance,
+            allowance,
+        ] = await this.props.blockchain.getTokenBalanceAndAllowanceAsync(
+            this.props.userAddress, token.address,
+        );
 
         // Add the custom token to local storage and to the redux store
         trackedTokenStorage.addTrackedToken(this.props.blockchain.networkId, token);
         this.props.dispatcher.addTokenToTokenByAddress(token);
+        this.props.dispatcher.updateTokenStateByAddress({
+            [token.address]: {
+                balance,
+                allowance,
+            },
+        });
 
         // FireAndForget update balance & allowance
         this.props.blockchain.updateTokenBalancesAndAllowancesAsync([token]);

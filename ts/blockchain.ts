@@ -41,6 +41,8 @@ import {
     ProviderType,
     LedgerWalletSubprovider,
     EtherscanLinkSuffixes,
+    TokenByAddress,
+    TokenStateByAddress,
 } from 'ts/types';
 import {Web3Wrapper} from 'ts/web3_wrapper';
 import {errorReporter} from 'ts/utils/error_reporter';
@@ -259,8 +261,7 @@ export class Blockchain {
         this.zrxPollIntervalId = window.setInterval(async () => {
             const [balance] = await this.getTokenBalanceAndAllowanceAsync(this.userAddress, token.address);
             if (!balance.eq(currBalance)) {
-                token.balance = balance;
-                this.dispatcher.updateTokenByAddress([token]);
+                this.dispatcher.replaceTokenBalanceByAddress(token.address, balance);
                 clearInterval(this.zrxPollIntervalId);
                 delete this.zrxPollIntervalId;
             }
@@ -332,18 +333,21 @@ export class Blockchain {
         return [balance, allowance];
     }
     public async updateTokenBalancesAndAllowancesAsync(tokens: Token[]) {
-        const updatedTokens = [];
+        utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
+
+        const tokenStateByAddress: TokenStateByAddress = {};
         for (const token of tokens) {
-            if (_.isUndefined(token.address)) {
-                continue; // Cannot retrieve balance for tokens without an address
-            }
-            const [balance, allowance] = await this.getTokenBalanceAndAllowanceAsync(this.userAddress, token.address);
-            updatedTokens.push(_.assign({}, token, {
+            const [
                 balance,
                 allowance,
-            }));
+            ] = await this.getTokenBalanceAndAllowanceAsync(this.userAddress, token.address);
+            const tokenState = {
+                balance,
+                allowance,
+            };
+            tokenStateByAddress[token.address] = tokenState;
         }
-        this.dispatcher.updateTokenByAddress(updatedTokens);
+        this.dispatcher.updateTokenStateByAddress(tokenStateByAddress);
     }
     public async getUserAccountsAsync() {
         utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
@@ -456,48 +460,26 @@ export class Blockchain {
             this.exchangeLogFillEventEmitters = [];
         }
     }
-    private async getTokenRegistryTokensAsync(): Promise<Token[]> {
+    private async getTokenRegistryTokensByAddressAsync(): Promise<TokenByAddress> {
         utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
         const tokenRegistryTokens = await this.zeroEx.tokenRegistry.getTokensAsync();
 
-        const tokenBalanceAllowancePromises: Array<Promise<BigNumber.BigNumber[]>> = _.map(
-            tokenRegistryTokens,
-            (token: ZeroExToken) => (this.getTokenBalanceAndAllowanceAsync(this.userAddress, token.address)),
-        );
-        const balancesAndAllowances = await Promise.all(tokenBalanceAllowancePromises);
-
-        const tokens = _.map(tokenRegistryTokens, (t: ZeroExToken, i: number) => {
-            const [
-                balance,
-                allowance,
-            ] = balancesAndAllowances[i];
+        const tokenByAddress: TokenByAddress = {};
+        _.each(tokenRegistryTokens, (t: ZeroExToken, i: number) => {
             // HACK: For now we have a hard-coded list of iconUrls for the dummyTokens
             // TODO: Refactor this out and pull the iconUrl directly from the TokenRegistry
             const iconUrl = constants.iconUrlBySymbol[t.symbol];
             const token: Token = {
                 iconUrl: !_.isUndefined(iconUrl) ? iconUrl : constants.DEFAULT_TOKEN_ICON_URL,
                 address: t.address,
-                balance,
-                allowance,
                 name: t.name,
                 symbol: t.symbol,
                 decimals: t.decimals,
+                isTracked: false,
             };
-            return token;
+            tokenByAddress[token.address] = token;
         });
-        return tokens;
-    }
-    private async getTrackedTokensAsync() {
-        const trackedTokens = trackedTokenStorage.getTrackedTokens(this.networkId);
-        for (const trackedToken of trackedTokens) {
-            const [
-              balance,
-              allowance,
-          ] = await this.getTokenBalanceAndAllowanceAsync(this.userAddress, trackedToken.address);
-            trackedToken.balance = balance;
-            trackedToken.allowance = allowance;
-        }
-        return trackedTokens;
+        return tokenByAddress;
     }
     private async onPageLoadInitFireAndForgetAsync() {
         await this.onPageLoadAsync(); // wait for page to load
@@ -602,11 +584,30 @@ export class Blockchain {
 
         this.dispatcher.updateBlockchainIsLoaded(false);
         this.dispatcher.clearTokenByAddress();
-        const tokenArrays = await Promise.all([
-                this.getTokenRegistryTokensAsync(),
-                this.getTrackedTokensAsync(),
-        ]);
-        const tokens = _.flatten(tokenArrays);
+        const tokenRegistryTokensByAddress = await this.getTokenRegistryTokensByAddressAsync();
+        let trackedTokensIfExists = trackedTokenStorage.getTrackedTokensIfExists(this.networkId);
+        if (_.isUndefined(trackedTokensIfExists)) {
+            const tokenRegistryTokens = _.values(tokenRegistryTokensByAddress);
+            trackedTokensIfExists = _.map(configs.defaultTrackedTokenSymbols, symbol => {
+                const token = _.find(tokenRegistryTokens, t => t.symbol === symbol);
+                token.isTracked = true;
+                // Not sure if this is required or if the previous line already updates it by reference
+                // TODO: Check if required.
+                tokenRegistryTokensByAddress[token.address].isTracked = true;
+                return token;
+            });
+        } else {
+            // Properly set all tokenRegistry tokens `isTracked` to true if they are in the existing trackedTokens array
+            _.each(trackedTokensIfExists, trackedToken => {
+                if (!_.isUndefined(tokenRegistryTokensByAddress[trackedToken.address])) {
+                    tokenRegistryTokensByAddress[trackedToken.address].isTracked = true;
+                }
+            });
+        }
+        const tokenRegistryTokens = _.values(tokenRegistryTokensByAddress);
+        const allTokens = _.uniq([...tokenRegistryTokens, ...trackedTokensIfExists]);
+        this.dispatcher.updateTokenByAddress(allTokens);
+
         // HACK: We need to fetch the userAddress here because otherwise we cannot fetch the token
         // balances and allowances and we need to do this in order not to trigger the blockchain
         // loading dialog to show up twice. First to load the contracts, and second to load the
@@ -615,10 +616,12 @@ export class Blockchain {
         if (!_.isEmpty(this.userAddress)) {
             this.dispatcher.updateUserAddress(this.userAddress);
         }
-        await this.updateTokenBalancesAndAllowancesAsync(tokens);
+        // Get balance/allowance for tracked tokens
+        await this.updateTokenBalancesAndAllowancesAsync(trackedTokensIfExists);
+
         const mostPopularTradingPairTokens: Token[] = [
-            _.find(tokens, {symbol: configs.defaultTrackedTokens[0]}),
-            _.find(tokens, {symbol: configs.defaultTrackedTokens[1]}),
+            _.find(allTokens, {symbol: configs.defaultTrackedTokenSymbols[0]}),
+            _.find(allTokens, {symbol: configs.defaultTrackedTokenSymbols[1]}),
         ];
         this.dispatcher.updateChosenAssetTokenAddress(Side.deposit, mostPopularTradingPairTokens[0].address);
         this.dispatcher.updateChosenAssetTokenAddress(Side.receive, mostPopularTradingPairTokens[1].address);

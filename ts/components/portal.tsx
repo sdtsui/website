@@ -29,6 +29,7 @@ import {
     Styles,
     ScreenWidths,
     Token,
+    TokenStateByAddress,
 } from 'ts/types';
 import {TopBar} from 'ts/components/top_bar';
 import {Footer} from 'ts/components/footer';
@@ -52,6 +53,7 @@ export interface PortalAllProps {
     orderFillAmount: BigNumber.BigNumber;
     screenWidth: ScreenWidths;
     tokenByAddress: TokenByAddress;
+    tokenStateByAddress: TokenStateByAddress;
     userEtherBalance: BigNumber.BigNumber;
     userAddress: string;
     shouldBlockchainErrDialogBeOpen: boolean;
@@ -258,6 +260,7 @@ export class Portal extends React.Component<PortalAllProps, PortalAllState> {
                 dispatcher={this.props.dispatcher}
                 screenWidth={this.props.screenWidth}
                 tokenByAddress={this.props.tokenByAddress}
+                tokenStateByAddress={this.props.tokenStateByAddress}
                 userAddress={this.props.userAddress}
                 userEtherBalance={this.props.userEtherBalance}
                 networkId={this.props.networkId}
@@ -278,6 +281,7 @@ export class Portal extends React.Component<PortalAllProps, PortalAllState> {
                 networkId={this.props.networkId}
                 userAddress={this.props.userAddress}
                 tokenByAddress={this.props.tokenByAddress}
+                tokenStateByAddress={this.props.tokenStateByAddress}
                 dispatcher={this.props.dispatcher}
             />
         );

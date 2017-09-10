@@ -10,11 +10,13 @@ import {
     BlockchainErrs,
     SignatureData,
     TokenByAddress,
+    TokenStateByAddress,
     Order,
     Action,
     ActionTypes,
     ScreenWidths,
     ProviderType,
+    TokenState,
 } from 'ts/types';
 
 // Instead of defaulting the 0x.js version to an empty string, we pre-populate it with
@@ -38,6 +40,7 @@ export interface State {
     shouldBlockchainErrDialogBeOpen: boolean;
     sideToAssetToken: SideToAssetToken;
     tokenByAddress: TokenByAddress;
+    tokenStateByAddress: TokenStateByAddress;
     userAddress: string;
     userEtherBalance: BigNumber.BigNumber;
     // Note: cache of supplied orderJSON in fill order step. Do not use for anything else.
@@ -77,6 +80,7 @@ const INITIAL_STATE: State = {
         [Side.receive]: {},
     },
     tokenByAddress: {},
+    tokenStateByAddress: {},
     userAddress: '',
     userEtherBalance: new BigNumber(0),
     userSuppliedOrderCache: undefined,
@@ -159,28 +163,52 @@ export function reducer(state: State = INITIAL_STATE, action: Action) {
             });
         }
 
+        case ActionTypes.UPDATE_TOKEN_STATE_BY_ADDRESS: {
+            const tokenStateByAddress = state.tokenByAddress;
+            const updatedTokenStateByAddress = action.data;
+            _.each(updatedTokenStateByAddress, (tokenState: TokenState, address: string) => {
+                const updatedTokenState = _.assign({}, tokenStateByAddress[address], tokenState);
+                tokenStateByAddress[address] = updatedTokenState;
+            });
+            return _.assign({}, state, {
+                tokenStateByAddress,
+            });
+        }
+
         case ActionTypes.REPLACE_TOKEN_ALLOWANCE_BY_ADDRESS: {
-            const tokenByAddress = state.tokenByAddress;
+            const tokenStateByAddress = state.tokenStateByAddress;
             const allowance = action.data.allowance;
             const tokenAddress = action.data.address;
-            tokenByAddress[tokenAddress] = _.assign({}, tokenByAddress[tokenAddress], {
+            tokenStateByAddress[tokenAddress] = _.assign({}, tokenStateByAddress[tokenAddress], {
                 allowance,
             });
             return _.assign({}, state, {
-                tokenByAddress,
+                tokenStateByAddress,
+            });
+        }
+
+        case ActionTypes.REPLACE_TOKEN_BALANCE_BY_ADDRESS: {
+            const tokenStateByAddress = state.tokenStateByAddress;
+            const balance = action.data.balance;
+            const tokenAddress = action.data.address;
+            tokenStateByAddress[tokenAddress] = _.assign({}, tokenStateByAddress[tokenAddress], {
+                balance,
+            });
+            return _.assign({}, state, {
+                tokenStateByAddress,
             });
         }
 
         case ActionTypes.UPDATE_TOKEN_BALANCE_BY_ADDRESS: {
-            const tokenByAddress = state.tokenByAddress;
+            const tokenStateByAddress = state.tokenStateByAddress;
             const balanceDelta = action.data.balanceDelta;
             const tokenAddress = action.data.address;
-            const currBalance = tokenByAddress[tokenAddress].balance;
-            tokenByAddress[tokenAddress] = _.assign({}, tokenByAddress[tokenAddress], {
+            const currBalance = tokenStateByAddress[tokenAddress].balance;
+            tokenStateByAddress[tokenAddress] = _.assign({}, tokenStateByAddress[tokenAddress], {
                 balance: currBalance.plus(balanceDelta),
             });
             return _.assign({}, state, {
-                tokenByAddress,
+                tokenStateByAddress,
             });
         }
 

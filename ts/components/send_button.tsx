@@ -3,9 +3,8 @@ import {ZeroEx} from '0x.js';
 import * as React from 'react';
 import * as BigNumber from 'bignumber.js';
 import RaisedButton from 'material-ui/RaisedButton';
-import {BlockchainCallErrs} from 'ts/types';
+import {BlockchainCallErrs, Token, TokenState} from 'ts/types';
 import {SendDialog} from 'ts/components/dialogs/send_dialog';
-import {Token} from 'ts/types';
 import {constants} from 'ts/utils/constants';
 import {utils} from 'ts/utils/utils';
 import {Dispatcher} from 'ts/redux/dispatcher';
@@ -14,6 +13,7 @@ import {Blockchain} from 'ts/blockchain';
 
 interface SendButtonProps {
     token: Token;
+    tokenState: TokenState;
     dispatcher: Dispatcher;
     blockchain: Blockchain;
     onError: () => void;
@@ -48,6 +48,7 @@ export class SendButton extends React.Component<SendButtonProps, SendButtonState
                     onComplete={this.onSendAmountSelectedAsync.bind(this)}
                     onCancelled={this.toggleSendDialog.bind(this)}
                     token={this.props.token}
+                    tokenState={this.props.tokenState}
                 />
             </div>
         );
@@ -63,14 +64,12 @@ export class SendButton extends React.Component<SendButtonProps, SendButtonState
         });
         this.toggleSendDialog();
         const token = this.props.token;
-        let balance = token.balance;
+        const tokenState = this.props.tokenState;
+        let balance = tokenState.balance;
         try {
             await this.props.blockchain.transferAsync(token, recipient, value);
             balance = balance.minus(value);
-            const updatedToken = _.assign({}, token, {
-                balance,
-            });
-            this.props.dispatcher.updateTokenByAddress([updatedToken]);
+            this.props.dispatcher.replaceTokenBalanceByAddress(token.address, balance);
         } catch (err) {
             const errMsg = `${err}`;
             if (_.includes(errMsg, BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES)) {

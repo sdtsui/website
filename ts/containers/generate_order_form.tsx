@@ -11,6 +11,7 @@ import {
     SignatureData,
     HashData,
     TokenByAddress,
+    TokenStateByAddress,
     BlockchainErrs,
 } from 'ts/types';
 import * as BigNumber from 'bignumber.js';
@@ -32,6 +33,7 @@ interface ConnectedState {
     networkId: number;
     sideToAssetToken: SideToAssetToken;
     tokenByAddress: TokenByAddress;
+    tokenStateByAddress: TokenStateByAddress;
 }
 
 const mapStateToProps = (state: State, ownProps: GenerateOrderFormProps): ConnectedState => ({
@@ -44,6 +46,7 @@ const mapStateToProps = (state: State, ownProps: GenerateOrderFormProps): Connec
     networkId: state.networkId,
     sideToAssetToken: state.sideToAssetToken,
     tokenByAddress: state.tokenByAddress,
+    tokenStateByAddress: state.tokenStateByAddress,
     userAddress: state.userAddress,
 });
 

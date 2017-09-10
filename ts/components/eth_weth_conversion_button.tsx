@@ -3,7 +3,7 @@ import {ZeroEx} from '0x.js';
 import * as React from 'react';
 import * as BigNumber from 'bignumber.js';
 import RaisedButton from 'material-ui/RaisedButton';
-import {BlockchainCallErrs} from 'ts/types';
+import {BlockchainCallErrs, TokenState} from 'ts/types';
 import {EthWethConversionDialog} from 'ts/components/dialogs/eth_weth_conversion_dialog';
 import {Side, Token} from 'ts/types';
 import {constants} from 'ts/utils/constants';
@@ -14,6 +14,7 @@ import {Blockchain} from 'ts/blockchain';
 
 interface EthWethConversionButtonProps {
     ethToken: Token;
+    ethTokenState: TokenState;
     dispatcher: Dispatcher;
     blockchain: Blockchain;
     userEtherBalance: BigNumber.BigNumber;
@@ -51,6 +52,7 @@ export class EthWethConversionButton extends
                     onCancelled={this.toggleConversionDialog.bind(this)}
                     etherBalance={this.props.userEtherBalance}
                     token={this.props.ethToken}
+                    tokenState={this.props.ethTokenState}
                 />
             </div>
         );
@@ -66,7 +68,8 @@ export class EthWethConversionButton extends
         });
         this.toggleConversionDialog();
         const token = this.props.ethToken;
-        let balance = token.balance;
+        const tokenState = this.props.ethTokenState;
+        let balance = tokenState.balance;
         try {
             if (direction === Side.deposit) {
                 await this.props.blockchain.convertEthToWrappedEthTokensAsync(value);
@@ -79,10 +82,7 @@ export class EthWethConversionButton extends
                 this.props.dispatcher.showFlashMessage(`Successfully converted ${tokenAmount.toString()} WETH to ETH`);
                 balance = balance.minus(value);
             }
-            const updatedToken = _.assign({}, token, {
-                balance,
-            });
-            this.props.dispatcher.updateTokenByAddress([updatedToken]);
+            this.props.dispatcher.replaceTokenBalanceByAddress(token.address, balance);
         } catch (err) {
             const errMsg = '' + err;
             if (_.includes(errMsg, BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES)) {

@@ -12,6 +12,7 @@ import {
     ActionTypes,
     ScreenWidths,
     ProviderType,
+    TokenStateByAddress,
 } from 'ts/types';
 import * as BigNumber from 'bignumber.js';
 
@@ -132,6 +133,12 @@ export class Dispatcher {
             type: ActionTypes.UPDATE_TOKEN_BY_ADDRESS,
          });
     }
+    public updateTokenStateByAddress(tokenStateByAddress: TokenStateByAddress) {
+        this.dispatch({
+             data: tokenStateByAddress,
+            type: ActionTypes.UPDATE_TOKEN_STATE_BY_ADDRESS,
+         });
+    }
     public replaceTokenAllowanceByAddress(address: string, allowance: BigNumber.BigNumber) {
         this.dispatch({
             data: {
@@ -139,6 +146,15 @@ export class Dispatcher {
               allowance,
             },
             type: ActionTypes.REPLACE_TOKEN_ALLOWANCE_BY_ADDRESS,
+        });
+    }
+    public replaceTokenBalanceByAddress(address: string, balance: BigNumber.BigNumber) {
+        this.dispatch({
+            data: {
+                address,
+                balance,
+            },
+            type: ActionTypes.REPLACE_TOKEN_BALANCE_BY_ADDRESS,
         });
     }
     public updateTokenBalanceByAddress(address: string, balanceDelta: BigNumber.BigNumber) {

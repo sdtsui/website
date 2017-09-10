@@ -5,7 +5,7 @@ import TextField from 'material-ui/TextField';
 import Dialog from 'material-ui/Dialog';
 import {constants} from 'ts/utils/constants';
 import {Blockchain} from 'ts/blockchain';
-import {Token, TokenByAddress, AlertTypes} from 'ts/types';
+import {Token, TokenState, TokenByAddress, AlertTypes} from 'ts/types';
 import {AddressInput} from 'ts/components/inputs/address_input';
 import {Alert} from 'ts/components/ui/alert';
 import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
@@ -17,7 +17,7 @@ interface NewTokenDialogProps {
     isOpen: boolean;
     tokenByAddress: TokenByAddress;
     onCloseDialog: () => void;
-    onNewTokenSubmitted: (token: Token) => void;
+    onNewTokenSubmitted: (token: Token, tokenState: TokenState) => void;
 }
 
 interface NewTokenDialogState {
@@ -159,14 +159,17 @@ export class NewTokenDialog extends React.Component<NewTokenDialogProps, NewToke
 
         const newToken: Token = {
             address: this.state.address,
-            allowance,
-            balance,
             decimals: _.parseInt(this.state.decimals),
             iconUrl: constants.DEFAULT_TOKEN_ICON_URL,
             name: this.state.name,
             symbol: this.state.symbol.toUpperCase(),
+            isTracked: true,
         };
-        this.props.onNewTokenSubmitted(newToken);
+        const newTokenState: TokenState = {
+            balance,
+            allowance,
+        };
+        this.props.onNewTokenSubmitted(newToken, newTokenState);
     }
     private onTokenNameChanged(e: any, name: string) {
         let nameErrText = '';

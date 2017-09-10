@@ -5,7 +5,16 @@ import {Store as ReduxStore, Dispatch} from 'redux';
 import {State} from 'ts/redux/reducer';
 import {constants} from 'ts/utils/constants';
 import {Dispatcher} from 'ts/redux/dispatcher';
-import {Side, HashData, TokenByAddress, BlockchainErrs, Fill, Order, ScreenWidths} from 'ts/types';
+import {
+    Side,
+    HashData,
+    TokenByAddress,
+    BlockchainErrs,
+    Fill,
+    Order,
+    ScreenWidths,
+    TokenStateByAddress,
+} from 'ts/types';
 import {
     Portal as PortalComponent,
     PortalAllProps as PortalComponentAllProps,
@@ -21,6 +30,7 @@ interface MapStateToProps {
     nodeVersion: string;
     orderFillAmount: number;
     tokenByAddress: TokenByAddress;
+    tokenStateByAddress: TokenStateByAddress;
     userEtherBalance: number;
     screenWidth: ScreenWidths;
     shouldBlockchainErrDialogBeOpen: boolean;
@@ -68,6 +78,7 @@ const mapStateToProps = (state: State, ownProps: PortalComponentAllProps): Conne
         screenWidth: state.screenWidth,
         shouldBlockchainErrDialogBeOpen: state.shouldBlockchainErrDialogBeOpen,
         tokenByAddress: state.tokenByAddress,
+        tokenStateByAddress: state.tokenStateByAddress,
         userAddress: state.userAddress,
         userEtherBalance: state.userEtherBalance,
         userSuppliedOrderCache: state.userSuppliedOrderCache,
