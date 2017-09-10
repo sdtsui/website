@@ -145,7 +145,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                         <span>Validating order...</span>
                     </div>
                 }
-                {this.state.orderJSONErrMsg !== '' &&
+                {!_.isEmpty(this.state.orderJSONErrMsg) &&
                     <Alert type={AlertTypes.ERROR} message={this.state.orderJSONErrMsg} />
                 }
             </div>
@@ -217,7 +217,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             amount: this.props.orderFillAmount,
             symbol: takerToken.symbol,
         };
-        const orderTaker = this.state.parsedOrder.taker.address !== '' ? this.state.parsedOrder.taker.address :
+        const orderTaker = !_.isEmpty(this.state.parsedOrder.taker.address) ? this.state.parsedOrder.taker.address :
                            this.props.userAddress;
         const parsedOrderExpiration = new BigNumber(this.state.parsedOrder.expiration);
         const expiryDate = utils.convertToReadableDateTimeFromUnixTimestamp(parsedOrderExpiration);
@@ -279,7 +279,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                         label={this.state.isFilling ? 'Filling order...' : 'Fill order'}
                         onClick={this.onFillOrderClick.bind(this)}
                     />
-                    {this.state.globalErrMsg !== '' &&
+                    {!_.isEmpty(this.state.globalErrMsg) &&
                         <Alert type={AlertTypes.ERROR} message={this.state.globalErrMsg} />
                     }
                     {this.state.didFillOrderSucceed &&
@@ -382,7 +382,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                 this.addTokenToCustomTokensIfUnseen(parsedOrder.taker.token);
             }
         } catch (err) {
-            if (orderJSON !== '') {
+            if (!_.isEmpty(orderJSON)) {
                 orderJSONErrMsg = 'Submitted order JSON is not valid JSON';
             }
             this.setState({
@@ -395,7 +395,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         }
 
         let unavailableTakerAmount = new BigNumber(0);
-        if (orderJSONErrMsg !== '') {
+        if (!_.isEmpty(orderJSONErrMsg)) {
             // Clear cache entry if user updates orderJSON to invalid entry
             this.props.dispatcher.updateUserSuppliedOrderCache(undefined);
         } else {
@@ -423,7 +423,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
     }
 
     private async onFillOrderClickAsync(): Promise<void> {
-        if (this.props.blockchainErr !== '' || this.props.userAddress === '') {
+        if (!_.isEmpty(this.props.blockchainErr) || _.isEmpty(this.props.userAddress)) {
             this.props.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
             return;
         }
@@ -477,7 +477,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         } else if (takerFillAmount.lte(0) || takerFillAmount.gt(takerToken.balance) ||
             takerFillAmount.gt(takerToken.allowance)) {
             globalErrMsg = 'You must fix the above errors in order to fill this order';
-        } else if (specifiedTakerAddressIfExists !== '' && specifiedTakerAddressIfExists !== takerAddress) {
+        } else if (!_.isEmpty(specifiedTakerAddressIfExists) && specifiedTakerAddressIfExists !== takerAddress) {
             globalErrMsg = `This order can only be filled by ${specifiedTakerAddressIfExists}`;
         } else if (parsedOrderExpiration.lt(currentUnixTimestamp)) {
             globalErrMsg = `This order has expired`;
@@ -493,7 +493,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         } else if (!isValidSignature) {
             globalErrMsg = 'Order signature is not valid';
         }
-        if (globalErrMsg !== '') {
+        if (!_.isEmpty(globalErrMsg)) {
             this.setState({
                 isFilling: false,
                 globalErrMsg,
