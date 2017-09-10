@@ -586,6 +586,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             ...orderToken,
             iconUrl: constants.DEFAULT_TOKEN_ICON_URL,
             isTracked: true,
+            isRegistered: false,
         };
 
         const [

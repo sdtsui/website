@@ -476,6 +476,7 @@ export class Blockchain {
                 symbol: t.symbol,
                 decimals: t.decimals,
                 isTracked: false,
+                isRegistered: true,
             };
             tokenByAddress[token.address] = token;
         });

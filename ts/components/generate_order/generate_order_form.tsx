@@ -112,6 +112,7 @@ export class GenerateOrderForm extends React.Component<GenerateOrderFormProps, a
                                     dispatcher={this.props.dispatcher}
                                     label="Selling"
                                     side={Side.deposit}
+                                    networkId={this.props.networkId}
                                     assetToken={this.props.sideToAssetToken[Side.deposit]}
                                     updateChosenAssetToken={dispatcher.updateChosenAssetToken.bind(dispatcher)}
                                     tokenByAddress={this.props.tokenByAddress}
@@ -141,6 +142,7 @@ export class GenerateOrderForm extends React.Component<GenerateOrderFormProps, a
                                     dispatcher={this.props.dispatcher}
                                     label="Buying"
                                     side={Side.receive}
+                                    networkId={this.props.networkId}
                                     assetToken={this.props.sideToAssetToken[Side.receive]}
                                     updateChosenAssetToken={dispatcher.updateChosenAssetToken.bind(dispatcher)}
                                     tokenByAddress={this.props.tokenByAddress}

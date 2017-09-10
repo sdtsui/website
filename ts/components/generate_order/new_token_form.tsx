@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import {colors} from 'material-ui/styles';
 import TextField from 'material-ui/TextField';
-import Dialog from 'material-ui/Dialog';
 import {constants} from 'ts/utils/constants';
 import {Blockchain} from 'ts/blockchain';
 import {Token, TokenState, TokenByAddress, AlertTypes} from 'ts/types';
@@ -12,15 +11,13 @@ import {LifeCycleRaisedButton} from 'ts/components/ui/lifecycle_raised_button';
 import {RequiredLabel} from 'ts/components/ui/required_label';
 import * as BigNumber from 'bignumber.js';
 
-interface NewTokenDialogProps {
+interface NewTokenFormProps {
     blockchain: Blockchain;
-    isOpen: boolean;
     tokenByAddress: TokenByAddress;
-    onCloseDialog: () => void;
     onNewTokenSubmitted: (token: Token, tokenState: TokenState) => void;
 }
 
-interface NewTokenDialogState {
+interface NewTokenFormState {
     globalErrMsg: string;
     name: string;
     nameErrText: string;
@@ -32,8 +29,8 @@ interface NewTokenDialogState {
     decimalsErrText: string;
 }
 
-export class NewTokenDialog extends React.Component<NewTokenDialogProps, NewTokenDialogState> {
-    constructor(props: NewTokenDialogProps) {
+export class NewTokenForm extends React.Component<NewTokenFormProps, NewTokenFormState> {
+    constructor(props: NewTokenFormProps) {
         super(props);
         this.state = {
             address: '',
@@ -49,66 +46,58 @@ export class NewTokenDialog extends React.Component<NewTokenDialogProps, NewToke
     }
     public render() {
         return (
-            <Dialog
-                title="Add an ERC20 token"
-                titleStyle={{fontWeight: 100}}
-                modal={false}
-                open={this.props.isOpen}
-                onRequestClose={this.props.onCloseDialog.bind(this)}
-            >
-                <div className="mx-auto pb2" style={{width: 256}}>
-                    <div>
-                        <TextField
-                            floatingLabelFixed={true}
-                            floatingLabelStyle={{color: colors.grey500}}
-                            floatingLabelText={<RequiredLabel label="Name" />}
-                            value={this.state.name}
-                            errorText={this.state.nameErrText}
-                            onChange={this.onTokenNameChanged.bind(this)}
-                        />
-                    </div>
-                    <div>
-                        <TextField
-                            floatingLabelFixed={true}
-                            floatingLabelStyle={{color: colors.grey500}}
-                            floatingLabelText={<RequiredLabel label="Symbol" />}
-                            value={this.state.symbol}
-                            errorText={this.state.symbolErrText}
-                            onChange={this.onTokenSymbolChanged.bind(this)}
-                        />
-                    </div>
-                    <div>
-                        <AddressInput
-                            isRequired={true}
-                            label="Contract address"
-                            initialAddress=""
-                            shouldShowIncompleteErrs={this.state.shouldShowAddressIncompleteErr}
-                            updateAddress={this.onTokenAddressChanged.bind(this)}
-                        />
-                    </div>
-                    <div>
-                        <TextField
-                            floatingLabelFixed={true}
-                            floatingLabelStyle={{color: colors.grey500}}
-                            floatingLabelText={<RequiredLabel label="Decimals" />}
-                            value={this.state.decimals}
-                            errorText={this.state.decimalsErrText}
-                            onChange={this.onTokenDecimalsChanged.bind(this)}
-                        />
-                    </div>
-                    <div className="pt2 mx-auto" style={{width: 120}}>
-                        <LifeCycleRaisedButton
-                            labelReady="Add"
-                            labelLoading="Adding..."
-                            labelComplete="Added!"
-                            onClickAsyncFn={this.onAddNewTokenClickAsync.bind(this)}
-                        />
-                    </div>
-                    {this.state.globalErrMsg !== '' &&
-                        <Alert type={AlertTypes.ERROR} message={this.state.globalErrMsg} />
-                    }
+            <div className="mx-auto pb2" style={{width: 256}}>
+                <div>
+                    <TextField
+                        floatingLabelFixed={true}
+                        floatingLabelStyle={{color: colors.grey500}}
+                        floatingLabelText={<RequiredLabel label="Name" />}
+                        value={this.state.name}
+                        errorText={this.state.nameErrText}
+                        onChange={this.onTokenNameChanged.bind(this)}
+                    />
                 </div>
-            </Dialog>
+                <div>
+                    <TextField
+                        floatingLabelFixed={true}
+                        floatingLabelStyle={{color: colors.grey500}}
+                        floatingLabelText={<RequiredLabel label="Symbol" />}
+                        value={this.state.symbol}
+                        errorText={this.state.symbolErrText}
+                        onChange={this.onTokenSymbolChanged.bind(this)}
+                    />
+                </div>
+                <div>
+                    <AddressInput
+                        isRequired={true}
+                        label="Contract address"
+                        initialAddress=""
+                        shouldShowIncompleteErrs={this.state.shouldShowAddressIncompleteErr}
+                        updateAddress={this.onTokenAddressChanged.bind(this)}
+                    />
+                </div>
+                <div>
+                    <TextField
+                        floatingLabelFixed={true}
+                        floatingLabelStyle={{color: colors.grey500}}
+                        floatingLabelText={<RequiredLabel label="Decimals" />}
+                        value={this.state.decimals}
+                        errorText={this.state.decimalsErrText}
+                        onChange={this.onTokenDecimalsChanged.bind(this)}
+                    />
+                </div>
+                <div className="pt2 mx-auto" style={{width: 120}}>
+                    <LifeCycleRaisedButton
+                        labelReady="Add"
+                        labelLoading="Adding..."
+                        labelComplete="Added!"
+                        onClickAsyncFn={this.onAddNewTokenClickAsync.bind(this)}
+                    />
+                </div>
+                {this.state.globalErrMsg !== '' &&
+                    <Alert type={AlertTypes.ERROR} message={this.state.globalErrMsg} />
+                }
+            </div>
         );
     }
     private async onAddNewTokenClickAsync() {
@@ -164,6 +153,7 @@ export class NewTokenDialog extends React.Component<NewTokenDialogProps, NewToke
             name: this.state.name,
             symbol: this.state.symbol.toUpperCase(),
             isTracked: true,
+            isRegistered: false,
         };
         const newTokenState: TokenState = {
             balance,

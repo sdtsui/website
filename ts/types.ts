@@ -44,6 +44,7 @@ export interface Token {
     symbol: string;
     decimals: number;
     isTracked: boolean;
+    isRegistered: boolean;
 };
 
 export interface TokenByAddress {
@@ -496,4 +497,10 @@ export interface Article {
 
 export interface ArticlesBySection {
     [section: string]: Article[];
+}
+
+export interface DialogConfigs {
+    title: string;
+    isModal: boolean;
+    actions: any[];
 }
