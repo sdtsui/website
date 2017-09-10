@@ -596,6 +596,7 @@ export class Blockchain {
                 tokenRegistryTokensByAddress[token.address].isTracked = true;
                 return token;
             });
+            _.each(trackedTokensIfExists, token => trackedTokenStorage.addTrackedToken(this.networkId, token));
         } else {
             // Properly set all tokenRegistry tokens `isTracked` to true if they are in the existing trackedTokens array
             _.each(trackedTokensIfExists, trackedToken => {
