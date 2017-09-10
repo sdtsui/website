@@ -45,7 +45,7 @@ import {
 import {Web3Wrapper} from 'ts/web3_wrapper';
 import {errorReporter} from 'ts/utils/error_reporter';
 import {tradeHistoryStorage} from 'ts/local_storage/trade_history_storage';
-import {customTokenStorage} from 'ts/local_storage/custom_token_storage';
+import {trackedTokenStorage} from 'ts/local_storage/tracked_token_storage';
 import * as MintableArtifacts from '../contracts/Mintable.json';
 
 const ALLOWANCE_TO_ZERO_GAS_AMOUNT = 45730;
@@ -487,17 +487,17 @@ export class Blockchain {
         });
         return tokens;
     }
-    private async getCustomTokensAsync() {
-        const customTokens = customTokenStorage.getCustomTokens(this.networkId);
-        for (const customToken of customTokens) {
+    private async getTrackedTokensAsync() {
+        const trackedTokens = trackedTokenStorage.getTrackedTokens(this.networkId);
+        for (const trackedToken of trackedTokens) {
             const [
               balance,
               allowance,
-            ] = await this.getTokenBalanceAndAllowanceAsync(this.userAddress, customToken.address);
-            customToken.balance = balance;
-            customToken.allowance = allowance;
+          ] = await this.getTokenBalanceAndAllowanceAsync(this.userAddress, trackedToken.address);
+            trackedToken.balance = balance;
+            trackedToken.allowance = allowance;
         }
-        return customTokens;
+        return trackedTokens;
     }
     private async onPageLoadInitFireAndForgetAsync() {
         await this.onPageLoadAsync(); // wait for page to load
@@ -604,7 +604,7 @@ export class Blockchain {
         this.dispatcher.clearTokenByAddress();
         const tokenArrays = await Promise.all([
                 this.getTokenRegistryTokensAsync(),
-                this.getCustomTokensAsync(),
+                this.getTrackedTokensAsync(),
         ]);
         const tokens = _.flatten(tokenArrays);
         // HACK: We need to fetch the userAddress here because otherwise we cannot fetch the token

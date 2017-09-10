@@ -6,7 +6,7 @@ import {Dispatcher} from 'ts/redux/dispatcher';
 import {AssetToken, Side, TokenByAddress, BlockchainErrs, Token} from 'ts/types';
 import {AssetPicker} from 'ts/components/generate_order/asset_picker';
 import {NewTokenDialog} from 'ts/components/generate_order/new_token_dialog';
-import {customTokenStorage} from 'ts/local_storage/custom_token_storage';
+import {trackedTokenStorage} from 'ts/local_storage/tracked_token_storage';
 import {InputLabel} from 'ts/components/ui/input_label';
 
 const TOKEN_ICON_DIMENSION = 80;
@@ -119,7 +119,7 @@ export class TokenInput extends React.Component<TokenInputProps, TokenInputState
         });
     }
     private onNewTokenSubmitted(newToken: Token) {
-        customTokenStorage.addCustomToken(this.props.blockchain.networkId, newToken);
+        trackedTokenStorage.addTrackedToken(this.props.blockchain.networkId, newToken);
         this.props.dispatcher.addTokenToTokenByAddress(newToken);
         this.props.updateChosenAssetToken(this.props.side, {
             amount: this.props.assetToken.amount,

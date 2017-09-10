@@ -175,7 +175,7 @@ export interface Action {
     data?: any;
 }
 
-export interface CustomTokensByNetworkId {
+export interface TrackedTokensByNetworkId {
     [networkId: number]: Token;
 }
 

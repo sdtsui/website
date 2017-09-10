@@ -35,7 +35,7 @@ import {orderSchema} from 'ts/schemas/order_schema';
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {Blockchain} from 'ts/blockchain';
 import {errorReporter} from 'ts/utils/error_reporter';
-import {customTokenStorage} from 'ts/local_storage/custom_token_storage';
+import {trackedTokenStorage} from 'ts/local_storage/tracked_token_storage';
 
 interface FillOrderProps {
     blockchain: Blockchain;
@@ -378,8 +378,8 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                 // Update user supplied order cache so that if they navigate away from fill view
                 // e.g to set a token allowance, when they come back, the fill order persists
                 this.props.dispatcher.updateUserSuppliedOrderCache(parsedOrder);
-                this.addTokenToCustomTokensIfUnseen(parsedOrder.maker.token);
-                this.addTokenToCustomTokensIfUnseen(parsedOrder.taker.token);
+                this.addTokenToTrackedTokensIfUnseen(parsedOrder.maker.token);
+                this.addTokenToTrackedTokensIfUnseen(parsedOrder.taker.token);
             }
         } catch (err) {
             if (!_.isEmpty(orderJSON)) {
@@ -551,12 +551,12 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             return;
         }
     }
-    private addTokenToCustomTokensIfUnseen(orderToken: OrderToken) {
+    private addTokenToTrackedTokensIfUnseen(orderToken: OrderToken) {
         const existingToken = this.props.tokenByAddress[orderToken.address];
 
         // If a token with the address already exists, we trust the tokens retrieved from the
         // tokenRegistry or supplied by the current user over ones from an orderJSON. Thus, we
-        // do not add a customToken and will defer to the rest of the details associated to the existing
+        // do not add a trackedToken and will defer to the rest of the details associated to the existing
         // token with this address for the rest of it's metadata.
         const doesTokenWithAddressExist = !_.isUndefined(existingToken);
         if (doesTokenWithAddressExist) {
@@ -586,7 +586,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         };
 
         // Add the custom token to local storage and to the redux store
-        customTokenStorage.addCustomToken(this.props.blockchain.networkId, token);
+        trackedTokenStorage.addTrackedToken(this.props.blockchain.networkId, token);
         this.props.dispatcher.addTokenToTokenByAddress(token);
 
         // FireAndForget update balance & allowance
