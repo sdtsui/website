@@ -11,7 +11,7 @@ export const constants = {
     BITLY_ACCESS_TOKEN: 'ffc4c1a31e5143848fb7c523b39f91b9b213d208',
     BITLY_ENDPOINT: 'https://api-ssl.bitly.com',
     CUSTOM_BLUE: '#60a4f4',
-    DEFAULT_TOKEN_ICON_URL: '/images/token_icons/default.png',
+    DEFAULT_TOKEN_ICON_URL: '/images/token_icons/user_added_token.png',
     DEFAULT_DERIVATION_PATH: `44'/60'/0'`,
     ETHER_FAUCET_ENDPOINT: 'https://faucet.0xproject.com',
     FEE_RECIPIENT_ADDRESS: '0x0000000000000000000000000000000000000000',
@@ -23,6 +23,11 @@ export const constants = {
     LINKEDIN_0X_URL: 'https://www.linkedin.com/company/0x',
     LEDGER_PROVIDER_NAME: 'Ledger',
     METAMASK_PROVIDER_NAME: 'Metamask',
+    GENESIS_ORDER_BLOCK_BY_NETWORK_ID: {
+        1: 4145578,
+        42: 3117574,
+        50: 0,
+    } as {[networkId: number]: number},
     PUBLIC_PROVIDER_NAME: '0x Public',
     // The order matters. We first try first node and only then fall back to others.
     PUBLIC_NODE_URLS_BY_NETWORK_ID: {
