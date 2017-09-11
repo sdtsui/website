@@ -100,31 +100,34 @@ export class Party extends React.Component<PartyProps, PartyState> {
                         <EthereumAddress address={address} networkId={this.props.networkId} />
                     </div>
                     {!_.isUndefined(this.props.isInTokenRegistry) &&
-                        <div
-                            data-tip={true}
-                            data-for={registeredTooltipId}
-                            style={{fontSize: 13}}
-                        >
-                            <span style={{color: isRegistered ? CHECK_MARK_GREEN : colors.red500}}>
-                                <i
-                                    className={`zmdi ${isRegistered ? 'zmdi-check-circle' : 'zmdi-alert-triangle'}`}
-                                />
-                            </span>{' '}
-                            <span>{isRegistered ? 'Registered' : 'Unregistered'} token</span>
-                            <ReactTooltip id={registeredTooltipId}>
-                                {isRegistered ?
-                                    <div>
-                                        This token address was found in the token registry<br />
-                                        smart contract and is therefore believed to be a<br />
-                                        legitimate token.
-                                    </div> :
-                                    <div>
-                                        This token is not included in the token registry<br />
-                                        smart contract. We cannot guarantee the legitimacy<br />
-                                        of this token. Make sure to verify its address on Etherscan.
-                                    </div>
-                                }
-                            </ReactTooltip>
+                        <div>
+                            <div
+                                data-tip={true}
+                                data-for={registeredTooltipId}
+                                className="mx-auto"
+                                style={{fontSize: 13, width: 127}}
+                            >
+                                <span style={{color: isRegistered ? CHECK_MARK_GREEN : colors.red500}}>
+                                    <i
+                                        className={`zmdi ${isRegistered ? 'zmdi-check-circle' : 'zmdi-alert-triangle'}`}
+                                    />
+                                </span>{' '}
+                                <span>{isRegistered ? 'Registered' : 'Unregistered'} token</span>
+                                <ReactTooltip id={registeredTooltipId}>
+                                    {isRegistered ?
+                                        <div>
+                                            This token address was found in the token registry<br />
+                                            smart contract and is therefore believed to be a<br />
+                                            legitimate token.
+                                        </div> :
+                                        <div>
+                                            This token is not included in the token registry<br />
+                                            smart contract. We cannot guarantee the legitimacy<br />
+                                            of this token. Make sure to verify its address on Etherscan.
+                                        </div>
+                                    }
+                                </ReactTooltip>
+                            </div>
                         </div>
                     }
                 </div>
