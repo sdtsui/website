@@ -42,7 +42,6 @@ import {typeDocUtils} from 'ts/utils/typedoc_utils';
 const IntroMarkdown = require('md/docs/0xjs/introduction');
 const InstallationMarkdown = require('md/docs/0xjs/installation');
 const AsyncMarkdown = require('md/docs/0xjs/async');
-const TestRPCMarkdown = require('md/docs/0xjs/testrpc');
 const ErrorsMarkdown = require('md/docs/0xjs/errors');
 const versioningMarkdown = require('md/docs/0xjs/versioning');
 /* tslint:enable:no-var-requires */
@@ -52,7 +51,6 @@ const SCROLL_TO_TIMEOUT = 500;
 const sectionNameToMarkdown = {
     [ZeroExJsDocSections.introduction]: IntroMarkdown,
     [ZeroExJsDocSections.installation]: InstallationMarkdown,
-    [ZeroExJsDocSections.testrpc]: TestRPCMarkdown,
     [ZeroExJsDocSections.async]: AsyncMarkdown,
     [ZeroExJsDocSections.errors]: ErrorsMarkdown,
     [ZeroExJsDocSections.versioning]: versioningMarkdown,

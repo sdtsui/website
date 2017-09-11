@@ -39,6 +39,7 @@ import {HelpTooltip} from 'ts/components/ui/help_tooltip';
 import {errorReporter} from 'ts/utils/error_reporter';
 import {AllowanceToggle} from 'ts/components/inputs/allowance_toggle';
 import {EthWethConversionButton} from 'ts/components/eth_weth_conversion_button';
+import {SendButton} from 'ts/components/send_button';
 
 const ETHER_ICON_PATH = '/images/ether.png';
 const ETHER_TOKEN_SYMBOL = 'WETH';
@@ -272,6 +273,11 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                             <TableHeaderColumn>
                                 Action
                             </TableHeaderColumn>
+                            {this.props.screenWidth !== ScreenWidths.SM &&
+                                <TableHeaderColumn>
+                                    Send
+                                </TableHeaderColumn>
+                            }
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false}>
@@ -360,7 +366,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                     {isMintable &&
                         <LifeCycleRaisedButton
                             labelReady="Mint"
-                            labelLoading="Minting..."
+                            labelLoading={<span style={{fontSize: 12}}>Minting...</span>}
                             labelComplete="Minted!"
                             onClickAsyncFn={this.onMintTestTokensAsync.bind(this, token)}
                         />
@@ -383,12 +389,29 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                         />
                     }
                 </TableRowColumn>
+                {this.props.screenWidth !== ScreenWidths.SM &&
+                    <TableRowColumn
+                        style={{paddingLeft: actionPaddingX, paddingRight: actionPaddingX}}
+                    >
+                        <SendButton
+                            blockchain={this.props.blockchain}
+                            dispatcher={this.props.dispatcher}
+                            token={token}
+                            onError={this.onSendFailed.bind(this)}
+                        />
+                    </TableRowColumn>
+                }
             </TableRow>
         );
     }
     private onEthWethConversionFailed() {
         this.setState({
             errorType: BalanceErrs.wethConversionFailed,
+        });
+    }
+    private onSendFailed() {
+        this.setState({
+            errorType: BalanceErrs.sendFailed,
         });
     }
     private renderAmount(amount: BigNumber.BigNumber, decimals: number) {

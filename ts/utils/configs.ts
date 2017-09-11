@@ -12,6 +12,6 @@ export const configs = {
     BACKEND_BASE_URL: isDevelopment ? 'https://localhost:3001' : 'https://api.0xproject.com',
     symbolsOfMintableTokens: ['MKR', 'MLN', 'GNT', 'DGD', 'REP'],
     mostPopularTradingPairSymbols: ['WETH', 'ZRX'],
-    lastLocalStorageFillClearanceDate: '2017-07-07',
+    lastLocalStorageFillClearanceDate: '2017-09-09',
     isMainnetEnabled: true,
 };
