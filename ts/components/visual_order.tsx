@@ -34,30 +34,30 @@ export class VisualOrder extends React.Component<VisualOrderProps, VisualOrderSt
                     <div className="col col-5 center">
                         <Party
                             label="Send"
-                            address={this.props.makerToken.address}
-                            alternativeImage={makerImage}
+                            address={this.props.takerToken.address}
+                            alternativeImage={takerImage}
                             networkId={this.props.networkId}
-                            isInTokenRegistry={this.props.isMakerTokenAddressInRegistry}
+                            isInTokenRegistry={this.props.isTakerTokenAddressInRegistry}
                         />
                     </div>
                     <div className="col col-2 center pt1">
                         <div className="pb1">
-                            {this.renderAmount(this.props.makerAssetToken, this.props.makerToken)}
+                            {this.renderAmount(this.props.takerAssetToken, this.props.takerToken)}
                         </div>
                         <div className="lg-p2 md-p2 sm-p1">
                             <img src="/images/trade_arrows.png" style={{width: 47}} />
                         </div>
                         <div className="pt1">
-                            {this.renderAmount(this.props.takerAssetToken, this.props.takerToken)}
+                            {this.renderAmount(this.props.makerAssetToken, this.props.makerToken)}
                         </div>
                     </div>
                     <div className="col col-5 center">
                         <Party
                             label="Receive"
-                            address={this.props.takerToken.address}
-                            alternativeImage={takerImage}
+                            address={this.props.makerToken.address}
+                            alternativeImage={makerImage}
                             networkId={this.props.networkId}
-                            isInTokenRegistry={this.props.isTakerTokenAddressInRegistry}
+                            isInTokenRegistry={this.props.isMakerTokenAddressInRegistry}
                         />
                     </div>
                 </div>
