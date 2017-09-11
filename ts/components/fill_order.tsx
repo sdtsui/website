@@ -7,7 +7,6 @@ import * as BigNumber from 'bignumber.js';
 import Paper from 'material-ui/Paper';
 import {Card, CardText, CardHeader} from 'material-ui/Card';
 import Divider from 'material-ui/Divider';
-import CircularProgress from 'material-ui/CircularProgress';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import {utils} from 'ts/utils/utils';
@@ -311,7 +310,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                 isFillWarningDialogOpen: true,
             });
         } else {
-            this.onFillOrderClickAsync();
+            this.onFillOrderClickFireAndForgetAsync();
         }
     }
     private onFillWarningClosed(didUserCancel: boolean) {
@@ -319,7 +318,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             isFillWarningDialogOpen: false,
         });
         if (!didUserCancel) {
-            this.onFillOrderClickAsync();
+            this.onFillOrderClickFireAndForgetAsync();
         }
     }
     private onFillAmountChange(isValid: boolean, amount?: BigNumber.BigNumber) {
@@ -421,8 +420,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             unavailableTakerAmount,
         });
     }
-
-    private async onFillOrderClickAsync(): Promise<void> {
+    private async onFillOrderClickFireAndForgetAsync(): Promise<void> {
         if (this.props.blockchainErr !== '' || this.props.userAddress === '') {
             this.props.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
             return;

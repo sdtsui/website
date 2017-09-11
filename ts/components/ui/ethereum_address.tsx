@@ -1,8 +1,6 @@
-import * as _ from 'lodash';
 import * as React from 'react';
 import {EtherScanIcon} from 'ts/components/ui/etherscan_icon';
 import ReactTooltip = require('react-tooltip');
-import {colors} from 'material-ui/styles';
 import {EtherscanLinkSuffixes} from 'ts/types';
 import {utils} from 'ts/utils/utils';
 

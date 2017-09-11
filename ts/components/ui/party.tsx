@@ -1,17 +1,17 @@
 import * as _ from 'lodash';
 import * as React from 'react';
-import {CopyIcon} from 'ts/components/ui/copy_icon';
 import ReactTooltip = require('react-tooltip');
 import {colors} from 'material-ui/styles';
 import {Identicon} from 'ts/components/ui/identicon';
-import {Styles, EtherscanLinkSuffixes} from 'ts/types';
+import {EtherscanLinkSuffixes} from 'ts/types';
 import {utils} from 'ts/utils/utils';
 import {EthereumAddress} from 'ts/components/ui/ethereum_address';
 
 const MIN_ADDRESS_WIDTH = 60;
 const ALTERNATIVE_IMAGE_DIMENSION = 80;
 const IDENTICON_DIAMETER = 100;
-const DEFAULT_ALTERNATIVE_IMAGE = '/images/team/anyone.png';
+const TOKEN_CIRCLE_DIAMETER = 120;
+const DEFAULT_ALTERNATIVE_IMAGE = '/images/token_icons/user_added_token.png';
 const CHECK_MARK_GREEN = 'rgb(0, 195, 62)';
 
 interface PartyProps {
@@ -47,8 +47,8 @@ export class Party extends React.Component<PartyProps, PartyState> {
             marginBottom: 10,
         };
         const tokenCircleStyle = {
-            width: 120,
-            height: 120,
+            width: TOKEN_CIRCLE_DIAMETER,
+            height: TOKEN_CIRCLE_DIAMETER,
             border: '1px solid #bdbdbd',
             backgroundColor: 'white',
         };
