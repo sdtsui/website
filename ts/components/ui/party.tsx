@@ -11,7 +11,6 @@ const MIN_ADDRESS_WIDTH = 60;
 const ALTERNATIVE_IMAGE_DIMENSION = 80;
 const IDENTICON_DIAMETER = 100;
 const TOKEN_CIRCLE_DIAMETER = 120;
-const DEFAULT_ALTERNATIVE_IMAGE = '/images/token_icons/user_added_token.png';
 const CHECK_MARK_GREEN = 'rgb(0, 195, 62)';
 
 interface PartyProps {
@@ -30,7 +29,6 @@ export class Party extends React.Component<PartyProps, PartyState> {
     public static defaultProps: Partial<PartyProps> = {
         identiconStyle: {},
         identiconDiameter: IDENTICON_DIAMETER,
-        alternativeImage: DEFAULT_ALTERNATIVE_IMAGE,
     };
     public render() {
         const label = this.props.label;
@@ -73,7 +71,7 @@ export class Party extends React.Component<PartyProps, PartyState> {
                             href={etherscanLinkIfExists}
                             target="_blank"
                         >
-                            {this.props.alternativeImage !== DEFAULT_ALTERNATIVE_IMAGE ?
+                            {!_.isUndefined(this.props.alternativeImage) ?
                                 <div
                                     className="mx-auto circle relative"
                                     style={tokenCircleStyle}
