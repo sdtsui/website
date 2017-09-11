@@ -271,7 +271,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                         </div>
                     </div>
                 </div>
-                <div className="clearfix mx-auto" style={{width: 315, height: 108}}>
+                <div className="clearfix mx-auto" style={{width: 355, height: 108}}>
                    <div className="col col-7" style={{maxWidth: 235}}>
                        <TokenAmountInput
                            label="Fill amount"
