@@ -7,6 +7,8 @@ import Dialog from 'material-ui/Dialog';
 import Divider from 'material-ui/Divider';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentAdd from 'material-ui/svg-icons/content/add';
 import {
     Table,
     TableBody,
@@ -41,6 +43,7 @@ import {errorReporter} from 'ts/utils/error_reporter';
 import {AllowanceToggle} from 'ts/components/inputs/allowance_toggle';
 import {EthWethConversionButton} from 'ts/components/eth_weth_conversion_button';
 import {SendButton} from 'ts/components/send_button';
+import {AssetPicker} from 'ts/components/generate_order/asset_picker';
 
 const ETHER_ICON_PATH = '/images/ether.png';
 const ETHER_TOKEN_SYMBOL = 'WETH';
@@ -79,6 +82,7 @@ interface TokenBalancesState {
     isDharmaDialogVisible: boolean;
     isZRXSpinnerVisible: boolean;
     currentZrxBalance?: BigNumber.BigNumber;
+    isTokenPickerOpen: boolean;
 }
 
 export class TokenBalances extends React.Component<TokenBalancesProps, TokenBalancesState> {
@@ -89,6 +93,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
             isBalanceSpinnerVisible: false,
             isZRXSpinnerVisible: false,
             isDharmaDialogVisible: DharmaLoanFrame.isAuthTokenPresent(),
+            isTokenPickerOpen: false,
         };
     }
     public componentWillReceiveProps(nextProps: TokenBalancesProps) {
@@ -245,7 +250,21 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                         </TableRow>
                     </TableBody>
                 </Table>
-                <h3 className="pt2">{isTestNetwork ? 'Test tokens' : 'Tokens'}</h3>
+                <div className="clearfix" style={{paddingBottom: 1}}>
+                    <div className="col col-11">
+                        <h3 className="pt2">
+                            {isTestNetwork ? 'Test tokens' : 'Tokens'}
+                        </h3>
+                    </div>
+                    <div className="col col-1 pt3 align-right">
+                        <FloatingActionButton
+                            mini={true}
+                            onClick={this.onAddTokenClicked.bind(this)}
+                        >
+                            <ContentAdd />
+                        </FloatingActionButton>
+                    </div>
+                </div>
                 <Divider />
                 <div className="pt2 pb2">
                     {isTestNetwork ?
@@ -307,6 +326,16 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                 >
                     {this.renderDharmaLoanFrame()}
                 </Dialog>
+                <AssetPicker
+                    networkId={this.props.networkId}
+                    blockchain={this.props.blockchain}
+                    dispatcher={this.props.dispatcher}
+                    isOpen={this.state.isTokenPickerOpen}
+                    currentTokenAddress={''}
+                    onTokenChosen={this.onTokenToTrackChosen.bind(this)}
+                    tokenByAddress={this.props.tokenByAddress}
+                    shouldOnlyShowUntrackedTokens={true}
+                />
             </div>
         );
     }
@@ -411,6 +440,13 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                 }
             </TableRow>
         );
+    }
+    private onTokenToTrackChosen(tokenAddress: string) {
+        // Already added the token to those tracked, so simply close dialog in this
+        // callback
+        this.setState({
+            isTokenPickerOpen: false,
+        });
     }
     private onEthWethConversionFailed() {
         this.setState({
@@ -612,5 +648,10 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
         const tokens = _.values(this.props.tokenByAddress);
         const wrappedEthToken = _.find(tokens, {symbol: ETHER_TOKEN_SYMBOL});
         return wrappedEthToken;
+    }
+    private onAddTokenClicked() {
+        this.setState({
+            isTokenPickerOpen: true,
+        });
     }
 }
