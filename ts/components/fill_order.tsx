@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import * as accounting from 'accounting';
 import {Link} from 'react-router-dom';
 import {ZeroEx} from '0x.js';
 import * as moment from 'moment';
@@ -7,7 +8,6 @@ import * as BigNumber from 'bignumber.js';
 import Paper from 'material-ui/Paper';
 import {Card, CardText, CardHeader} from 'material-ui/Card';
 import Divider from 'material-ui/Divider';
-import CircularProgress from 'material-ui/CircularProgress';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import {utils} from 'ts/utils/utils';
@@ -37,6 +37,8 @@ import {Dispatcher} from 'ts/redux/dispatcher';
 import {Blockchain} from 'ts/blockchain';
 import {errorReporter} from 'ts/utils/error_reporter';
 import {trackedTokenStorage} from 'ts/local_storage/tracked_token_storage';
+
+const CUSTOM_LIGHT_GRAY = '#BBBBBB';
 
 interface FillOrderProps {
     blockchain: Blockchain;
@@ -223,6 +225,14 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         const orderTaker = !_.isEmpty(this.state.parsedOrder.taker.address) ? this.state.parsedOrder.taker.address :
                            this.props.userAddress;
         const parsedOrderExpiration = new BigNumber(this.state.parsedOrder.expiration);
+        const exchangeRate = orderMakerAmount.div(orderTakerAmount);
+
+        let orderReceiveAmount = 0;
+        if (!_.isUndefined(this.props.orderFillAmount)) {
+            const orderReceiveAmountBigNumber = exchangeRate.mul(this.props.orderFillAmount);
+            orderReceiveAmount = this.formatCurrencyAmount(orderReceiveAmountBigNumber, makerToken.decimals);
+        }
+
         const expiryDate = utils.convertToReadableDateTimeFromUnixTimestamp(parsedOrderExpiration);
         return (
             <div className="pt3 pb1">
@@ -264,17 +274,25 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                         </div>
                     </div>
                 </div>
-                <div className="mx-auto" style={{width: 238, height: 108}}>
-                    <TokenAmountInput
-                        label="Fill amount"
-                        onChange={this.onFillAmountChange.bind(this)}
-                        shouldShowIncompleteErrs={false}
-                        token={fillToken}
-                        tokenState={fillTokenState}
-                        amount={fillAssetToken.amount}
-                        shouldCheckBalance={true}
-                        shouldCheckAllowance={true}
-                    />
+                <div className="clearfix mx-auto" style={{width: 355, height: 108}}>
+                   <div className="col col-7" style={{maxWidth: 235}}>
+                       <TokenAmountInput
+                           label="Fill amount"
+                           onChange={this.onFillAmountChange.bind(this)}
+                           shouldShowIncompleteErrs={false}
+                           token={fillToken}
+                           tokenState={fillTokenState}
+                           amount={fillAssetToken.amount}
+                           shouldCheckBalance={true}
+                           shouldCheckAllowance={true}
+                       />
+                   </div>
+                   <div
+                       className="col col-5 pl1"
+                       style={{color: CUSTOM_LIGHT_GRAY, paddingTop: 39}}
+                   >
+                       = {accounting.formatNumber(orderReceiveAmount, 6)} {makerToken.symbol}
+                   </div>
                 </div>
                 <div>
                     <RaisedButton
@@ -315,7 +333,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                 isFillWarningDialogOpen: true,
             });
         } else {
-            this.onFillOrderClickAsync();
+            this.onFillOrderClickFireAndForgetAsync();
         }
     }
     private onFillWarningClosed(didUserCancel: boolean) {
@@ -323,7 +341,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             isFillWarningDialogOpen: false,
         });
         if (!didUserCancel) {
-            this.onFillOrderClickAsync();
+            this.onFillOrderClickFireAndForgetAsync();
         }
     }
     private onFillAmountChange(isValid: boolean, amount?: BigNumber.BigNumber) {
@@ -425,8 +443,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             unavailableTakerAmount,
         });
     }
-
-    private async onFillOrderClickAsync(): Promise<void> {
+    private async onFillOrderClickFireAndForgetAsync(): Promise<void> {
         if (!_.isEmpty(this.props.blockchainErr) || _.isEmpty(this.props.userAddress)) {
             this.props.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
             return;
@@ -611,5 +628,10 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
     }
     private addSymbolFlourish(symbol: string) {
         return `*${symbol}*`;
+    }
+    private formatCurrencyAmount(amount: BigNumber.BigNumber, decimals: number): number {
+        const unitAmount = ZeroEx.toUnitAmount(amount, decimals);
+        const roundedUnitAmount = Math.round(unitAmount.toNumber() * 100000) / 100000;
+        return roundedUnitAmount;
     }
 }

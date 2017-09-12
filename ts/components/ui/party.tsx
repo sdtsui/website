@@ -1,17 +1,16 @@
 import * as _ from 'lodash';
 import * as React from 'react';
-import {CopyIcon} from 'ts/components/ui/copy_icon';
 import ReactTooltip = require('react-tooltip');
 import {colors} from 'material-ui/styles';
 import {Identicon} from 'ts/components/ui/identicon';
-import {Styles, EtherscanLinkSuffixes} from 'ts/types';
+import {EtherscanLinkSuffixes} from 'ts/types';
 import {utils} from 'ts/utils/utils';
 import {EthereumAddress} from 'ts/components/ui/ethereum_address';
 
 const MIN_ADDRESS_WIDTH = 60;
 const ALTERNATIVE_IMAGE_DIMENSION = 80;
 const IDENTICON_DIAMETER = 100;
-const DEFAULT_ALTERNATIVE_IMAGE = '/images/team/anyone.png';
+const TOKEN_CIRCLE_DIAMETER = 120;
 const CHECK_MARK_GREEN = 'rgb(0, 195, 62)';
 
 interface PartyProps {
@@ -30,7 +29,6 @@ export class Party extends React.Component<PartyProps, PartyState> {
     public static defaultProps: Partial<PartyProps> = {
         identiconStyle: {},
         identiconDiameter: IDENTICON_DIAMETER,
-        alternativeImage: DEFAULT_ALTERNATIVE_IMAGE,
     };
     public render() {
         const label = this.props.label;
@@ -47,8 +45,8 @@ export class Party extends React.Component<PartyProps, PartyState> {
             marginBottom: 10,
         };
         const tokenCircleStyle = {
-            width: 120,
-            height: 120,
+            width: TOKEN_CIRCLE_DIAMETER,
+            height: TOKEN_CIRCLE_DIAMETER,
             border: '1px solid #bdbdbd',
             backgroundColor: 'white',
         };
@@ -73,7 +71,7 @@ export class Party extends React.Component<PartyProps, PartyState> {
                             href={etherscanLinkIfExists}
                             target="_blank"
                         >
-                            {this.props.alternativeImage !== DEFAULT_ALTERNATIVE_IMAGE ?
+                            {!_.isUndefined(this.props.alternativeImage) ?
                                 <div
                                     className="mx-auto circle relative"
                                     style={tokenCircleStyle}
@@ -100,31 +98,34 @@ export class Party extends React.Component<PartyProps, PartyState> {
                         <EthereumAddress address={address} networkId={this.props.networkId} />
                     </div>
                     {!_.isUndefined(this.props.isInTokenRegistry) &&
-                        <div
-                            data-tip={true}
-                            data-for={registeredTooltipId}
-                            style={{fontSize: 13}}
-                        >
-                            <span style={{color: isRegistered ? CHECK_MARK_GREEN : colors.red500}}>
-                                <i
-                                    className={`zmdi ${isRegistered ? 'zmdi-check-circle' : 'zmdi-alert-triangle'}`}
-                                />
-                            </span>{' '}
-                            <span>{isRegistered ? 'Registered' : 'Unregistered'} token</span>
-                            <ReactTooltip id={registeredTooltipId}>
-                                {isRegistered ?
-                                    <div>
-                                        This token address was found in the token registry<br />
-                                        smart contract and is therefore believed to be a<br />
-                                        legitimate token.
-                                    </div> :
-                                    <div>
-                                        This token is not included in the token registry<br />
-                                        smart contract. We cannot guarantee the legitimacy<br />
-                                        of this token. Make sure to verify its address on Etherscan.
-                                    </div>
-                                }
-                            </ReactTooltip>
+                        <div>
+                            <div
+                                data-tip={true}
+                                data-for={registeredTooltipId}
+                                className="mx-auto"
+                                style={{fontSize: 13, width: 127}}
+                            >
+                                <span style={{color: isRegistered ? CHECK_MARK_GREEN : colors.red500}}>
+                                    <i
+                                        className={`zmdi ${isRegistered ? 'zmdi-check-circle' : 'zmdi-alert-triangle'}`}
+                                    />
+                                </span>{' '}
+                                <span>{isRegistered ? 'Registered' : 'Unregistered'} token</span>
+                                <ReactTooltip id={registeredTooltipId}>
+                                    {isRegistered ?
+                                        <div>
+                                            This token address was found in the token registry<br />
+                                            smart contract and is therefore believed to be a<br />
+                                            legitimate token.
+                                        </div> :
+                                        <div>
+                                            This token is not included in the token registry<br />
+                                            smart contract. We cannot guarantee the legitimacy<br />
+                                            of this token. Make sure to verify its address on Etherscan.
+                                        </div>
+                                    }
+                                </ReactTooltip>
+                            </div>
                         </div>
                     }
                 </div>

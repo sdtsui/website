@@ -6,7 +6,6 @@ import * as moment from 'moment';
 import Paper from 'material-ui/Paper';
 import {colors} from 'material-ui/styles';
 import {ZeroEx} from '0x.js';
-import {utils} from 'ts/utils/utils';
 import {TokenByAddress, Fill, Token, EtherscanLinkSuffixes} from 'ts/types';
 import {Party} from 'ts/components/ui/party';
 import {EtherScanIcon} from 'ts/components/ui/etherscan_icon';
