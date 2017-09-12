@@ -72,15 +72,19 @@ export class TokenInput extends React.Component<TokenInputProps, TokenInputState
                     blockchain={this.props.blockchain}
                     dispatcher={this.props.dispatcher}
                     isOpen={this.state.isPickerOpen}
-                    currentAssetToken={this.props.assetToken}
-                    onAssetChosen={this.onAssetChosen.bind(this)}
+                    currentTokenAddress={this.props.assetToken.address}
+                    onTokenChosen={this.onTokenChosen.bind(this)}
                     side={this.props.side}
                     tokenByAddress={this.props.tokenByAddress}
                 />
             </div>
         );
     }
-    private onAssetChosen(side: Side, assetToken: AssetToken) {
+    private onTokenChosen(side: Side, tokenAddress: string) {
+        const assetToken: AssetToken = {
+            address: tokenAddress,
+            amount: this.props.assetToken.amount,
+        };
         this.props.updateChosenAssetToken(side, assetToken);
         this.setState({
             isPickerOpen: false,

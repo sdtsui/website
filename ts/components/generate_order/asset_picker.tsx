@@ -26,15 +26,15 @@ interface AssetPickerProps {
     networkId: number;
     isOpen: boolean;
     side: Side;
-    currentAssetToken: AssetToken;
-    onAssetChosen: (side: Side, chosenAssetToken: AssetToken) => void;
+    currentTokenAddress: string;
+    onTokenChosen: (side: Side, tokenAddress: string) => void;
     tokenByAddress: TokenByAddress;
 }
 
 interface AssetPickerState {
     assetView: AssetViews;
     hoveredAddress: string | undefined;
-    chosenTrackAssetTokenIfExists: AssetToken;
+    chosenTrackTokenAddress: string;
     isAddingTokenToTracked: boolean;
 }
 
@@ -45,7 +45,7 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
         this.state = {
             assetView: AssetViews.ASSET_PICKER,
             hoveredAddress: undefined,
-            chosenTrackAssetTokenIfExists: undefined,
+            chosenTrackTokenAddress: undefined,
             isAddingTokenToTracked: false,
         };
         this.dialogConfigsByAssetView = {
@@ -103,7 +103,7 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
         );
     }
     private renderConfirmTrackToken() {
-        const token = this.props.tokenByAddress[this.state.chosenTrackAssetTokenIfExists.address];
+        const token = this.props.tokenByAddress[this.state.chosenTrackTokenAddress];
         return (
             <div style={{color: colors.grey700}}>
                 {this.state.isAddingTokenToTracked ?
@@ -148,10 +148,6 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
     }
     private renderGridTiles() {
         const gridTiles = _.map(this.props.tokenByAddress, (token: Token, address: string) => {
-            const assetToken: AssetToken = {
-                address,
-                amount: this.props.currentAssetToken.amount,
-            };
             const isHovered = this.state.hoveredAddress === address;
             const tileStyles = {
                 cursor: 'pointer',
@@ -162,7 +158,7 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
                     key={address}
                     style={{width: TILE_DIMENSION, height: TILE_DIMENSION, ...tileStyles}}
                     className="p2 mx-auto"
-                    onClick={this.onChooseAsset.bind(this, assetToken)}
+                    onClick={this.onChooseToken.bind(this, address)}
                     onMouseEnter={this.onToggleHover.bind(this, address, true)}
                     onMouseLeave={this.onToggleHover.bind(this, address, false)}
                 >
@@ -212,16 +208,16 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
         this.setState({
             assetView: AssetViews.ASSET_PICKER,
         });
-        this.props.onAssetChosen(this.props.side, this.props.currentAssetToken);
+        this.props.onTokenChosen(this.props.side, this.props.currentTokenAddress);
     }
-    private onChooseAsset(assetToken: AssetToken) {
-        const token = this.props.tokenByAddress[assetToken.address];
+    private onChooseToken(tokenAddress: string) {
+        const token = this.props.tokenByAddress[tokenAddress];
         if (token.isTracked) {
-            this.props.onAssetChosen(this.props.side, assetToken);
+            this.props.onTokenChosen(this.props.side, tokenAddress);
         } else {
             this.setState({
                 assetView: AssetViews.CONFIRM_TRACK_TOKEN,
-                chosenTrackAssetTokenIfExists: assetToken,
+                chosenTrackTokenAddress: tokenAddress,
             });
         }
     }
@@ -254,17 +250,14 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
         this.setState({
             assetView: AssetViews.ASSET_PICKER,
         });
-        this.props.onAssetChosen(this.props.side, {
-            amount: this.props.currentAssetToken.amount,
-            address: newToken.address,
-        });
+        this.props.onTokenChosen(this.props.side, newToken.address);
     }
     private async onTrackConfirmationRespondedAsync(didUserAcceptTracking: boolean) {
         if (!didUserAcceptTracking) {
             this.setState({
                 isAddingTokenToTracked: false,
                 assetView: AssetViews.ASSET_PICKER,
-                chosenTrackAssetTokenIfExists: undefined,
+                chosenTrackTokenAddress: undefined,
             });
             this.onCloseDialog();
             return;
@@ -272,8 +265,8 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
         this.setState({
             isAddingTokenToTracked: true,
         });
-        const assetToken = this.state.chosenTrackAssetTokenIfExists;
-        const token = this.props.tokenByAddress[assetToken.address];
+        const tokenAddress = this.state.chosenTrackTokenAddress;
+        const token = this.props.tokenByAddress[tokenAddress];
         const newTokenEntry = _.assign({}, token);
         newTokenEntry.isTracked = true;
         trackedTokenStorage.addTrackedToken(this.props.networkId, newTokenEntry);
@@ -292,8 +285,8 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
         this.setState({
             isAddingTokenToTracked: false,
             assetView: AssetViews.ASSET_PICKER,
-            chosenTrackAssetTokenIfExists: undefined,
+            chosenTrackTokenAddress: undefined,
         });
-        this.props.onAssetChosen(this.props.side, assetToken);
+        this.props.onTokenChosen(this.props.side, tokenAddress);
     }
 }
