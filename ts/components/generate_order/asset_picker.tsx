@@ -8,7 +8,7 @@ import FlatButton from 'material-ui/FlatButton';
 import {utils} from 'ts/utils/utils';
 import {Blockchain} from 'ts/blockchain';
 import {Dispatcher} from 'ts/redux/dispatcher';
-import {Token, Side, AssetToken, TokenByAddress, Styles, TokenState, DialogConfigs} from 'ts/types';
+import {Token, AssetToken, TokenByAddress, Styles, TokenState, DialogConfigs} from 'ts/types';
 import {NewTokenForm} from 'ts/components/generate_order/new_token_form';
 import {trackedTokenStorage} from 'ts/local_storage/tracked_token_storage';
 import {Party} from 'ts/components/ui/party';
@@ -25,9 +25,8 @@ interface AssetPickerProps {
     dispatcher: Dispatcher;
     networkId: number;
     isOpen: boolean;
-    side: Side;
     currentTokenAddress: string;
-    onTokenChosen: (side: Side, tokenAddress: string) => void;
+    onTokenChosen: (tokenAddress: string) => void;
     tokenByAddress: TokenByAddress;
 }
 
@@ -208,12 +207,12 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
         this.setState({
             assetView: AssetViews.ASSET_PICKER,
         });
-        this.props.onTokenChosen(this.props.side, this.props.currentTokenAddress);
+        this.props.onTokenChosen(this.props.currentTokenAddress);
     }
     private onChooseToken(tokenAddress: string) {
         const token = this.props.tokenByAddress[tokenAddress];
         if (token.isTracked) {
-            this.props.onTokenChosen(this.props.side, tokenAddress);
+            this.props.onTokenChosen(tokenAddress);
         } else {
             this.setState({
                 assetView: AssetViews.CONFIRM_TRACK_TOKEN,
@@ -250,7 +249,7 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
         this.setState({
             assetView: AssetViews.ASSET_PICKER,
         });
-        this.props.onTokenChosen(this.props.side, newToken.address);
+        this.props.onTokenChosen(newToken.address);
     }
     private async onTrackConfirmationRespondedAsync(didUserAcceptTracking: boolean) {
         if (!didUserAcceptTracking) {
@@ -287,6 +286,6 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
             assetView: AssetViews.ASSET_PICKER,
             chosenTrackTokenAddress: undefined,
         });
-        this.props.onTokenChosen(this.props.side, tokenAddress);
+        this.props.onTokenChosen(tokenAddress);
     }
 }

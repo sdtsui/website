@@ -74,18 +74,17 @@ export class TokenInput extends React.Component<TokenInputProps, TokenInputState
                     isOpen={this.state.isPickerOpen}
                     currentTokenAddress={this.props.assetToken.address}
                     onTokenChosen={this.onTokenChosen.bind(this)}
-                    side={this.props.side}
                     tokenByAddress={this.props.tokenByAddress}
                 />
             </div>
         );
     }
-    private onTokenChosen(side: Side, tokenAddress: string) {
+    private onTokenChosen(tokenAddress: string) {
         const assetToken: AssetToken = {
             address: tokenAddress,
             amount: this.props.assetToken.amount,
         };
-        this.props.updateChosenAssetToken(side, assetToken);
+        this.props.updateChosenAssetToken(this.props.side, assetToken);
         this.setState({
             isPickerOpen: false,
         });
