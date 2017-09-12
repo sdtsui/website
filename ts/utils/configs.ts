@@ -12,7 +12,7 @@ export const configs = {
     BACKEND_BASE_URL: isDevelopment ? 'https://localhost:3001' : 'https://api.0xproject.com',
     symbolsOfMintableTokens: ['MKR', 'MLN', 'GNT', 'DGD', 'REP'],
     // WARNING: ZRX & WETH MUST always be default trackedTokens
-    defaultTrackedTokenSymbols: ['WETH', 'ZRX', 'MKR'],
+    defaultTrackedTokenSymbols: ['WETH', 'ZRX'],
     lastLocalStorageFillClearanceDate: '2017-09-09',
     isMainnetEnabled: true,
 };
