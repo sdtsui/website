@@ -28,6 +28,7 @@ interface AssetPickerProps {
     currentTokenAddress: string;
     onTokenChosen: (tokenAddress: string) => void;
     tokenByAddress: TokenByAddress;
+    shouldOnlyShowUntrackedTokens?: boolean;
 }
 
 interface AssetPickerState {
@@ -38,6 +39,9 @@ interface AssetPickerState {
 }
 
 export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerState> {
+    public static defaultProps: Partial<AssetPickerProps> = {
+        shouldOnlyShowUntrackedTokens: false,
+    };
     private dialogConfigsByAssetView: {[assetView: string]: DialogConfigs};
     constructor(props: AssetPickerProps) {
         super(props);
@@ -147,6 +151,9 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
     }
     private renderGridTiles() {
         const gridTiles = _.map(this.props.tokenByAddress, (token: Token, address: string) => {
+            if (this.props.shouldOnlyShowUntrackedTokens && token.isTracked) {
+                return null; // Skip
+            }
             const isHovered = this.state.hoveredAddress === address;
             const tileStyles = {
                 cursor: 'pointer',
