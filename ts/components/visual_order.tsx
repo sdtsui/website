@@ -1,6 +1,8 @@
+import * as _ from 'lodash';
 import * as React from 'react';
 import {ZeroEx} from '0x.js';
-import {AssetToken, Token} from 'ts/types';
+import {AssetToken, Token, TokenByAddress} from 'ts/types';
+import {utils} from 'ts/utils/utils';
 import {Party} from 'ts/components/ui/party';
 import {constants} from 'ts/utils/constants';
 
@@ -14,6 +16,7 @@ interface VisualOrderProps {
     makerToken: Token;
     takerToken: Token;
     networkId: number;
+    tokenByAddress: TokenByAddress;
     isMakerTokenAddressInRegistry: boolean;
     isTakerTokenAddressInRegistry: boolean;
 }
@@ -22,6 +25,7 @@ interface VisualOrderState {}
 
 export class VisualOrder extends React.Component<VisualOrderProps, VisualOrderState> {
     public render() {
+        const allTokens = _.values(this.props.tokenByAddress);
         const makerImage = this.props.isMakerTokenAddressInRegistry ?
                            this.props.makerToken.iconUrl :
                            constants.DEFAULT_TOKEN_ICON_URL;
@@ -38,6 +42,7 @@ export class VisualOrder extends React.Component<VisualOrderProps, VisualOrderSt
                             alternativeImage={takerImage}
                             networkId={this.props.networkId}
                             isInTokenRegistry={this.props.isTakerTokenAddressInRegistry}
+                            hasUniqueNameAndSymbol={utils.hasUniqueNameAndSymbol(allTokens, this.props.takerToken)}
                         />
                     </div>
                     <div className="col col-2 center pt1">
@@ -58,6 +63,7 @@ export class VisualOrder extends React.Component<VisualOrderProps, VisualOrderSt
                             alternativeImage={makerImage}
                             networkId={this.props.networkId}
                             isInTokenRegistry={this.props.isMakerTokenAddressInRegistry}
+                            hasUniqueNameAndSymbol={utils.hasUniqueNameAndSymbol(allTokens, this.props.makerToken)}
                         />
                     </div>
                 </div>

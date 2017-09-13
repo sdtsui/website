@@ -119,6 +119,7 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
         return (
             <TrackTokenConfirmation
                 tokens={[token]}
+                tokenByAddress={this.props.tokenByAddress}
                 networkId={this.props.networkId}
                 isAddingTokenToTracked={this.state.isAddingTokenToTracked}
             />
@@ -236,11 +237,11 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
         });
     }
     private onNewTokenSubmitted(newToken: Token, newTokenState: TokenState) {
-        trackedTokenStorage.addTrackedTokenToUser(this.props.userAddress, this.props.networkId, newToken);
-        this.props.dispatcher.addTokenToTokenByAddress(newToken);
         this.props.dispatcher.updateTokenStateByAddress({
             [newToken.address]: newTokenState,
         });
+        trackedTokenStorage.addTrackedTokenToUser(this.props.userAddress, this.props.networkId, newToken);
+        this.props.dispatcher.addTokenToTokenByAddress(newToken);
         this.setState({
             assetView: AssetViews.ASSET_PICKER,
         });

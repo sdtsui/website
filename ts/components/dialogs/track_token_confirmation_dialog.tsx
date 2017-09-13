@@ -57,6 +57,7 @@ export class TrackTokenConfirmationDialog extends
                     <TrackTokenConfirmation
                         tokens={tokens}
                         networkId={this.props.networkId}
+                        tokenByAddress={this.props.tokenByAddress}
                         isAddingTokenToTracked={this.state.isAddingTokenToTracked}
                     />
                 </div>

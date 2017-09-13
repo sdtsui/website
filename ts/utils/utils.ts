@@ -8,6 +8,7 @@ import {
     OrderParty,
     ScreenWidths,
     EtherscanLinkSuffixes,
+    Token,
 } from 'ts/types';
 import * as moment from 'moment';
 import isMobile = require('is-mobile');
@@ -198,5 +199,14 @@ export const utils = {
     getAddressBeginAndEnd(address: string): string {
         const truncatedAddress = `${address.substring(0, 6)}...${address.substr(-4)}`; // 0x3d5a...b287
         return truncatedAddress;
+    },
+    hasUniqueNameAndSymbol(tokens: Token[], token: Token) {
+        if (token.isRegistered) {
+            return true; // Since it's registered, it is the canonical token
+        }
+        const registeredTokens = _.filter(tokens, t => t.isRegistered);
+        const isUniqueName = _.isUndefined(_.find(registeredTokens, {name: token.name}));
+        const isUniqueSymbol = _.isUndefined(_.find(registeredTokens, {name: token.symbol}));
+        return isUniqueName && isUniqueSymbol;
     },
 };
