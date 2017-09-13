@@ -164,7 +164,7 @@ export function reducer(state: State = INITIAL_STATE, action: Action) {
         }
 
         case ActionTypes.UPDATE_TOKEN_STATE_BY_ADDRESS: {
-            const tokenStateByAddress = state.tokenByAddress;
+            const tokenStateByAddress = state.tokenStateByAddress;
             const updatedTokenStateByAddress = action.data;
             _.each(updatedTokenStateByAddress, (tokenState: TokenState, address: string) => {
                 const updatedTokenState = _.assign({}, tokenStateByAddress[address], tokenState);
@@ -176,7 +176,7 @@ export function reducer(state: State = INITIAL_STATE, action: Action) {
         }
 
         case ActionTypes.REMOVE_FROM_TOKEN_STATE_BY_ADDRESS: {
-            const tokenStateByAddress = state.tokenByAddress;
+            const tokenStateByAddress = state.tokenStateByAddress;
             const tokenAddress = action.data;
             delete tokenStateByAddress[tokenAddress];
             return _.assign({}, state, {
