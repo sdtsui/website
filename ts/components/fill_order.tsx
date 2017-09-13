@@ -281,6 +281,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                             orderMakerAddress={this.state.parsedOrder.maker.address}
                             makerAssetToken={makerAssetToken}
                             takerAssetToken={takerAssetToken}
+                            tokenByAddress={this.props.tokenByAddress}
                             makerToken={makerToken}
                             takerToken={takerToken}
                             networkId={this.props.networkId}
@@ -384,25 +385,25 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         const tokensToTrack = [];
         const isUnseenMakerToken = _.isUndefined(makerTokenIfExists);
         const isMakerTokenTracked = !_.isUndefined(makerTokenIfExists) && makerTokenIfExists.isTracked;
-        if (!isMakerTokenTracked) {
-            tokensToTrack.push(makerTokenIfExists);
-        } else if (isUnseenMakerToken) {
+        if (isUnseenMakerToken) {
             tokensToTrack.push(_.assign({}, this.state.parsedOrder.maker.token, {
                 iconUrl: constants.DEFAULT_TOKEN_ICON_URL,
                 isTracked: false,
                 isRegistered: false,
             }));
+        } else if (!isMakerTokenTracked) {
+            tokensToTrack.push(makerTokenIfExists);
         }
         const isUnseenTakerToken = _.isUndefined(takerTokenIfExists);
         const isTakerTokenTracked = !_.isUndefined(takerTokenIfExists) && takerTokenIfExists.isTracked;
-        if (!isTakerTokenTracked) {
-            tokensToTrack.push(takerTokenIfExists);
-        } else if (isUnseenTakerToken) {
+        if (isUnseenTakerToken) {
             tokensToTrack.push(_.assign({}, this.state.parsedOrder.taker.token, {
                 iconUrl: constants.DEFAULT_TOKEN_ICON_URL,
                 isTracked: false,
                 isRegistered: false,
             }));
+        } else if (!isTakerTokenTracked) {
+            tokensToTrack.push(takerTokenIfExists);
         }
         if (!_.isEmpty(tokensToTrack)) {
             this.setState({
