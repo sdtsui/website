@@ -19,7 +19,6 @@ interface TrackTokenConfirmationState {}
 export class TrackTokenConfirmation extends
     React.Component<TrackTokenConfirmationProps, TrackTokenConfirmationState> {
     public render() {
-        console.log('tokens', this.props.tokens);
         const isMultipleTokens = this.props.tokens.length > 1;
         const allTokens = _.values(this.props.tokenByAddress);
         return (
