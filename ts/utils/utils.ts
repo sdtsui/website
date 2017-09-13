@@ -205,8 +205,10 @@ export const utils = {
             return true; // Since it's registered, it is the canonical token
         }
         const registeredTokens = _.filter(tokens, t => t.isRegistered);
-        const isUniqueName = _.isUndefined(_.find(registeredTokens, {name: token.name}));
-        const isUniqueSymbol = _.isUndefined(_.find(registeredTokens, {name: token.symbol}));
+        const tokenWithSameNameIfExists = _.find(registeredTokens, {name: token.name});
+        const isUniqueName = _.isUndefined(tokenWithSameNameIfExists);
+        const tokenWithSameSymbolIfExists = _.find(registeredTokens, {name: token.symbol});
+        const isUniqueSymbol = _.isUndefined(tokenWithSameSymbolIfExists);
         return isUniqueName && isUniqueSymbol;
     },
 };
