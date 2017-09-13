@@ -37,6 +37,7 @@ import {Dispatcher} from 'ts/redux/dispatcher';
 import {Blockchain} from 'ts/blockchain';
 import {errorReporter} from 'ts/utils/error_reporter';
 import {trackedTokenStorage} from 'ts/local_storage/tracked_token_storage';
+import {TrackTokenConfirmationDialog} from 'ts/components/dialogs/track_token_confirmation_dialog';
 
 const CUSTOM_LIGHT_GRAY = '#BBBBBB';
 
@@ -55,6 +56,7 @@ interface FillOrderProps {
 
 interface FillOrderState {
     didOrderValidationRun: boolean;
+    areAllInvolvedTokensTracked: boolean;
     globalErrMsg: string;
     orderJSON: string;
     orderJSONErrMsg: string;
@@ -65,6 +67,8 @@ interface FillOrderState {
     isTakerTokenAddressInRegistry: boolean;
     isFillWarningDialogOpen: boolean;
     isFilling: boolean;
+    isConfirmingTokenTracking: boolean;
+    tokenAddressesToTrack: string[];
 }
 
 export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
@@ -74,6 +78,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         this.state = {
             globalErrMsg: '',
             didOrderValidationRun: false,
+            areAllInvolvedTokensTracked: false,
             didFillOrderSucceed: false,
             orderJSON: _.isUndefined(this.props.initialOrder) ? '' : JSON.stringify(this.props.initialOrder),
             orderJSONErrMsg: '',
@@ -83,6 +88,8 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             isTakerTokenAddressInRegistry: false,
             isFillWarningDialogOpen: false,
             isFilling: false,
+            isConfirmingTokenTracking: false,
+            tokenAddressesToTrack: [],
         };
         this.validator = new SchemaValidator();
     }
@@ -111,7 +118,8 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                         </div>
                     }
                     <div>
-                        {!_.isUndefined(this.state.parsedOrder) && this.state.didOrderValidationRun &&
+                        {!_.isUndefined(this.state.parsedOrder) && this.state.didOrderValidationRun
+                         && this.state.areAllInvolvedTokensTracked &&
                              this.renderVisualOrder()
                         }
                     </div>
@@ -134,6 +142,15 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                 <FillWarningDialog
                     isOpen={this.state.isFillWarningDialogOpen}
                     onToggleDialog={this.onFillWarningClosed.bind(this)}
+                />
+                <TrackTokenConfirmationDialog
+                    networkId={this.props.networkId}
+                    blockchain={this.props.blockchain}
+                    tokenByAddress={this.props.tokenByAddress}
+                    dispatcher={this.props.dispatcher}
+                    tokenAddresses={this.state.tokenAddressesToTrack}
+                    isOpen={this.state.isConfirmingTokenTracking}
+                    onToggleDialog={this.onToggleTrackConfirmDialog.bind(this)}
                 />
             </div>
         );
@@ -355,6 +372,34 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         });
         this.validateFillOrderFireAndForgetAsync(orderJSON);
     }
+    private async checkForUntrackedTokensAndAskToAdd() {
+        if (!_.isEmpty(this.state.orderJSONErrMsg)) {
+            return;
+        }
+
+        const makerTokenIfExists = this.props.tokenByAddress[this.state.parsedOrder.maker.token.address];
+        const takerTokenIfExists = this.props.tokenByAddress[this.state.parsedOrder.taker.token.address];
+
+        const tokenAddressesToTrack = [];
+        const isMakerTokenTracked = !_.isUndefined(makerTokenIfExists) && makerTokenIfExists.isTracked;
+        if (!isMakerTokenTracked) {
+            tokenAddressesToTrack.push(this.state.parsedOrder.maker.token.address);
+        }
+        const isTakerTokenTracked = !_.isUndefined(takerTokenIfExists) && takerTokenIfExists.isTracked;
+        if (!isTakerTokenTracked) {
+            tokenAddressesToTrack.push(this.state.parsedOrder.taker.token.address);
+        }
+        if (!_.isEmpty(tokenAddressesToTrack)) {
+            this.setState({
+                isConfirmingTokenTracking: true,
+                tokenAddressesToTrack,
+            });
+        } else {
+            this.setState({
+                areAllInvolvedTokensTracked: true,
+            });
+        }
+    }
     private async validateFillOrderFireAndForgetAsync(orderJSON: string) {
         let orderJSONErrMsg = '';
         let parsedOrder: Order;
@@ -400,8 +445,6 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                 // Update user supplied order cache so that if they navigate away from fill view
                 // e.g to set a token allowance, when they come back, the fill order persists
                 this.props.dispatcher.updateUserSuppliedOrderCache(parsedOrder);
-                await this.addTokenToTrackedTokensIfUnseenAsync(parsedOrder.maker.token);
-                await this.addTokenToTrackedTokensIfUnseenAsync(parsedOrder.taker.token);
             }
         } catch (err) {
             if (!_.isEmpty(orderJSON)) {
@@ -442,6 +485,8 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             parsedOrder,
             unavailableTakerAmount,
         });
+
+        await this.checkForUntrackedTokensAndAskToAdd();
     }
     private async onFillOrderClickFireAndForgetAsync(): Promise<void> {
         if (!_.isEmpty(this.props.blockchainErr) || _.isEmpty(this.props.userAddress)) {
@@ -633,5 +678,22 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         const unitAmount = ZeroEx.toUnitAmount(amount, decimals);
         const roundedUnitAmount = Math.round(unitAmount.toNumber() * 100000) / 100000;
         return roundedUnitAmount;
+    }
+    private onToggleTrackConfirmDialog(didConfirmTokenTracking: boolean) {
+        if (!didConfirmTokenTracking) {
+            this.setState({
+                orderJSON: '',
+                orderJSONErrMsg: '',
+                parsedOrder: undefined,
+            });
+        } else {
+            this.setState({
+                areAllInvolvedTokensTracked: true,
+            });
+        }
+        this.setState({
+            isConfirmingTokenTracking: !this.state.isConfirmingTokenTracking,
+            tokenAddressesToTrack: [],
+        });
     }
 }

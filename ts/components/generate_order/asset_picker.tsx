@@ -11,7 +11,7 @@ import {Dispatcher} from 'ts/redux/dispatcher';
 import {Token, AssetToken, TokenByAddress, Styles, TokenState, DialogConfigs} from 'ts/types';
 import {NewTokenForm} from 'ts/components/generate_order/new_token_form';
 import {trackedTokenStorage} from 'ts/local_storage/tracked_token_storage';
-import {Party} from 'ts/components/ui/party';
+import {TrackTokenConfirmation} from 'ts/components/track_token_confirmation';
 
 const TILE_DIMENSION = 146;
 enum AssetViews {
@@ -108,35 +108,10 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
     private renderConfirmTrackToken() {
         const token = this.props.tokenByAddress[this.state.chosenTrackTokenAddress];
         return (
-            <div style={{color: colors.grey700}}>
-                {this.state.isAddingTokenToTracked ?
-                    <div>
-                        <span className="pr1">
-                            <i className="zmdi zmdi-spinner zmdi-hc-spin" />
-                        </span>
-                        <span>Adding token...</span>
-                    </div> :
-                    <div>
-                        <div>
-                            You do not currently track the following token:
-                        </div>
-                        <div className="py2">
-                            <Party
-                                label={token.name}
-                                address={token.address}
-                                networkId={this.props.networkId}
-                                alternativeImage={token.iconUrl}
-                                isInTokenRegistry={token.isRegistered}
-                            />
-                        </div>
-                        <div>
-                            Tracking a token adds it to the balances section of 0x Portal and
-                            allows you to generate orders that involve this tokens. Would you
-                            like to start tracking this token?
-                        </div>
-                    </div>
-                }
-            </div>
+            <TrackTokenConfirmation
+                tokens={[token]}
+                networkId={this.props.networkId}
+            />
         );
     }
     private renderAssetPicker() {
