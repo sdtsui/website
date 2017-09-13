@@ -164,12 +164,16 @@ export class NewTokenForm extends React.Component<NewTokenFormProps, NewTokenFor
     private onTokenNameChanged(e: any, name: string) {
         let nameErrText = '';
         const maxLength = 30;
+        const tokens = _.values(this.props.tokenByAddress);
+        const tokenWithNameExists = !_.isUndefined(_.find(tokens, {name}));
         if (name === '') {
             nameErrText = 'Name is required';
         } else if (!this.isValidName(name)) {
             nameErrText = 'Name should only contain letters, digits and spaces';
         } else if (name.length > maxLength) {
             nameErrText = `Max length is ${maxLength}`;
+        } else if (tokenWithNameExists) {
+            nameErrText = 'Token with this name already exists';
         }
 
         this.setState({
