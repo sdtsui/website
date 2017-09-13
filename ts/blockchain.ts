@@ -88,6 +88,7 @@ export class Blockchain {
     public async userAddressUpdatedFireAndForgetAsync(newUserAddress: string) {
         if (this.userAddress !== newUserAddress) {
             this.userAddress = newUserAddress;
+            await this.fetchTokenInformationAsync();
             await this.rehydrateStoreWithContractEvents();
         }
     }
