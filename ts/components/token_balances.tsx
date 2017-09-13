@@ -458,6 +458,12 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
         );
     }
     private onAssetTokenPicked(tokenAddress: string) {
+        if (_.isEmpty(tokenAddress)) {
+            this.setState({
+                isTokenPickerOpen: false,
+            });
+            return;
+        }
         const token = this.props.tokenByAddress[tokenAddress];
         const isDefaultTrackedToken = _.includes(configs.defaultTrackedTokenSymbols, token.symbol);
         if (!this.state.isAddingToken && !isDefaultTrackedToken) {
