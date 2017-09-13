@@ -607,9 +607,6 @@ export class Blockchain {
             trackedTokensIfExists = _.map(configs.defaultTrackedTokenSymbols, symbol => {
                 const token = _.find(tokenRegistryTokens, t => t.symbol === symbol);
                 token.isTracked = true;
-                // Not sure if this is required or if the previous line already updates it by reference
-                // TODO: Check if required.
-                tokenRegistryTokensByAddress[token.address].isTracked = true;
                 return token;
             });
             _.each(trackedTokensIfExists, token => {
