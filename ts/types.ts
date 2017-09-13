@@ -158,6 +158,7 @@ export const ActionTypes = strEnum([
     'UPDATE_ORDER_SIGNATURE_DATA',
     'UPDATE_TOKEN_BY_ADDRESS',
     'UPDATE_TOKEN_STATE_BY_ADDRESS',
+    'REMOVE_FROM_TOKEN_STATE_BY_ADDRESS',
     'REPLACE_TOKEN_ALLOWANCE_BY_ADDRESS',
     'REPLACE_TOKEN_BALANCE_BY_ADDRESS',
     'UPDATE_TOKEN_BALANCE_BY_ADDRESS',
@@ -503,4 +504,10 @@ export interface DialogConfigs {
     title: string;
     isModal: boolean;
     actions: any[];
+}
+
+export enum TokenVisibility {
+    ALL = 'ALL',
+    UNTRACKED = 'UNTRACKED',
+    TRACKED = 'TRACKED',
 }

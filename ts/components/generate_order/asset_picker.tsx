@@ -8,7 +8,15 @@ import FlatButton from 'material-ui/FlatButton';
 import {utils} from 'ts/utils/utils';
 import {Blockchain} from 'ts/blockchain';
 import {Dispatcher} from 'ts/redux/dispatcher';
-import {Token, AssetToken, TokenByAddress, Styles, TokenState, DialogConfigs} from 'ts/types';
+import {
+    Token,
+    AssetToken,
+    TokenByAddress,
+    Styles,
+    TokenState,
+    DialogConfigs,
+    TokenVisibility,
+} from 'ts/types';
 import {NewTokenForm} from 'ts/components/generate_order/new_token_form';
 import {trackedTokenStorage} from 'ts/local_storage/tracked_token_storage';
 import {TrackTokenConfirmation} from 'ts/components/track_token_confirmation';
@@ -28,7 +36,7 @@ interface AssetPickerProps {
     currentTokenAddress: string;
     onTokenChosen: (tokenAddress: string) => void;
     tokenByAddress: TokenByAddress;
-    shouldOnlyShowUntrackedTokens?: boolean;
+    tokenVisibility?: TokenVisibility;
 }
 
 interface AssetPickerState {
@@ -40,7 +48,7 @@ interface AssetPickerState {
 
 export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerState> {
     public static defaultProps: Partial<AssetPickerProps> = {
-        shouldOnlyShowUntrackedTokens: false,
+        tokenVisibility: TokenVisibility.ALL,
     };
     private dialogConfigsByAssetView: {[assetView: string]: DialogConfigs};
     constructor(props: AssetPickerProps) {
@@ -111,6 +119,7 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
             <TrackTokenConfirmation
                 tokens={[token]}
                 networkId={this.props.networkId}
+                isAddingTokenToTracked={this.state.isAddingTokenToTracked}
             />
         );
     }
@@ -126,7 +135,8 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
     }
     private renderGridTiles() {
         const gridTiles = _.map(this.props.tokenByAddress, (token: Token, address: string) => {
-            if (this.props.shouldOnlyShowUntrackedTokens && token.isTracked) {
+            if ((this.props.tokenVisibility === TokenVisibility.TRACKED && !token.isTracked) ||
+                (this.props.tokenVisibility === TokenVisibility.UNTRACKED && token.isTracked)) {
                 return null; // Skip
             }
             const isHovered = this.state.hoveredAddress === address;
@@ -159,24 +169,26 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
             cursor: 'pointer',
             opacity: isHovered ? 0.6 : 1,
         };
-        gridTiles.push((
-            <div
-                key={otherTokenKey}
-                style={{width: TILE_DIMENSION, height: TILE_DIMENSION, ...tileStyles}}
-                className="p2 mx-auto"
-                onClick={this.onCustomAssetChosen.bind(this)}
-                onMouseEnter={this.onToggleHover.bind(this, otherTokenKey, true)}
-                onMouseLeave={this.onToggleHover.bind(this, otherTokenKey, false)}
-            >
-                <div className="p1 center">
-                    <i
-                        style={{fontSize: 105, paddingLeft: 1, paddingRight: 1}}
-                        className="zmdi zmdi-plus-circle"
-                    />
+        if (this.props.tokenVisibility !== TokenVisibility.TRACKED) {
+            gridTiles.push((
+                <div
+                    key={otherTokenKey}
+                    style={{width: TILE_DIMENSION, height: TILE_DIMENSION, ...tileStyles}}
+                    className="p2 mx-auto"
+                    onClick={this.onCustomAssetChosen.bind(this)}
+                    onMouseEnter={this.onToggleHover.bind(this, otherTokenKey, true)}
+                    onMouseLeave={this.onToggleHover.bind(this, otherTokenKey, false)}
+                >
+                    <div className="p1 center">
+                        <i
+                            style={{fontSize: 105, paddingLeft: 1, paddingRight: 1}}
+                            className="zmdi zmdi-plus-circle"
+                        />
+                    </div>
+                    <div className="center">Other ERC20 Token</div>
                 </div>
-                <div className="center">Other ERC20 Token</div>
-            </div>
-        ));
+            ));
+        }
         return gridTiles;
     }
     private onToggleHover(address: string, isHovered: boolean) {
