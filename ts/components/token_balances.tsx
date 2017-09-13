@@ -9,6 +9,7 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import ContentRemove from 'material-ui/svg-icons/content/remove';
 import {
     Table,
     TableBody,
@@ -32,6 +33,7 @@ import {
     ScreenWidths,
     EtherscanLinkSuffixes,
     BlockchainCallErrs,
+    TokenVisibility,
 } from 'ts/types';
 import {Blockchain} from 'ts/blockchain';
 import {utils} from 'ts/utils/utils';
@@ -44,6 +46,7 @@ import {AllowanceToggle} from 'ts/components/inputs/allowance_toggle';
 import {EthWethConversionButton} from 'ts/components/eth_weth_conversion_button';
 import {SendButton} from 'ts/components/send_button';
 import {AssetPicker} from 'ts/components/generate_order/asset_picker';
+import {trackedTokenStorage} from 'ts/local_storage/tracked_token_storage';
 
 const ETHER_ICON_PATH = '/images/ether.png';
 const ETHER_TOKEN_SYMBOL = 'WETH';
@@ -83,6 +86,7 @@ interface TokenBalancesState {
     isZRXSpinnerVisible: boolean;
     currentZrxBalance?: BigNumber.BigNumber;
     isTokenPickerOpen: boolean;
+    isAddingToken: boolean;
 }
 
 export class TokenBalances extends React.Component<TokenBalancesProps, TokenBalancesState> {
@@ -94,6 +98,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
             isZRXSpinnerVisible: false,
             isDharmaDialogVisible: DharmaLoanFrame.isAuthTokenPresent(),
             isTokenPickerOpen: false,
+            isAddingToken: false,
         };
     }
     public componentWillReceiveProps(nextProps: TokenBalancesProps) {
@@ -251,7 +256,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                     </TableBody>
                 </Table>
                 <div className="clearfix" style={{paddingBottom: 1}}>
-                    <div className="col col-11">
+                    <div className="col col-10">
                         <h3 className="pt2">
                             {isTestNetwork ? 'Test tokens' : 'Tokens'}
                         </h3>
@@ -259,9 +264,19 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                     <div className="col col-1 pt3 align-right">
                         <FloatingActionButton
                             mini={true}
+                            zDepth={0}
                             onClick={this.onAddTokenClicked.bind(this)}
                         >
                             <ContentAdd />
+                        </FloatingActionButton>
+                    </div>
+                    <div className="col col-1 pt3 align-right">
+                        <FloatingActionButton
+                            mini={true}
+                            zDepth={0}
+                            onClick={this.onRemoveTokenClicked.bind(this)}
+                        >
+                            <ContentRemove />
                         </FloatingActionButton>
                     </div>
                 </div>
@@ -303,7 +318,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false}>
-                        {this.renderTableRows()}
+                        {this.renderTokenTableRows()}
                     </TableBody>
                 </Table>
                 <Dialog
@@ -332,14 +347,14 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                     dispatcher={this.props.dispatcher}
                     isOpen={this.state.isTokenPickerOpen}
                     currentTokenAddress={''}
-                    onTokenChosen={this.onTokenToTrackChosen.bind(this)}
+                    onTokenChosen={this.onAssetTokenPicked.bind(this)}
                     tokenByAddress={this.props.tokenByAddress}
-                    shouldOnlyShowUntrackedTokens={true}
+                    tokenVisibility={this.state.isAddingToken ? TokenVisibility.UNTRACKED : TokenVisibility.TRACKED}
                 />
             </div>
         );
     }
-    private renderTableRows() {
+    private renderTokenTableRows() {
         if (!this.props.blockchainIsLoaded || this.props.blockchainErr !== '') {
             return '';
         }
@@ -441,9 +456,20 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
             </TableRow>
         );
     }
-    private onTokenToTrackChosen(tokenAddress: string) {
-        // Already added the token to those tracked, so simply close dialog in this
-        // callback
+    private onAssetTokenPicked(tokenAddress: string) {
+        const token = this.props.tokenByAddress[tokenAddress];
+        const isDefaultTrackedToken = _.includes(configs.defaultTrackedTokenSymbols, token.symbol);
+        if (!this.state.isAddingToken && !isDefaultTrackedToken) {
+            // Remove the token from tracked tokens
+            const newToken = _.assign({}, token, {
+                isTracked: false,
+            });
+            this.props.dispatcher.updateTokenByAddress([newToken]);
+            this.props.dispatcher.removeFromTokenStateByAddress(tokenAddress);
+            trackedTokenStorage.removeTrackedToken(this.props.networkId, tokenAddress);
+        } else if (isDefaultTrackedToken) {
+            this.props.dispatcher.showFlashMessage(`Cannot remove ${token.name} because it's a default token`);
+        }
         this.setState({
             isTokenPickerOpen: false,
         });
@@ -652,6 +678,13 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
     private onAddTokenClicked() {
         this.setState({
             isTokenPickerOpen: true,
+            isAddingToken: true,
+        });
+    }
+    private onRemoveTokenClicked() {
+        this.setState({
+            isTokenPickerOpen: true,
+            isAddingToken: false,
         });
     }
 }

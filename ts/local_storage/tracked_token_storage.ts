@@ -31,4 +31,14 @@ export const trackedTokenStorage = {
         const trackedTokens = trackedTokensByNetworkId[networkId];
         return trackedTokens;
     },
+    removeTrackedToken(networkId: number, tokenAddress: string) {
+        const trackedTokensByNetworkId = this.getTrackedTokensByNetworkId();
+        const trackedTokens = trackedTokensByNetworkId[networkId];
+        const remainingTrackedTokens = _.filter(trackedTokens, (token: Token) => {
+            return token.address !== tokenAddress;
+        });
+        trackedTokensByNetworkId[networkId] = remainingTrackedTokens;
+        const trackedTokensByNetworkIdJSONString = JSON.stringify(trackedTokensByNetworkId);
+        localStorage.setItem(TRACKED_TOKENS_KEY, trackedTokensByNetworkIdJSONString);
+    },
 };

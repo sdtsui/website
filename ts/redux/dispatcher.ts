@@ -139,6 +139,12 @@ export class Dispatcher {
             type: ActionTypes.UPDATE_TOKEN_STATE_BY_ADDRESS,
          });
     }
+    public removeFromTokenStateByAddress(tokenAddress: string) {
+        this.dispatch({
+            data: tokenAddress,
+            type: ActionTypes.REMOVE_FROM_TOKEN_STATE_BY_ADDRESS,
+        });
+    }
     public replaceTokenAllowanceByAddress(address: string, allowance: BigNumber.BigNumber) {
         this.dispatch({
             data: {
