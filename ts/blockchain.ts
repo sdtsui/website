@@ -333,14 +333,16 @@ export class Blockchain {
         return [balance, allowance];
     }
     public async updateTokenBalancesAndAllowancesAsync(tokens: Token[]) {
-        utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
-
         const tokenStateByAddress: TokenStateByAddress = {};
         for (const token of tokens) {
-            const [
-                balance,
-                allowance,
-            ] = await this.getTokenBalanceAndAllowanceAsync(this.userAddress, token.address);
+            let balance = new BigNumber(0);
+            let allowance = new BigNumber(0);
+            if (this.doesUserAddressExist()) {
+                [
+                    balance,
+                    allowance,
+                ] = await this.getTokenBalanceAndAllowanceAsync(this.userAddress, token.address);
+            }
             const tokenState = {
                 balance,
                 allowance,
