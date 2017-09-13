@@ -618,62 +618,6 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             return;
         }
     }
-    private async addTokenToTrackedTokensIfUnseenAsync(orderToken: OrderToken) {
-        const existingToken = this.props.tokenByAddress[orderToken.address];
-
-        // If a token with the address already exists, we trust the tokens retrieved from the
-        // tokenRegistry or supplied by the current user over ones from an orderJSON. Thus, we
-        // do not add a trackedToken and will defer to the rest of the details associated to the existing
-        // token with this address for the rest of it's metadata.
-        const doesTokenWithAddressExist = !_.isUndefined(existingToken);
-        if (doesTokenWithAddressExist) {
-            return;
-        }
-
-        // Let's make sure this token (with a unique address), also have a unique name/symbol, otherwise
-        // we append something to make it visibly clear to the end user that this is a different underlying
-        // token then the identically named one they already had locally.
-        const existingTokens = _.values(this.props.tokenByAddress);
-        const isUniqueName = _.isUndefined(_.find(existingTokens, {name: orderToken.name}));
-        if (!isUniqueName) {
-            orderToken.name = `${orderToken.name} [Imported]`;
-        }
-
-        const isUniqueSymbol = _.isUndefined(_.find(existingTokens, {symbol: orderToken.symbol}));
-        if (!isUniqueSymbol) {
-            orderToken.symbol = this.addSymbolFlourish(orderToken.symbol);
-        }
-
-        const token: Token = {
-            ...orderToken,
-            iconUrl: constants.DEFAULT_TOKEN_ICON_URL,
-            isTracked: true,
-            isRegistered: false,
-        };
-
-        const [
-            balance,
-            allowance,
-        ] = await this.props.blockchain.getTokenBalanceAndAllowanceAsync(
-            this.props.userAddress, token.address,
-        );
-
-        // Add the custom token to local storage and to the redux store
-        trackedTokenStorage.addTrackedToken(this.props.blockchain.networkId, token);
-        this.props.dispatcher.addTokenToTokenByAddress(token);
-        this.props.dispatcher.updateTokenStateByAddress({
-            [token.address]: {
-                balance,
-                allowance,
-            },
-        });
-
-        // FireAndForget update balance & allowance
-        this.props.blockchain.updateTokenBalancesAndAllowancesAsync([token]);
-    }
-    private addSymbolFlourish(symbol: string) {
-        return `*${symbol}*`;
-    }
     private formatCurrencyAmount(amount: BigNumber.BigNumber, decimals: number): number {
         const unitAmount = ZeroEx.toUnitAmount(amount, decimals);
         const roundedUnitAmount = Math.round(unitAmount.toNumber() * 100000) / 100000;
