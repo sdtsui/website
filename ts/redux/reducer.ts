@@ -151,6 +151,14 @@ export function reducer(state: State = INITIAL_STATE, action: Action) {
             });
         }
 
+        case ActionTypes.REMOVE_TOKEN_TO_TOKEN_BY_ADDRESS: {
+            const newTokenByAddress = state.tokenByAddress;
+            delete newTokenByAddress[action.data.address];
+            return _.assign({}, state, {
+                tokenByAddress: newTokenByAddress,
+            });
+        }
+
         case ActionTypes.UPDATE_TOKEN_BY_ADDRESS: {
             const tokenByAddress = state.tokenByAddress;
             const tokens = action.data;

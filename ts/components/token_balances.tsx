@@ -467,11 +467,15 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
         const token = this.props.tokenByAddress[tokenAddress];
         const isDefaultTrackedToken = _.includes(configs.defaultTrackedTokenSymbols, token.symbol);
         if (!this.state.isAddingToken && !isDefaultTrackedToken) {
-            // Remove the token from tracked tokens
-            const newToken = _.assign({}, token, {
-                isTracked: false,
-            });
-            this.props.dispatcher.updateTokenByAddress([newToken]);
+            if (token.isRegistered) {
+                // Remove the token from tracked tokens
+                const newToken = _.assign({}, token, {
+                    isTracked: false,
+                });
+                this.props.dispatcher.updateTokenByAddress([newToken]);
+            } else {
+                this.props.dispatcher.removeTokenToTokenByAddress(token);
+            }
             this.props.dispatcher.removeFromTokenStateByAddress(tokenAddress);
             trackedTokenStorage.removeTrackedToken(this.props.userAddress, this.props.networkId, tokenAddress);
         } else if (isDefaultTrackedToken) {
