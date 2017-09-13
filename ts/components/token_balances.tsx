@@ -342,6 +342,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                     {this.renderDharmaLoanFrame()}
                 </Dialog>
                 <AssetPicker
+                    userAddress={this.props.userAddress}
                     networkId={this.props.networkId}
                     blockchain={this.props.blockchain}
                     dispatcher={this.props.dispatcher}
@@ -466,7 +467,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
             });
             this.props.dispatcher.updateTokenByAddress([newToken]);
             this.props.dispatcher.removeFromTokenStateByAddress(tokenAddress);
-            trackedTokenStorage.removeTrackedToken(this.props.networkId, tokenAddress);
+            trackedTokenStorage.removeTrackedToken(this.props.userAddress, this.props.networkId, tokenAddress);
         } else if (isDefaultTrackedToken) {
             this.props.dispatcher.showFlashMessage(`Cannot remove ${token.name} because it's a default token`);
         }

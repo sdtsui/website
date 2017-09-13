@@ -18,6 +18,7 @@ interface TrackTokenConfirmationDialogProps {
     dispatcher: Dispatcher;
     networkId: number;
     blockchain: Blockchain;
+    userAddress: string;
 }
 
 interface TrackTokenConfirmationDialogState {
@@ -74,7 +75,7 @@ export class TrackTokenConfirmationDialog extends
             const token = this.props.tokenByAddress[tokenAddress];
             const newTokenEntry = _.assign({}, token);
             newTokenEntry.isTracked = true;
-            trackedTokenStorage.addTrackedToken(this.props.networkId, newTokenEntry);
+            trackedTokenStorage.addTrackedTokenToUser(this.props.userAddress, this.props.networkId, newTokenEntry);
             this.props.dispatcher.updateTokenByAddress([newTokenEntry]);
 
             const [

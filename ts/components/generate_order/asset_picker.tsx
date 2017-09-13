@@ -29,6 +29,7 @@ enum AssetViews {
 }
 
 interface AssetPickerProps {
+    userAddress: string;
     blockchain: Blockchain;
     dispatcher: Dispatcher;
     networkId: number;
@@ -235,7 +236,7 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
         });
     }
     private onNewTokenSubmitted(newToken: Token, newTokenState: TokenState) {
-        trackedTokenStorage.addTrackedToken(this.props.networkId, newToken);
+        trackedTokenStorage.addTrackedTokenToUser(this.props.userAddress, this.props.networkId, newToken);
         this.props.dispatcher.addTokenToTokenByAddress(newToken);
         this.props.dispatcher.updateTokenStateByAddress({
             [newToken.address]: newTokenState,
@@ -277,7 +278,7 @@ export class AssetPicker extends React.Component<AssetPickerProps, AssetPickerSt
         }
 
         newTokenEntry.isTracked = true;
-        trackedTokenStorage.addTrackedToken(this.props.networkId, newTokenEntry);
+        trackedTokenStorage.addTrackedTokenToUser(this.props.userAddress, this.props.networkId, newTokenEntry);
         this.props.dispatcher.updateTokenByAddress([newTokenEntry]);
 
         const [

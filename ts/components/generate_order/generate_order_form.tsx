@@ -107,6 +107,7 @@ export class GenerateOrderForm extends React.Component<GenerateOrderFormProps, a
                         <div className="mx-auto clearfix">
                             <div className="lg-col md-col lg-col-5 md-col-5 sm-col sm-col-5 sm-pb2">
                                 <TokenInput
+                                    userAddress={this.props.userAddress}
                                     blockchain={this.props.blockchain}
                                     blockchainErr={this.props.blockchainErr}
                                     dispatcher={this.props.dispatcher}
@@ -137,6 +138,7 @@ export class GenerateOrderForm extends React.Component<GenerateOrderFormProps, a
                             </div>
                             <div className="lg-col md-col lg-col-5 md-col-5 sm-col sm-col-5 sm-pb2">
                                 <TokenInput
+                                    userAddress={this.props.userAddress}
                                     blockchain={this.props.blockchain}
                                     blockchainErr={this.props.blockchainErr}
                                     dispatcher={this.props.dispatcher}

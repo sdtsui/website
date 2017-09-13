@@ -20,6 +20,7 @@ interface TokenInputProps {
     assetToken: AssetToken;
     updateChosenAssetToken: (side: Side, token: AssetToken) => void;
     tokenByAddress: TokenByAddress;
+    userAddress: string;
 }
 
 interface TokenInputState {
@@ -68,6 +69,7 @@ export class TokenInput extends React.Component<TokenInputProps, TokenInputState
                     </div>
                 </Paper>
                 <AssetPicker
+                    userAddress={this.props.userAddress}
                     networkId={this.props.networkId}
                     blockchain={this.props.blockchain}
                     dispatcher={this.props.dispatcher}

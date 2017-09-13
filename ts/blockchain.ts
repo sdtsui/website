@@ -588,8 +588,20 @@ export class Blockchain {
 
         this.dispatcher.updateBlockchainIsLoaded(false);
         this.dispatcher.clearTokenByAddress();
+
         const tokenRegistryTokensByAddress = await this.getTokenRegistryTokensByAddressAsync();
-        let trackedTokensIfExists = trackedTokenStorage.getTrackedTokensIfExists(this.networkId);
+
+        // HACK: We need to fetch the userAddress here because otherwise we cannot save the
+        // tracked tokens in localStorage under the users address nor fetch the token
+        // balances and allowances and we need to do this in order not to trigger the blockchain
+        // loading dialog to show up twice. First to load the contracts, and second to load the
+        // balances and allowances.
+        this.userAddress = await this.web3Wrapper.getFirstAccountIfExistsAsync();
+        if (!_.isEmpty(this.userAddress)) {
+            this.dispatcher.updateUserAddress(this.userAddress);
+        }
+
+        let trackedTokensIfExists = trackedTokenStorage.getTrackedTokensIfExists(this.userAddress, this.networkId);
         if (_.isUndefined(trackedTokensIfExists)) {
             const tokenRegistryTokens = _.values(tokenRegistryTokensByAddress);
             trackedTokensIfExists = _.map(configs.defaultTrackedTokenSymbols, symbol => {
@@ -600,7 +612,9 @@ export class Blockchain {
                 tokenRegistryTokensByAddress[token.address].isTracked = true;
                 return token;
             });
-            _.each(trackedTokensIfExists, token => trackedTokenStorage.addTrackedToken(this.networkId, token));
+            _.each(trackedTokensIfExists, token => {
+                trackedTokenStorage.addTrackedTokenToUser(this.userAddress, this.networkId, token);
+            });
         } else {
             // Properly set all tokenRegistry tokens `isTracked` to true if they are in the existing trackedTokens array
             _.each(trackedTokensIfExists, trackedToken => {
@@ -613,14 +627,6 @@ export class Blockchain {
         const allTokens = _.uniq([...tokenRegistryTokens, ...trackedTokensIfExists]);
         this.dispatcher.updateTokenByAddress(allTokens);
 
-        // HACK: We need to fetch the userAddress here because otherwise we cannot fetch the token
-        // balances and allowances and we need to do this in order not to trigger the blockchain
-        // loading dialog to show up twice. First to load the contracts, and second to load the
-        // balances and allowances.
-        this.userAddress = await this.web3Wrapper.getFirstAccountIfExistsAsync();
-        if (!_.isEmpty(this.userAddress)) {
-            this.dispatcher.updateUserAddress(this.userAddress);
-        }
         // Get balance/allowance for tracked tokens
         await this.updateTokenBalancesAndAllowancesAsync(trackedTokensIfExists);
 

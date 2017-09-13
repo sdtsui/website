@@ -144,6 +144,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                     onToggleDialog={this.onFillWarningClosed.bind(this)}
                 />
                 <TrackTokenConfirmationDialog
+                    userAddress={this.props.userAddress}
                     networkId={this.props.networkId}
                     blockchain={this.props.blockchain}
                     tokenByAddress={this.props.tokenByAddress}
