@@ -68,7 +68,7 @@ interface FillOrderState {
     isFillWarningDialogOpen: boolean;
     isFilling: boolean;
     isConfirmingTokenTracking: boolean;
-    tokenAddressesToTrack: string[];
+    tokensToTrack: Token[];
 }
 
 export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
@@ -89,7 +89,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             isFillWarningDialogOpen: false,
             isFilling: false,
             isConfirmingTokenTracking: false,
-            tokenAddressesToTrack: [],
+            tokensToTrack: [],
         };
         this.validator = new SchemaValidator();
     }
@@ -149,7 +149,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                     blockchain={this.props.blockchain}
                     tokenByAddress={this.props.tokenByAddress}
                     dispatcher={this.props.dispatcher}
-                    tokenAddresses={this.state.tokenAddressesToTrack}
+                    tokens={this.state.tokensToTrack}
                     isOpen={this.state.isConfirmingTokenTracking}
                     onToggleDialog={this.onToggleTrackConfirmDialog.bind(this)}
                 />
@@ -381,19 +381,33 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         const makerTokenIfExists = this.props.tokenByAddress[this.state.parsedOrder.maker.token.address];
         const takerTokenIfExists = this.props.tokenByAddress[this.state.parsedOrder.taker.token.address];
 
-        const tokenAddressesToTrack = [];
+        const tokensToTrack = [];
+        const isUnseenMakerToken = _.isUndefined(makerTokenIfExists);
         const isMakerTokenTracked = !_.isUndefined(makerTokenIfExists) && makerTokenIfExists.isTracked;
         if (!isMakerTokenTracked) {
-            tokenAddressesToTrack.push(this.state.parsedOrder.maker.token.address);
+            tokensToTrack.push(makerTokenIfExists);
+        } else if (isUnseenMakerToken) {
+            tokensToTrack.push(_.assign({}, this.state.parsedOrder.maker.token, {
+                iconUrl: constants.DEFAULT_TOKEN_ICON_URL,
+                isTracked: false,
+                isRegistered: false,
+            }));
         }
+        const isUnseenTakerToken = _.isUndefined(takerTokenIfExists);
         const isTakerTokenTracked = !_.isUndefined(takerTokenIfExists) && takerTokenIfExists.isTracked;
         if (!isTakerTokenTracked) {
-            tokenAddressesToTrack.push(this.state.parsedOrder.taker.token.address);
+            tokensToTrack.push(takerTokenIfExists);
+        } else if (isUnseenTakerToken) {
+            tokensToTrack.push(_.assign({}, this.state.parsedOrder.taker.token, {
+                iconUrl: constants.DEFAULT_TOKEN_ICON_URL,
+                isTracked: false,
+                isRegistered: false,
+            }));
         }
-        if (!_.isEmpty(tokenAddressesToTrack)) {
+        if (!_.isEmpty(tokensToTrack)) {
             this.setState({
                 isConfirmingTokenTracking: true,
-                tokenAddressesToTrack,
+                tokensToTrack,
             });
         } else {
             this.setState({
@@ -638,7 +652,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         }
         this.setState({
             isConfirmingTokenTracking: !this.state.isConfirmingTokenTracking,
-            tokenAddressesToTrack: [],
+            tokensToTrack: [],
         });
     }
 }

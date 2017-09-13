@@ -11,7 +11,7 @@ import {trackedTokenStorage} from 'ts/local_storage/tracked_token_storage';
 import {Token, TokenByAddress} from 'ts/types';
 
 interface TrackTokenConfirmationDialogProps {
-    tokenAddresses: string[];
+    tokens: Token[];
     tokenByAddress: TokenByAddress;
     isOpen: boolean;
     onToggleDialog: (didConfirmTokenTracking: boolean) => void;
@@ -34,7 +34,7 @@ export class TrackTokenConfirmationDialog extends
         };
     }
     public render() {
-        const tokens = _.map(this.props.tokenAddresses, tokenAddress => this.props.tokenByAddress[tokenAddress]);
+        const tokens = this.props.tokens;
         return (
             <Dialog
                 title="Tracking confirmation"
@@ -71,9 +71,25 @@ export class TrackTokenConfirmationDialog extends
         this.setState({
             isAddingTokenToTracked: true,
         });
-        for (const tokenAddress of this.props.tokenAddresses) {
-            const token = this.props.tokenByAddress[tokenAddress];
+        for (const token of this.props.tokens) {
             const newTokenEntry = _.assign({}, token);
+
+            if (!token.isRegistered) {
+                // Let's make sure this token (with a unique address), also have a unique name/symbol, otherwise
+                // we append something to make it visibly clear to the end user that this is a different underlying
+                // token then the identically named one they already had locally.
+                const existingTokens = _.values(this.props.tokenByAddress);
+                const isUniqueName = _.isUndefined(_.find(existingTokens, {name: newTokenEntry.name}));
+                if (!isUniqueName) {
+                    newTokenEntry.name = `${newTokenEntry.name} [Imported]`;
+                }
+
+                const isUniqueSymbol = _.isUndefined(_.find(existingTokens, {symbol: newTokenEntry.symbol}));
+                if (!isUniqueSymbol) {
+                    newTokenEntry.symbol = this.addSymbolFlourish(newTokenEntry.symbol);
+                }
+            }
+
             newTokenEntry.isTracked = true;
             trackedTokenStorage.addTrackedTokenToUser(this.props.userAddress, this.props.networkId, newTokenEntry);
             this.props.dispatcher.updateTokenByAddress([newTokenEntry]);
@@ -94,5 +110,8 @@ export class TrackTokenConfirmationDialog extends
             isAddingTokenToTracked: false,
         });
         this.props.onToggleDialog(didUserAcceptTracking);
+    }
+    private addSymbolFlourish(symbol: string) {
+        return `*${symbol}*`;
     }
 }
