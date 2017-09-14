@@ -63,11 +63,13 @@ interface FillOrderState {
     orderJSONErrMsg: string;
     parsedOrder: Order;
     didFillOrderSucceed: boolean;
+    didCancelOrderSucceed: boolean;
     unavailableTakerAmount: BigNumber.BigNumber;
     isMakerTokenAddressInRegistry: boolean;
     isTakerTokenAddressInRegistry: boolean;
     isFillWarningDialogOpen: boolean;
     isFilling: boolean;
+    isCancelling: boolean;
     isConfirmingTokenTracking: boolean;
     tokensToTrack: Token[];
 }
@@ -81,6 +83,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             didOrderValidationRun: false,
             areAllInvolvedTokensTracked: false,
             didFillOrderSucceed: false,
+            didCancelOrderSucceed: false,
             orderJSON: _.isUndefined(this.props.initialOrder) ? '' : JSON.stringify(this.props.initialOrder),
             orderJSONErrMsg: '',
             parsedOrder: this.props.initialOrder,
@@ -89,6 +92,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             isTakerTokenAddressInRegistry: false,
             isFillWarningDialogOpen: false,
             isFilling: false,
+            isCancelling: false,
             isConfirmingTokenTracking: false,
             tokensToTrack: [],
         };
@@ -217,7 +221,8 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             const orderReceiveAmountBigNumber = exchangeRate.mul(this.props.orderFillAmount);
             orderReceiveAmount = this.formatCurrencyAmount(orderReceiveAmountBigNumber, makerToken.decimals);
         }
-
+        const canCancel = !_.isUndefined(this.state.parsedOrder) &&
+                          this.state.parsedOrder.maker.address === this.props.userAddress;
         const expiryDate = utils.convertToReadableDateTimeFromUnixTimestamp(parsedOrderExpiration);
         return (
             <div className="pt3 pb1">
@@ -260,47 +265,69 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                         </div>
                     </div>
                 </div>
-                <div className="clearfix mx-auto" style={{width: 315, height: 108}}>
-                   <div className="col col-7" style={{maxWidth: 235}}>
-                       <TokenAmountInput
-                           label="Fill amount"
-                           onChange={this.onFillAmountChange.bind(this)}
-                           shouldShowIncompleteErrs={false}
-                           token={fillToken}
-                           tokenState={fillTokenState}
-                           amount={fillAssetToken.amount}
-                           shouldCheckBalance={true}
-                           shouldCheckAllowance={true}
-                       />
-                   </div>
-                   <div
-                       className="col col-5 pl1"
-                       style={{color: CUSTOM_LIGHT_GRAY, paddingTop: 39}}
-                   >
-                       = {accounting.formatNumber(orderReceiveAmount, 6)} {makerToken.symbol}
-                   </div>
-                </div>
+                {!canCancel &&
+                    <div className="clearfix mx-auto" style={{width: 315, height: 108}}>
+                       <div className="col col-7" style={{maxWidth: 235}}>
+                           <TokenAmountInput
+                               label="Fill amount"
+                               onChange={this.onFillAmountChange.bind(this)}
+                               shouldShowIncompleteErrs={false}
+                               token={fillToken}
+                               tokenState={fillTokenState}
+                               amount={fillAssetToken.amount}
+                               shouldCheckBalance={true}
+                               shouldCheckAllowance={true}
+                           />
+                       </div>
+                       <div
+                           className="col col-5 pl1"
+                           style={{color: CUSTOM_LIGHT_GRAY, paddingTop: 39}}
+                       >
+                           = {accounting.formatNumber(orderReceiveAmount, 6)} {makerToken.symbol}
+                       </div>
+                    </div>
+                }
                 <div>
-                    <RaisedButton
-                        style={{width: '100%'}}
-                        disabled={this.state.isFilling}
-                        label={this.state.isFilling ? 'Filling order...' : 'Fill order'}
-                        onClick={this.onFillOrderClick.bind(this)}
-                    />
-                    {!_.isEmpty(this.state.globalErrMsg) &&
-                        <Alert type={AlertTypes.ERROR} message={this.state.globalErrMsg} />
+                    {!canCancel &&
+                        <div>
+                            <RaisedButton
+                                style={{width: '100%'}}
+                                disabled={this.state.isFilling}
+                                label={this.state.isFilling ? 'Filling order...' : 'Fill order'}
+                                onClick={this.onFillOrderClick.bind(this)}
+                            />
+                            {!_.isEmpty(this.state.globalErrMsg) &&
+                                <Alert type={AlertTypes.ERROR} message={this.state.globalErrMsg} />
+                            }
+                            {this.state.didFillOrderSucceed &&
+                                <Alert
+                                    type={AlertTypes.SUCCESS}
+                                    message={this.renderFillSuccessMsg()}
+                                />
+                            }
+                        </div>
                     }
-                    {this.state.didFillOrderSucceed &&
-                        <Alert
-                            type={AlertTypes.SUCCESS}
-                            message={this.renderSuccessMsg()}
-                        />
+                    {canCancel &&
+                        <div>
+                            <RaisedButton
+                                style={{width: '100%'}}
+                                disabled={this.state.isCancelling}
+                                label={this.state.isCancelling ? 'Cancelling order...' : 'Cancel order'}
+                                onClick={this.onCancelOrderClick.bind(this)}
+                            />
+                            {this.state.didCancelOrderSucceed &&
+                                <Alert
+                                    type={AlertTypes.SUCCESS}
+                                    message={this.renderCancelSuccessMsg()}
+                                />
+                            }
+                        </div>
                     }
                 </div>
             </div>
         );
     }
-    private renderSuccessMsg() {
+    private renderFillSuccessMsg() {
         return (
             <div>
                 Order successfully filled. See the trade details in your{' '}
@@ -313,6 +340,13 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             </div>
         );
     }
+    private renderCancelSuccessMsg() {
+        return (
+            <div>
+                Order successfully cancelled.
+            </div>
+        );
+    }
     private onFillOrderClick() {
         if (!this.state.isMakerTokenAddressInRegistry || !this.state.isTakerTokenAddressInRegistry) {
             this.setState({
@@ -321,6 +355,9 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         } else {
             this.onFillOrderClickFireAndForgetAsync();
         }
+    }
+    private onCancelOrderClick() {
+        this.onCancelOrderClickFireAndForgetAsync();
     }
     private onFillWarningClosed(didUserCancel: boolean) {
         this.setState({
@@ -555,9 +592,91 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                 return;
             }
             globalErrMsg = 'Failed to fill order, please refresh and try again';
-            if (_.includes(errMsg, ExchangeContractErrs.OrderFillRoundingError)) {
-                globalErrMsg = 'The rounding error was too large when filling this order';
+            utils.consoleLog(`${err}`);
+            await errorReporter.reportAsync(err);
+            this.setState({
+                globalErrMsg,
+            });
+            return;
+        }
+    }
+    private async onCancelOrderClickFireAndForgetAsync(): Promise<void> {
+        if (!_.isEmpty(this.props.blockchainErr) || _.isEmpty(this.props.userAddress)) {
+            this.props.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
+            return;
+        }
+
+        this.setState({
+            isCancelling: true,
+            didCancelOrderSucceed: false,
+        });
+
+        const parsedOrder = this.state.parsedOrder;
+        const orderHash = parsedOrder.signature.hash;
+        const takerAddress = this.props.userAddress;
+
+        if (_.isUndefined(takerAddress)) {
+            this.props.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
+            this.setState({
+                isFilling: false,
+            });
+            return;
+        }
+        let globalErrMsg = '';
+
+        const takerTokenAmount = new BigNumber(parsedOrder.taker.amount);
+
+        const signedOrder = this.props.blockchain.portalOrderToSignedOrder(
+            parsedOrder.maker.address,
+            parsedOrder.taker.address,
+            parsedOrder.maker.token.address,
+            parsedOrder.taker.token.address,
+            new BigNumber(parsedOrder.maker.amount),
+            takerTokenAmount,
+            new BigNumber(parsedOrder.maker.feeAmount),
+            new BigNumber(parsedOrder.taker.feeAmount),
+            new BigNumber(this.state.parsedOrder.expiration),
+            parsedOrder.feeRecipient,
+            parsedOrder.signature,
+            new BigNumber(parsedOrder.salt),
+        );
+        const unavailableTakerAmount = await this.props.blockchain.getUnavailableTakerAmountAsync(orderHash);
+        const availableTakerTokenAmount = takerTokenAmount.minus(unavailableTakerAmount);
+        if (_.isEmpty(globalErrMsg)) {
+            try {
+                await this.props.blockchain.validateCancelOrderThrowIfInvalidAsync(
+                    signedOrder, availableTakerTokenAmount);
+            } catch (e) {
+                globalErrMsg = this.props.blockchain.toHumanReadableErrorMsg(e.message);
             }
+        }
+        if (!_.isEmpty(globalErrMsg)) {
+            this.setState({
+                isCancelling: false,
+                globalErrMsg,
+            });
+            return;
+        }
+        try {
+            await this.props.blockchain.cancelOrderAsync(
+                signedOrder, availableTakerTokenAmount,
+            );
+            this.setState({
+                isCancelling: false,
+                didCancelOrderSucceed: true,
+                globalErrMsg: '',
+                unavailableTakerAmount: takerTokenAmount,
+            });
+            return;
+        } catch (err) {
+            this.setState({
+                isCancelling: false,
+            });
+            const errMsg = `${err}`;
+            if (_.includes(errMsg, 'User denied transaction signature')) {
+                return;
+            }
+            globalErrMsg = 'Failed to canel order, please refresh and try again';
             utils.consoleLog(`${err}`);
             await errorReporter.reportAsync(err);
             this.setState({

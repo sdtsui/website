@@ -249,6 +249,18 @@ export class Blockchain {
         const filledTakerTokenAmount = new BigNumber(logFill.args.filledTakerTokenAmount);
         return filledTakerTokenAmount;
     }
+    public async cancelOrderAsync(signedOrder: SignedOrder,
+                                  cancelTakerTokenAmount: BigNumber.BigNumber): Promise<BigNumber.BigNumber> {
+        const txHash = await this.zeroEx.exchange.cancelOrderAsync(
+            signedOrder, cancelTakerTokenAmount,
+        );
+        const receipt = await this.showEtherScanLinkAndAwaitTransactionMinedAsync(txHash);
+        const logs: LogWithDecodedArgs[] = receipt.logs as any;
+        this.zeroEx.exchange.throwLogErrorsAsErrors(logs);
+        const logCancel = _.find(logs, {event: 'LogCancel'});
+        const cancelledTakerTokenAmount = new BigNumber(logCancel.args.cancelledTakerTokenAmount);
+        return cancelledTakerTokenAmount;
+    }
     public async getUnavailableTakerAmountAsync(orderHash: string): Promise<BigNumber.BigNumber> {
         utils.assert(ZeroEx.isValidOrderHash(orderHash), 'Must be valid orderHash');
         utils.assert(!_.isUndefined(this.zeroEx), 'ZeroEx must be instantiated.');
@@ -268,6 +280,10 @@ export class Blockchain {
                                                       takerAddress: string): Promise<void> {
         await this.zeroEx.exchange.validateFillOrderThrowIfInvalidAsync(
             signedOrder, fillTakerTokenAmount, takerAddress);
+    }
+    public async validateCancelOrderThrowIfInvalidAsync(order: Order,
+                                                        cancelTakerTokenAmount: BigNumber.BigNumber): Promise<void> {
+        await this.zeroEx.exchange.validateCancelOrderThrowIfInvalidAsync(order, cancelTakerTokenAmount);
     }
     public async validateCanelOrderThrowIfInvalidAsync(order: Order,
                                                        cancelTakerTokenAmount: BigNumber.BigNumber): Promise<void> {
