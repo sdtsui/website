@@ -4,7 +4,7 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RadioButtonGroup from 'material-ui/RadioButton/RadioButtonGroup';
 import RadioButton from 'material-ui/RadioButton';
-import {Side, Token} from 'ts/types';
+import {Side, Token, TokenState} from 'ts/types';
 import {TokenAmountInput} from 'ts/components/inputs/token_amount_input';
 import {EthAmountInput} from 'ts/components/inputs/eth_amount_input';
 import {AddressInput} from 'ts/components/inputs/address_input';
@@ -15,6 +15,7 @@ interface SendDialogProps {
     onCancelled: () => void;
     isOpen: boolean;
     token: Token;
+    tokenState: TokenState;
 }
 
 interface SendDialogState {
@@ -72,6 +73,7 @@ export class SendDialog extends React.Component<SendDialogProps, SendDialogState
                 <TokenAmountInput
                     label="Amount to send"
                     token={this.props.token}
+                    tokenState={this.props.tokenState}
                     shouldShowIncompleteErrs={this.state.shouldShowIncompleteErrs}
                     shouldCheckBalance={true}
                     shouldCheckAllowance={false}

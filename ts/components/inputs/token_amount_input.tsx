@@ -4,12 +4,13 @@ import * as BigNumber from 'bignumber.js';
 import {ZeroEx} from '0x.js';
 import {Link} from 'react-router-dom';
 import {colors} from 'material-ui/styles';
-import {Token, InputErrMsg, ValidatedBigNumberCallback} from 'ts/types';
+import {Token, TokenState, InputErrMsg, ValidatedBigNumberCallback} from 'ts/types';
 import {BalanceBoundedInput} from 'ts/components/inputs/balance_bounded_input';
 
 interface TokenAmountInputProps {
     label: string;
     token: Token;
+    tokenState: TokenState;
     amount?: BigNumber.BigNumber;
     shouldShowIncompleteErrs: boolean;
     shouldCheckBalance: boolean;
@@ -30,7 +31,7 @@ export class TokenAmountInput extends React.Component<TokenAmountInputProps, Tok
                 <BalanceBoundedInput
                     label={this.props.label}
                     amount={amount}
-                    balance={ZeroEx.toUnitAmount(this.props.token.balance, this.props.token.decimals)}
+                    balance={ZeroEx.toUnitAmount(this.props.tokenState.balance, this.props.token.decimals)}
                     onChange={this.onChange.bind(this)}
                     validate={this.validate.bind(this)}
                     shouldCheckBalance={this.props.shouldCheckBalance}
@@ -51,7 +52,7 @@ export class TokenAmountInput extends React.Component<TokenAmountInputProps, Tok
         this.props.onChange(isValid, baseUnitAmount);
     }
     private validate(amount: BigNumber.BigNumber): InputErrMsg {
-        if (this.props.shouldCheckAllowance && amount.gt(this.props.token.allowance)) {
+        if (this.props.shouldCheckAllowance && amount.gt(this.props.tokenState.allowance)) {
             return (
                 <span>
                     Insufficient allowance.{' '}

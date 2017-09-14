@@ -7,6 +7,9 @@ import Dialog from 'material-ui/Dialog';
 import Divider from 'material-ui/Divider';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentAdd from 'material-ui/svg-icons/content/add';
+import ContentRemove from 'material-ui/svg-icons/content/remove';
 import {
     Table,
     TableBody,
@@ -22,6 +25,7 @@ import QueryString = require('query-string');
 import {Dispatcher} from 'ts/redux/dispatcher';
 import {
     TokenByAddress,
+    TokenStateByAddress,
     Token,
     BlockchainErrs,
     BalanceErrs,
@@ -29,6 +33,7 @@ import {
     ScreenWidths,
     EtherscanLinkSuffixes,
     BlockchainCallErrs,
+    TokenVisibility,
 } from 'ts/types';
 import {Blockchain} from 'ts/blockchain';
 import {utils} from 'ts/utils/utils';
@@ -40,6 +45,8 @@ import {errorReporter} from 'ts/utils/error_reporter';
 import {AllowanceToggle} from 'ts/components/inputs/allowance_toggle';
 import {EthWethConversionButton} from 'ts/components/eth_weth_conversion_button';
 import {SendButton} from 'ts/components/send_button';
+import {AssetPicker} from 'ts/components/generate_order/asset_picker';
+import {trackedTokenStorage} from 'ts/local_storage/tracked_token_storage';
 
 const ETHER_ICON_PATH = '/images/ether.png';
 const ETHER_TOKEN_SYMBOL = 'WETH';
@@ -66,6 +73,7 @@ interface TokenBalancesProps {
     dispatcher: Dispatcher;
     screenWidth: ScreenWidths;
     tokenByAddress: TokenByAddress;
+    tokenStateByAddress: TokenStateByAddress;
     userAddress: string;
     userEtherBalance: BigNumber.BigNumber;
     networkId: number;
@@ -77,6 +85,8 @@ interface TokenBalancesState {
     isDharmaDialogVisible: boolean;
     isZRXSpinnerVisible: boolean;
     currentZrxBalance?: BigNumber.BigNumber;
+    isTokenPickerOpen: boolean;
+    isAddingToken: boolean;
 }
 
 export class TokenBalances extends React.Component<TokenBalancesProps, TokenBalancesState> {
@@ -87,6 +97,8 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
             isBalanceSpinnerVisible: false,
             isZRXSpinnerVisible: false,
             isDharmaDialogVisible: DharmaLoanFrame.isAuthTokenPresent(),
+            isTokenPickerOpen: false,
+            isAddingToken: false,
         };
     }
     public componentWillReceiveProps(nextProps: TokenBalancesProps) {
@@ -100,9 +112,10 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
             });
         }
         const nextZrxToken = _.find(_.values(nextProps.tokenByAddress), t => t.symbol === ZRX_TOKEN_SYMBOL);
-        if (!_.isUndefined(this.state.currentZrxBalance) && !nextZrxToken.balance.eq(this.state.currentZrxBalance)) {
+        const nextZrxTokenBalance = nextProps.tokenStateByAddress[nextZrxToken.address].balance;
+        if (!_.isUndefined(this.state.currentZrxBalance) && !nextZrxTokenBalance.eq(this.state.currentZrxBalance)) {
             if (this.state.isZRXSpinnerVisible) {
-                const receivedAmount = nextZrxToken.balance.minus(this.state.currentZrxBalance);
+                const receivedAmount = nextZrxTokenBalance.minus(this.state.currentZrxBalance);
                 const receiveAmountInUnits = ZeroEx.toUnitAmount(receivedAmount, 18);
                 this.props.dispatcher.showFlashMessage(`Received ${receiveAmountInUnits.toString(10)} Kovan ZRX`);
             }
@@ -242,7 +255,31 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                         </TableRow>
                     </TableBody>
                 </Table>
-                <h3 className="pt2">{isTestNetwork ? 'Test tokens' : 'Tokens'}</h3>
+                <div className="clearfix" style={{paddingBottom: 1}}>
+                    <div className="col col-10">
+                        <h3 className="pt2">
+                            {isTestNetwork ? 'Test tokens' : 'Tokens'}
+                        </h3>
+                    </div>
+                    <div className="col col-1 pt3 align-right">
+                        <FloatingActionButton
+                            mini={true}
+                            zDepth={0}
+                            onClick={this.onAddTokenClicked.bind(this)}
+                        >
+                            <ContentAdd />
+                        </FloatingActionButton>
+                    </div>
+                    <div className="col col-1 pt3 align-right">
+                        <FloatingActionButton
+                            mini={true}
+                            zDepth={0}
+                            onClick={this.onRemoveTokenClicked.bind(this)}
+                        >
+                            <ContentRemove />
+                        </FloatingActionButton>
+                    </div>
+                </div>
                 <Divider />
                 <div className="pt2 pb2">
                     {isTestNetwork ?
@@ -281,7 +318,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false}>
-                        {this.renderTableRows()}
+                        {this.renderTokenTableRows()}
                     </TableBody>
                 </Table>
                 <Dialog
@@ -304,29 +341,42 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                 >
                     {this.renderDharmaLoanFrame()}
                 </Dialog>
+                <AssetPicker
+                    userAddress={this.props.userAddress}
+                    networkId={this.props.networkId}
+                    blockchain={this.props.blockchain}
+                    dispatcher={this.props.dispatcher}
+                    isOpen={this.state.isTokenPickerOpen}
+                    currentTokenAddress={''}
+                    onTokenChosen={this.onAssetTokenPicked.bind(this)}
+                    tokenByAddress={this.props.tokenByAddress}
+                    tokenVisibility={this.state.isAddingToken ? TokenVisibility.UNTRACKED : TokenVisibility.TRACKED}
+                />
             </div>
         );
     }
-    private renderTableRows() {
+    private renderTokenTableRows() {
         if (!this.props.blockchainIsLoaded || this.props.blockchainErr !== '') {
             return '';
         }
         const isSmallScreen = this.props.screenWidth === ScreenWidths.SM;
         const tokenColSpan = isSmallScreen ? TOKEN_COL_SPAN_SM : TOKEN_COL_SPAN_LG;
         const actionPaddingX = isSmallScreen ? 2 : 24;
-        const tokens = _.values(this.props.tokenByAddress);
-        const tokensStartingWithEtherToken = tokens.sort(
+        const allTokens = _.values(this.props.tokenByAddress);
+        const trackedTokens = _.filter(allTokens, t => t.isTracked);
+        const trackedTokensStartingWithEtherToken = trackedTokens.sort(
             firstBy((t: Token) => (t.symbol !== ETHER_TOKEN_SYMBOL))
             .thenBy((t: Token) => (t.symbol !== ZRX_TOKEN_SYMBOL))
             .thenBy('address'),
         );
         const tableRows = _.map(
-            tokensStartingWithEtherToken,
+            trackedTokensStartingWithEtherToken,
             this.renderTokenRow.bind(this, tokenColSpan, actionPaddingX),
         );
         return tableRows;
     }
     private renderTokenRow(tokenColSpan: number, actionPaddingX: number, token: Token) {
+        const tokenState = this.props.tokenStateByAddress[token.address];
         const tokenLink = utils.getEtherScanLinkIfExists(token.address, this.props.networkId,
                                                          EtherscanLinkSuffixes.address);
         const isMintable = _.includes(configs.symbolsOfMintableTokens, token.symbol) &&
@@ -344,7 +394,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                     }
                 </TableRowColumn>
                 <TableRowColumn style={{paddingRight: 3, paddingLeft: 3}}>
-                    {this.renderAmount(token.balance, token.decimals)} {token.symbol}
+                    {this.renderAmount(tokenState.balance, token.decimals)} {token.symbol}
                     {this.state.isZRXSpinnerVisible && token.symbol === ZRX_TOKEN_SYMBOL &&
                         <span className="pl1">
                             <i className="zmdi zmdi-spinner zmdi-hc-spin" />
@@ -356,6 +406,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                         blockchain={this.props.blockchain}
                         dispatcher={this.props.dispatcher}
                         token={token}
+                        tokenState={tokenState}
                         onErrorOccurred={this.onErrorOccurred.bind(this)}
                         userAddress={this.props.userAddress}
                     />
@@ -376,6 +427,7 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                             blockchain={this.props.blockchain}
                             dispatcher={this.props.dispatcher}
                             ethToken={this.getWrappedEthToken()}
+                            ethTokenState={tokenState}
                             userEtherBalance={this.props.userEtherBalance}
                             onError={this.onEthWethConversionFailed.bind(this)}
                         />
@@ -397,12 +449,41 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
                             blockchain={this.props.blockchain}
                             dispatcher={this.props.dispatcher}
                             token={token}
+                            tokenState={tokenState}
                             onError={this.onSendFailed.bind(this)}
                         />
                     </TableRowColumn>
                 }
             </TableRow>
         );
+    }
+    private onAssetTokenPicked(tokenAddress: string) {
+        if (_.isEmpty(tokenAddress)) {
+            this.setState({
+                isTokenPickerOpen: false,
+            });
+            return;
+        }
+        const token = this.props.tokenByAddress[tokenAddress];
+        const isDefaultTrackedToken = _.includes(configs.defaultTrackedTokenSymbols, token.symbol);
+        if (!this.state.isAddingToken && !isDefaultTrackedToken) {
+            if (token.isRegistered) {
+                // Remove the token from tracked tokens
+                const newToken = _.assign({}, token, {
+                    isTracked: false,
+                });
+                this.props.dispatcher.updateTokenByAddress([newToken]);
+            } else {
+                this.props.dispatcher.removeTokenToTokenByAddress(token);
+            }
+            this.props.dispatcher.removeFromTokenStateByAddress(tokenAddress);
+            trackedTokenStorage.removeTrackedToken(this.props.userAddress, this.props.networkId, tokenAddress);
+        } else if (isDefaultTrackedToken) {
+            this.props.dispatcher.showFlashMessage(`Cannot remove ${token.name} because it's a default token`);
+        }
+        this.setState({
+            isTokenPickerOpen: false,
+        });
     }
     private onEthWethConversionFailed() {
         this.setState({
@@ -581,9 +662,10 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
         } else {
             const tokens = _.values(this.props.tokenByAddress);
             const zrxToken = _.find(tokens, t => t.symbol === ZRX_TOKEN_SYMBOL);
+            const zrxTokenState = this.props.tokenStateByAddress[zrxToken.address];
             this.setState({
                 isZRXSpinnerVisible: true,
-                currentZrxBalance: zrxToken.balance,
+                currentZrxBalance: zrxTokenState.balance,
             });
             this.props.blockchain.pollTokenBalanceAsync(zrxToken);
         }
@@ -603,5 +685,17 @@ export class TokenBalances extends React.Component<TokenBalancesProps, TokenBala
         const tokens = _.values(this.props.tokenByAddress);
         const wrappedEthToken = _.find(tokens, {symbol: ETHER_TOKEN_SYMBOL});
         return wrappedEthToken;
+    }
+    private onAddTokenClicked() {
+        this.setState({
+            isTokenPickerOpen: true,
+            isAddingToken: true,
+        });
+    }
+    private onRemoveTokenClicked() {
+        this.setState({
+            isTokenPickerOpen: true,
+            isAddingToken: false,
+        });
     }
 }

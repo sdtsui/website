@@ -42,13 +42,22 @@ export interface Token {
     name: string;
     address: string;
     symbol: string;
-    balance: BigNumber.BigNumber;
-    allowance: BigNumber.BigNumber;
     decimals: number;
+    isTracked: boolean;
+    isRegistered: boolean;
 };
 
 export interface TokenByAddress {
     [address: string]: Token;
+};
+
+export interface TokenState {
+    allowance: BigNumber.BigNumber;
+    balance: BigNumber.BigNumber;
+}
+
+export interface TokenStateByAddress {
+    [address: string]: TokenState;
 };
 
 export interface AssetToken {
@@ -148,7 +157,11 @@ export const ActionTypes = strEnum([
     'UPDATE_ORDER_SALT',
     'UPDATE_ORDER_SIGNATURE_DATA',
     'UPDATE_TOKEN_BY_ADDRESS',
+    'REMOVE_TOKEN_TO_TOKEN_BY_ADDRESS',
+    'UPDATE_TOKEN_STATE_BY_ADDRESS',
+    'REMOVE_FROM_TOKEN_STATE_BY_ADDRESS',
     'REPLACE_TOKEN_ALLOWANCE_BY_ADDRESS',
+    'REPLACE_TOKEN_BALANCE_BY_ADDRESS',
     'UPDATE_TOKEN_BALANCE_BY_ADDRESS',
     'UPDATE_ORDER_EXPIRY',
     'SWAP_ASSET_TOKENS',
@@ -175,7 +188,7 @@ export interface Action {
     data?: any;
 }
 
-export interface CustomTokensByNetworkId {
+export interface TrackedTokensByNetworkId {
     [networkId: number]: Token;
 }
 
@@ -486,4 +499,16 @@ export interface Article {
 
 export interface ArticlesBySection {
     [section: string]: Article[];
+}
+
+export interface DialogConfigs {
+    title: string;
+    isModal: boolean;
+    actions: any[];
+}
+
+export enum TokenVisibility {
+    ALL = 'ALL',
+    UNTRACKED = 'UNTRACKED',
+    TRACKED = 'TRACKED',
 }

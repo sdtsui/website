@@ -21,6 +21,7 @@ interface PartyProps {
     identiconDiameter?: number;
     identiconStyle?: React.CSSProperties;
     isInTokenRegistry?: boolean;
+    hasUniqueNameAndSymbol?: boolean;
 }
 
 interface PartyState {}
@@ -59,6 +60,7 @@ export class Party extends React.Component<PartyProps, PartyState> {
         );
         const isRegistered = this.props.isInTokenRegistry;
         const registeredTooltipId = `${this.props.address}-${isRegistered}-registeredTooltip`;
+        const uniqueNameAndSymbolTooltipId = `${this.props.address}-${isRegistered}-uniqueTooltip`;
         return (
             <div style={{overflow: 'hidden'}}>
                 <div className="pb1 center">{label}</div>
@@ -124,6 +126,28 @@ export class Party extends React.Component<PartyProps, PartyState> {
                                             of this token. Make sure to verify its address on Etherscan.
                                         </div>
                                     }
+                                </ReactTooltip>
+                            </div>
+                        </div>
+                    }
+                    {!_.isUndefined(this.props.hasUniqueNameAndSymbol) && !this.props.hasUniqueNameAndSymbol &&
+                        <div>
+                            <div
+                                data-tip={true}
+                                data-for={uniqueNameAndSymbolTooltipId}
+                                className="mx-auto"
+                                style={{fontSize: 13, width: 127}}
+                            >
+                                <span style={{color: colors.red500}}>
+                                    <i
+                                        className="zmdi zmdi-alert-octagon"
+                                    />
+                                </span>{' '}
+                                <span>Suspicious token</span>
+                                <ReactTooltip id={uniqueNameAndSymbolTooltipId}>
+                                    This token shares it's name, symbol or both with<br />
+                                    a token in the 0x Token Registry but it has a different<br />
+                                    smart contract address. This is most likely a scam token!
                                 </ReactTooltip>
                             </div>
                         </div>

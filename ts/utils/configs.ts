@@ -11,7 +11,8 @@ export const configs = {
     ENVIRONMENT: isDevelopment ? Environments.DEVELOPMENT : Environments.PRODUCTION,
     BACKEND_BASE_URL: isDevelopment ? 'https://localhost:3001' : 'https://api.0xproject.com',
     symbolsOfMintableTokens: ['MKR', 'MLN', 'GNT', 'DGD', 'REP'],
-    mostPopularTradingPairSymbols: ['WETH', 'ZRX'],
+    // WARNING: ZRX & WETH MUST always be default trackedTokens
+    defaultTrackedTokenSymbols: ['WETH', 'ZRX'],
     lastLocalStorageFillClearanceDate: '2017-09-09',
     isMainnetEnabled: true,
 };

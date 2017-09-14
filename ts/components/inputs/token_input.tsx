@@ -1,12 +1,11 @@
+import * as _ from 'lodash';
 import * as React from 'react';
 import Paper from 'material-ui/Paper';
 import {colors} from 'material-ui/styles';
 import {Blockchain} from 'ts/blockchain';
 import {Dispatcher} from 'ts/redux/dispatcher';
-import {AssetToken, Side, TokenByAddress, BlockchainErrs, Token} from 'ts/types';
+import {AssetToken, Side, TokenByAddress, BlockchainErrs, Token, TokenState} from 'ts/types';
 import {AssetPicker} from 'ts/components/generate_order/asset_picker';
-import {NewTokenDialog} from 'ts/components/generate_order/new_token_dialog';
-import {customTokenStorage} from 'ts/local_storage/custom_token_storage';
 import {InputLabel} from 'ts/components/ui/input_label';
 
 const TOKEN_ICON_DIMENSION = 80;
@@ -17,15 +16,17 @@ interface TokenInputProps {
     dispatcher: Dispatcher;
     label: string;
     side: Side;
+    networkId: number;
     assetToken: AssetToken;
     updateChosenAssetToken: (side: Side, token: AssetToken) => void;
     tokenByAddress: TokenByAddress;
+    userAddress: string;
 }
 
 interface TokenInputState {
     isHoveringIcon: boolean;
-    isNewTokenDialogOpen: boolean;
     isPickerOpen: boolean;
+    trackCandidateTokenIfExists?: Token;
 }
 
 export class TokenInput extends React.Component<TokenInputProps, TokenInputState> {
@@ -33,7 +34,6 @@ export class TokenInput extends React.Component<TokenInputProps, TokenInputState
         super(props);
         this.state = {
             isHoveringIcon: false,
-            isNewTokenDialogOpen: false,
             isPickerOpen: false,
         };
     }
@@ -69,31 +69,31 @@ export class TokenInput extends React.Component<TokenInputProps, TokenInputState
                     </div>
                 </Paper>
                 <AssetPicker
-                    isOpen={this.state.isPickerOpen}
-                    currentAssetToken={this.props.assetToken}
-                    onAssetChosen={this.onAssetChosen.bind(this)}
-                    onCustomAssetChosen={this.onCustomAssetChosen.bind(this)}
-                    side={this.props.side}
-                    tokenByAddress={this.props.tokenByAddress}
-                />
-                <NewTokenDialog
+                    userAddress={this.props.userAddress}
+                    networkId={this.props.networkId}
                     blockchain={this.props.blockchain}
-                    isOpen={this.state.isNewTokenDialogOpen}
-                    onCloseDialog={this.onCloseNewTokenDialog.bind(this)}
-                    onNewTokenSubmitted={this.onNewTokenSubmitted.bind(this)}
+                    dispatcher={this.props.dispatcher}
+                    isOpen={this.state.isPickerOpen}
+                    currentTokenAddress={this.props.assetToken.address}
+                    onTokenChosen={this.onTokenChosen.bind(this)}
                     tokenByAddress={this.props.tokenByAddress}
                 />
             </div>
         );
     }
+    private onTokenChosen(tokenAddress: string) {
+        const assetToken: AssetToken = {
+            address: tokenAddress,
+            amount: this.props.assetToken.amount,
+        };
+        this.props.updateChosenAssetToken(this.props.side, assetToken);
+        this.setState({
+            isPickerOpen: false,
+        });
+    }
     private onToggleHover(isHoveringIcon: boolean) {
         this.setState({
             isHoveringIcon,
-        });
-    }
-    private onCloseNewTokenDialog() {
-        this.setState({
-            isNewTokenDialogOpen: false,
         });
     }
     private onAssetClicked() {
@@ -104,29 +104,6 @@ export class TokenInput extends React.Component<TokenInputProps, TokenInputState
 
         this.setState({
             isPickerOpen: true,
-        });
-    }
-    private onAssetChosen(side: Side, assetToken: AssetToken) {
-        this.setState({
-            isPickerOpen: false,
-        });
-        this.props.updateChosenAssetToken(side, assetToken);
-    }
-    private onCustomAssetChosen() {
-        this.setState({
-            isNewTokenDialogOpen: true,
-            isPickerOpen: false,
-        });
-    }
-    private onNewTokenSubmitted(newToken: Token) {
-        customTokenStorage.addCustomToken(this.props.blockchain.networkId, newToken);
-        this.props.dispatcher.addTokenToTokenByAddress(newToken);
-        this.props.updateChosenAssetToken(this.props.side, {
-            amount: this.props.assetToken.amount,
-            address: newToken.address,
-        });
-        this.setState({
-            isNewTokenDialogOpen: false,
         });
     }
 }

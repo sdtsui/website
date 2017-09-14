@@ -3,7 +3,7 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RadioButtonGroup from 'material-ui/RadioButton/RadioButtonGroup';
 import RadioButton from 'material-ui/RadioButton';
-import {Side, Token} from 'ts/types';
+import {Side, Token, TokenState} from 'ts/types';
 import {TokenAmountInput} from 'ts/components/inputs/token_amount_input';
 import {EthAmountInput} from 'ts/components/inputs/eth_amount_input';
 import * as BigNumber from 'bignumber.js';
@@ -13,6 +13,7 @@ interface EthWethConversionDialogProps {
     onCancelled: () => void;
     isOpen: boolean;
     token: Token;
+    tokenState: TokenState;
     etherBalance: BigNumber.BigNumber;
 }
 
@@ -79,6 +80,7 @@ export class EthWethConversionDialog extends
                     <TokenAmountInput
                         label="Amount to convert"
                         token={this.props.token}
+                        tokenState={this.props.tokenState}
                         shouldShowIncompleteErrs={this.state.shouldShowIncompleteErrs}
                         shouldCheckBalance={true}
                         shouldCheckAllowance={false}
