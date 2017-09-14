@@ -483,29 +483,10 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         });
 
         const parsedOrder = this.state.parsedOrder;
-        const makerTokenAddress = parsedOrder.maker.token.address;
-        const takerTokenAddress = parsedOrder.taker.token.address;
-        const depositAssetToken = {
-            address: makerTokenAddress,
-            amount: new BigNumber(parsedOrder.maker.amount),
-        };
-        const receiveAssetToken = {
-            address: takerTokenAddress,
-            amount: new BigNumber(parsedOrder.taker.amount),
-        };
-        const parsedOrderExpiration = new BigNumber(this.state.parsedOrder.expiration);
         const orderHash = parsedOrder.signature.hash;
         const unavailableTakerAmount = await this.props.blockchain.getUnavailableTakerAmountAsync(orderHash);
-        const amountLeftToFill = receiveAssetToken.amount.minus(unavailableTakerAmount);
-        const specifiedTakerAddressIfExists = parsedOrder.taker.address.toLowerCase();
         const takerFillAmount = this.props.orderFillAmount;
-        const makerFillAmount = takerFillAmount.times(depositAssetToken.amount).div(receiveAssetToken.amount);
         const takerAddress = this.props.userAddress;
-        const takerToken = this.props.tokenByAddress[takerTokenAddress];
-        const takerTokenState = this.props.tokenStateByAddress[takerTokenAddress];
-        let isValidSignature = false;
-        const signatureData = parsedOrder.signature;
-        isValidSignature = ZeroEx.isValidSignature(signatureData.hash, signatureData, parsedOrder.maker.address);
 
         if (_.isUndefined(takerAddress)) {
             this.props.dispatcher.updateShouldBlockchainErrDialogBeOpen(true);
@@ -514,34 +495,33 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             });
             return;
         }
-
-        const [
-          makerBalance,
-          makerAllowance,
-        ] = await this.props.blockchain.getTokenBalanceAndAllowanceAsync(parsedOrder.maker.address,
-                                                                         parsedOrder.maker.token.address);
-        const currentUnixTimestamp = moment().unix();
         let globalErrMsg = '';
+
         if (_.isUndefined(takerFillAmount)) {
-            globalErrMsg = 'You must specify a fill amount';
-        } else if (takerFillAmount.lte(0) || takerFillAmount.gt(takerTokenState.balance) ||
-            takerFillAmount.gt(takerTokenState.allowance)) {
-            globalErrMsg = 'You must fix the above errors in order to fill this order';
-        } else if (!_.isEmpty(specifiedTakerAddressIfExists) && specifiedTakerAddressIfExists !== takerAddress) {
-            globalErrMsg = `This order can only be filled by ${specifiedTakerAddressIfExists}`;
-        } else if (parsedOrderExpiration.lt(currentUnixTimestamp)) {
-            globalErrMsg = `This order has expired`;
-        } else if (amountLeftToFill.eq(0)) {
-            globalErrMsg = 'This order has already been completely filled';
-        } else if (takerFillAmount.gt(amountLeftToFill)) {
-            const amountLeftToFillInUnits = ZeroEx.toUnitAmount(amountLeftToFill, parsedOrder.taker.token.decimals);
-            globalErrMsg = `Cannot fill more then remaining ${amountLeftToFillInUnits} ${takerToken.symbol}`;
-        } else if (makerBalance.lt(makerFillAmount)) {
-            globalErrMsg = 'Maker no longer has a sufficient balance to complete this order';
-        } else if (makerAllowance.lt(makerFillAmount)) {
-            globalErrMsg = 'Maker does not have a high enough allowance set to complete this order';
-        } else if (!isValidSignature) {
-            globalErrMsg = 'Order signature is not valid';
+            globalErrMsg = 'You must specify the fill amount';
+        }
+
+        const signedOrder = this.props.blockchain.portalOrderToSignedOrder(
+            parsedOrder.maker.address,
+            parsedOrder.taker.address,
+            parsedOrder.maker.token.address,
+            parsedOrder.taker.token.address,
+            new BigNumber(parsedOrder.maker.amount),
+            new BigNumber(parsedOrder.taker.amount),
+            new BigNumber(parsedOrder.maker.feeAmount),
+            new BigNumber(parsedOrder.taker.feeAmount),
+            new BigNumber(this.state.parsedOrder.expiration),
+            parsedOrder.feeRecipient,
+            parsedOrder.signature,
+            new BigNumber(parsedOrder.salt),
+        );
+        if (_.isEmpty(globalErrMsg)) {
+            try {
+                await this.props.blockchain.validateFillOrderThrowIfInvalidAsync(
+                    signedOrder, takerFillAmount, takerAddress);
+            } catch (e) {
+                globalErrMsg = this.props.blockchain.toHumanReadableErrorMsg(e.message);
+            }
         }
         if (!_.isEmpty(globalErrMsg)) {
             this.setState({
@@ -550,28 +530,13 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             });
             return;
         }
-
-        const parsedOrderSalt = new BigNumber(parsedOrder.salt);
-        const parsedMakerFee = new BigNumber(parsedOrder.maker.feeAmount);
-        const parsedTakerFee = new BigNumber(parsedOrder.taker.feeAmount);
         try {
             const orderFilledAmount: BigNumber.BigNumber = await this.props.blockchain.fillOrderAsync(
-                                                       parsedOrder.maker.address,
-                                                       parsedOrder.taker.address,
-                                                       this.props.tokenByAddress[makerTokenAddress].address,
-                                                       this.props.tokenByAddress[takerTokenAddress].address,
-                                                       depositAssetToken.amount,
-                                                       receiveAssetToken.amount,
-                                                       parsedMakerFee,
-                                                       parsedTakerFee,
-                                                       parsedOrderExpiration,
-                                                       parsedOrder.feeRecipient,
-                                                       this.props.orderFillAmount,
-                                                       parsedOrder.signature,
-                                                       parsedOrderSalt,
-                                                   );
+                signedOrder, this.props.orderFillAmount,
+            );
             // After fill completes, let's update the token balances
-            const makerToken = this.props.tokenByAddress[makerTokenAddress];
+            const makerToken = this.props.tokenByAddress[parsedOrder.maker.token.address];
+            const takerToken = this.props.tokenByAddress[parsedOrder.taker.token.address];
             const tokens = [makerToken, takerToken];
             await this.props.blockchain.updateTokenBalancesAndAllowancesAsync(tokens);
             this.setState({

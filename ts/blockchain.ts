@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import {
     ZeroEx,
+    ZeroExError,
+    ExchangeContractErrs,
     ExchangeEvents,
     SubscriptionOpts,
     IndexedFilterValues,
@@ -11,6 +13,8 @@ import {
     Token as ZeroExToken,
     LogWithDecodedArgs,
     TransactionReceiptWithDecodedLogs,
+    SignedOrder,
+    Order,
 } from '0x.js';
 import * as BigNumber from 'bignumber.js';
 import Web3 = require('web3');
@@ -203,17 +207,15 @@ export class Blockchain {
             amountInBaseUnits,
         }));
     }
-    public async fillOrderAsync(maker: string, taker: string, makerTokenAddress: string,
-                                takerTokenAddress: string, makerTokenAmount: BigNumber.BigNumber,
-                                takerTokenAmount: BigNumber.BigNumber, makerFee: BigNumber.BigNumber,
-                                takerFee: BigNumber.BigNumber, expirationUnixTimestampSec: BigNumber.BigNumber,
-                                feeRecipient: string, fillTakerTokenAmount: BigNumber.BigNumber,
-                                signatureData: SignatureData, salt: BigNumber.BigNumber): Promise<BigNumber.BigNumber> {
-        utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
-
-        taker = taker === '' ? constants.NULL_ADDRESS : taker;
+    public portalOrderToSignedOrder(maker: string, taker: string, makerTokenAddress: string,
+                                    takerTokenAddress: string, makerTokenAmount: BigNumber.BigNumber,
+                                    takerTokenAmount: BigNumber.BigNumber, makerFee: BigNumber.BigNumber,
+                                    takerFee: BigNumber.BigNumber, expirationUnixTimestampSec: BigNumber.BigNumber,
+                                    feeRecipient: string,
+                                    signatureData: SignatureData, salt: BigNumber.BigNumber): SignedOrder {
         const ecSignature = signatureData;
         const exchangeContractAddress = this.getExchangeContractAddressIfExists();
+        taker = taker === '' ? constants.NULL_ADDRESS : taker;
         const signedOrder = {
             ecSignature,
             exchangeContractAddress,
@@ -229,6 +231,12 @@ export class Blockchain {
             takerTokenAddress,
             takerTokenAmount,
         };
+        return signedOrder;
+    }
+    public async fillOrderAsync(signedOrder: SignedOrder,
+                                fillTakerTokenAmount: BigNumber.BigNumber): Promise<BigNumber.BigNumber> {
+        utils.assert(this.doesUserAddressExist(), BlockchainCallErrs.USER_HAS_NO_ASSOCIATED_ADDRESSES);
+
         const shouldThrowOnInsufficientBalanceOrAllowance = true;
 
         const txHash = await this.zeroEx.exchange.fillOrderAsync(
@@ -249,6 +257,21 @@ export class Blockchain {
     }
     public getExchangeContractAddressIfExists() {
         return this.exchangeAddress;
+    }
+    public toHumanReadableErrorMsg(error: ZeroExError|ExchangeContractErrs): string {
+        const words = error.toLowerCase().split('_');
+        const humanreadableErrorMsg = [_.capitalize(words[0]), ...words.slice(1)].join(' ');
+        return humanreadableErrorMsg;
+    }
+    public async validateFillOrderThrowIfInvalidAsync(signedOrder: SignedOrder,
+                                                      fillTakerTokenAmount: BigNumber.BigNumber,
+                                                      takerAddress: string): Promise<void> {
+        await this.zeroEx.exchange.validateFillOrderThrowIfInvalidAsync(
+            signedOrder, fillTakerTokenAmount, takerAddress);
+    }
+    public async validateCanelOrderThrowIfInvalidAsync(order: Order,
+                                                       cancelTakerTokenAmount: BigNumber.BigNumber): Promise<void> {
+        await this.zeroEx.exchange.validateCancelOrderThrowIfInvalidAsync(order, cancelTakerTokenAmount);
     }
     public isValidAddress(address: string): boolean {
         const lowercaseAddress = address.toLowerCase();
