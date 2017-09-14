@@ -215,7 +215,7 @@ export class Blockchain {
                                     signatureData: SignatureData, salt: BigNumber.BigNumber): SignedOrder {
         const ecSignature = signatureData;
         const exchangeContractAddress = this.getExchangeContractAddressIfExists();
-        taker = taker === '' ? constants.NULL_ADDRESS : taker;
+        taker = _.isEmpty(taker) ? constants.NULL_ADDRESS : taker;
         const signedOrder = {
             ecSignature,
             exchangeContractAddress,
