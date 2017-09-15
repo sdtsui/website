@@ -669,7 +669,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             if (_.includes(errMsg, 'User denied transaction signature')) {
                 return;
             }
-            globalErrMsg = 'Failed to canel order, please refresh and try again';
+            globalErrMsg = 'Failed to cancel order, please refresh and try again';
             utils.consoleLog(`${err}`);
             await errorReporter.reportAsync(err);
             this.setState({
