@@ -294,7 +294,7 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                                 style={{width: '100%'}}
                                 disabled={this.state.isCancelling}
                                 label={this.state.isCancelling ? 'Cancelling order...' : 'Cancel order'}
-                                onClick={this.onCancelOrderClick.bind(this)}
+                                onClick={this.onCancelOrderClickFireAndForgetAsync.bind(this)}
                             />
                             {this.state.didCancelOrderSucceed &&
                                 <Alert
@@ -353,9 +353,6 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         } else {
             this.onFillOrderClickFireAndForgetAsync();
         }
-    }
-    private onCancelOrderClick() {
-        this.onCancelOrderClickFireAndForgetAsync();
     }
     private onFillWarningClosed(didUserCancel: boolean) {
         this.setState({
