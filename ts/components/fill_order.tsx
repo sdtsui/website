@@ -365,8 +365,8 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
     private onFillAmountChange(isValid: boolean, amount?: BigNumber.BigNumber) {
         this.props.dispatcher.updateOrderFillAmount(amount);
     }
-    private onFillOrderJSONChanged(e: any) {
-        const orderJSON = e.target.value;
+    private onFillOrderJSONChanged(event: any) {
+        const orderJSON = event.target.value;
         this.setState({
             didOrderValidationRun: _.isEmpty(orderJSON) && _.isEmpty(this.state.orderJSONErrMsg),
             didFillOrderSucceed: false,
@@ -551,8 +551,8 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             try {
                 await this.props.blockchain.validateFillOrderThrowIfInvalidAsync(
                     signedOrder, takerFillAmount, takerAddress);
-            } catch (e) {
-                globalErrMsg = this.props.blockchain.toHumanReadableErrorMsg(e.message);
+            } catch (err) {
+                globalErrMsg = this.props.blockchain.toHumanReadableErrorMsg(err.message);
             }
         }
         if (!_.isEmpty(globalErrMsg)) {
@@ -641,8 +641,8 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
             try {
                 await this.props.blockchain.validateCancelOrderThrowIfInvalidAsync(
                     signedOrder, availableTakerTokenAmount);
-            } catch (e) {
-                globalErrMsg = this.props.blockchain.toHumanReadableErrorMsg(e.message);
+            } catch (err) {
+                globalErrMsg = this.props.blockchain.toHumanReadableErrorMsg(err.message);
             }
         }
         if (!_.isEmpty(globalErrMsg)) {
