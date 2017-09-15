@@ -10,6 +10,7 @@ import {
     ContractEvent,
     ContractEventEmitter,
     LogFillContractEventArgs,
+    LogCancelContractEventArgs,
     Token as ZeroExToken,
     LogWithDecodedArgs,
     TransactionReceiptWithDecodedLogs,
@@ -246,7 +247,8 @@ export class Blockchain {
         const logs: LogWithDecodedArgs[] = receipt.logs as any;
         this.zeroEx.exchange.throwLogErrorsAsErrors(logs);
         const logFill = _.find(logs, {event: 'LogFill'});
-        const filledTakerTokenAmount = new BigNumber(logFill.args.filledTakerTokenAmount);
+        const args = logFill.args as any as LogFillContractEventArgs;
+        const filledTakerTokenAmount = args.filledTakerTokenAmount;
         return filledTakerTokenAmount;
     }
     public async cancelOrderAsync(signedOrder: SignedOrder,
@@ -258,7 +260,8 @@ export class Blockchain {
         const logs: LogWithDecodedArgs[] = receipt.logs as any;
         this.zeroEx.exchange.throwLogErrorsAsErrors(logs);
         const logCancel = _.find(logs, {event: 'LogCancel'});
-        const cancelledTakerTokenAmount = new BigNumber(logCancel.args.cancelledTakerTokenAmount);
+        const args = logCancel.args as any as LogCancelContractEventArgs;
+        const cancelledTakerTokenAmount = args.cancelledTakerTokenAmount;
         return cancelledTakerTokenAmount;
     }
     public async getUnavailableTakerAmountAsync(orderHash: string): Promise<BigNumber.BigNumber> {
