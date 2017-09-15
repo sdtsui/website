@@ -637,13 +637,11 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
         );
         const unavailableTakerAmount = await this.props.blockchain.getUnavailableTakerAmountAsync(orderHash);
         const availableTakerTokenAmount = takerTokenAmount.minus(unavailableTakerAmount);
-        if (_.isEmpty(globalErrMsg)) {
-            try {
-                await this.props.blockchain.validateCancelOrderThrowIfInvalidAsync(
-                    signedOrder, availableTakerTokenAmount);
-            } catch (err) {
-                globalErrMsg = this.props.blockchain.toHumanReadableErrorMsg(err.message);
-            }
+        try {
+            await this.props.blockchain.validateCancelOrderThrowIfInvalidAsync(
+                signedOrder, availableTakerTokenAmount);
+        } catch (err) {
+            globalErrMsg = this.props.blockchain.toHumanReadableErrorMsg(err.message);
         }
         if (!_.isEmpty(globalErrMsg)) {
             this.setState({
