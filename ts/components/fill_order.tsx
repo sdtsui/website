@@ -288,7 +288,21 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                     </div>
                 }
                 <div>
-                    {!canCancel &&
+                    {canCancel ?
+                        <div>
+                            <RaisedButton
+                                style={{width: '100%'}}
+                                disabled={this.state.isCancelling}
+                                label={this.state.isCancelling ? 'Cancelling order...' : 'Cancel order'}
+                                onClick={this.onCancelOrderClick.bind(this)}
+                            />
+                            {this.state.didCancelOrderSucceed &&
+                                <Alert
+                                    type={AlertTypes.SUCCESS}
+                                    message={this.renderCancelSuccessMsg()}
+                                />
+                            }
+                        </div> :
                         <div>
                             <RaisedButton
                                 style={{width: '100%'}}
@@ -303,22 +317,6 @@ export class FillOrder extends React.Component<FillOrderProps, FillOrderState> {
                                 <Alert
                                     type={AlertTypes.SUCCESS}
                                     message={this.renderFillSuccessMsg()}
-                                />
-                            }
-                        </div>
-                    }
-                    {canCancel &&
-                        <div>
-                            <RaisedButton
-                                style={{width: '100%'}}
-                                disabled={this.state.isCancelling}
-                                label={this.state.isCancelling ? 'Cancelling order...' : 'Cancel order'}
-                                onClick={this.onCancelOrderClick.bind(this)}
-                            />
-                            {this.state.didCancelOrderSucceed &&
-                                <Alert
-                                    type={AlertTypes.SUCCESS}
-                                    message={this.renderCancelSuccessMsg()}
                                 />
                             }
                         </div>
