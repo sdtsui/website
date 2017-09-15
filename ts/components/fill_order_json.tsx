@@ -21,16 +21,16 @@ interface FillOrderJSONState {}
 
 export class FillOrderJSON extends React.Component<FillOrderJSONProps, FillOrderJSONState> {
     public render() {
-        const addresses = _.keys(this.props.tokenByAddress);
+        const tokenAddresses = _.keys(this.props.tokenByAddress);
         const exchangeContract = this.props.blockchain.getExchangeContractAddressIfExists();
         const hintSideToAssetToken = {
             [Side.deposit]: {
                 amount: new BigNumber(35),
-                address: addresses[0],
+                address: tokenAddresses[0],
             },
             [Side.receive]: {
                 amount: new BigNumber(89),
-                address: addresses[1],
+                address: tokenAddresses[1],
             },
         };
         const hintOrderExpiryTimestamp = utils.initialOrderExpiryUnixTimestampSec();
