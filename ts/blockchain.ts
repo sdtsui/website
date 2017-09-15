@@ -288,10 +288,6 @@ export class Blockchain {
                                                         cancelTakerTokenAmount: BigNumber.BigNumber): Promise<void> {
         await this.zeroEx.exchange.validateCancelOrderThrowIfInvalidAsync(order, cancelTakerTokenAmount);
     }
-    public async validateCanelOrderThrowIfInvalidAsync(order: Order,
-                                                       cancelTakerTokenAmount: BigNumber.BigNumber): Promise<void> {
-        await this.zeroEx.exchange.validateCancelOrderThrowIfInvalidAsync(order, cancelTakerTokenAmount);
-    }
     public isValidAddress(address: string): boolean {
         const lowercaseAddress = address.toLowerCase();
         return this.web3Wrapper.isAddress(lowercaseAddress);
