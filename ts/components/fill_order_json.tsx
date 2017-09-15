@@ -14,7 +14,7 @@ interface FillOrderJSONProps {
     tokenByAddress: TokenByAddress;
     networkId: number;
     orderJSON: string;
-    onFillOrderJSONChanged: (e: any) => void;
+    onFillOrderJSONChanged: (event: any) => void;
 }
 
 interface FillOrderJSONState {}
